@@ -103,7 +103,7 @@
                         <label for="">Status</label>
                         <div class="input-group">
                             <select class="form-control" name="jenis" id="jenis">
-                                <option value="H">Hadir</option>
+                                <option value="H" selected>Hadir</option>
                                 <option value="S">Sakit</option>
                                 <option value="I">Izin</option>
                                 <option value="A">Alpa</option>

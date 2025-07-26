@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Santri;
+use App\Models\Perizinan;
+use App\Models\AlasanIzin;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class General extends Controller
@@ -15,22 +19,25 @@ class General extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->intended('/');
-            // return 'Berhasil';
+            // return dd('OK');
+        } else {
+            session()->flash('error', 'Username / Password salah');
+            return redirect('login');
         }
-        // return redirect('/login')->with('error', 'Invalid credentials');
-        return 'Gagal';
     }
     public function dashboard(){
         $user = Auth::user()->role;
         switch ($user) {
             case 'kepkam':
-                return redirect('/');
+                return redirect('/kepkam');
             case 'keamanan':
                 return redirect('/keamanan');
             case 'pengasuh':
                 return redirect('/');
+            case 'mahadiyah':
+                return redirect('/mahadiyah');
             default:
-                return redirect('/');
+                return redirect('/login');
         }
     }
     public function logout(){

@@ -33,12 +33,6 @@ class Keamanan extends Controller
         session()->flash('success', 'Pelanggaran berhasil ditambahkan');
         return redirect('/pelanggaran');
     }
-    public function perizinan() {
-        $santri = Santri::get(['nis','nama']);
-        $alasan = AlasanIzin::all();
-        $perizinan = Perizinan::get();
-        return view('keamanan.perizinan', compact('santri', 'alasan', 'perizinan'));
-    }
     public function dashboard() {
         $currentYear = date('Y');
         $pelanggar = Pelanggaran::whereYear('tanggal', $currentYear)->count();

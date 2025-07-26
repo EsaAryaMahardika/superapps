@@ -24,7 +24,27 @@ class AlurPerizinan extends Controller
             return $next($request);
         });
     }
-
+    public function perizinan() {
+        $santri = match ($this->user->role) {
+            // 'kepkam' => Santri::select(['nis','nama'])->where('kamar_id', $this->user->kamar_id)->get(),
+            'kepkam' => Santri::select('nis','nama')->get(),
+            'keamanan' => Santri::select('nis','nama')->get(),
+            default => abort(403, 'Unauthorized'),
+        };
+        $alasan = AlasanIzin::all();
+        $perizinan = match ($this->user->role) {
+            // 'kepkam' => Perizinan::whereHas('santri', fn($q) => $q->where('kamar_id', $this->user->kamar_id))->get(),
+            'kepkam' => Perizinan::all(),
+            'keamanan' => Perizinan::all(),
+            default => abort(403, 'Unauthorized'),
+        };
+        $view = match ($this->user->role) {
+            'kepkam' => 'kepkam.perizinan',
+            'keamanan' => 'keamanan.perizinan',
+            default => abort(403, 'Unauthorized'),
+        };
+        return view($view, compact('santri', 'alasan', 'perizinan'));
+    }
     public function accizin(Request $request, $nis){
         try {
             switch ($this->user->role) {

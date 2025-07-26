@@ -19,7 +19,7 @@
         </select>
     </div>
     <div class="table-responsive">
-        <table class="table table-custom" id="mingguan">
+        <table class="table table-hover js-basic dataTable table-custom spacing5">
             <thead>
                 <tr>
                     <th>Kepala Kamar</th>
@@ -62,11 +62,5 @@
 @endsection
 
 @section('script')
-<script>
-    $('#mingguan').DataTable({
-        "ordering": false
-        "paging": false,
-        "searching": false
-    });
-</script>
+
 @stop

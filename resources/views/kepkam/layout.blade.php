@@ -7,9 +7,9 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="icon" href="" type="image/x-icon">
         <title>{{ strtoupper($user) }} - An-Nur II</title>
-        <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}>
-        <link rel="stylesheet" href="{{ asset('vendor/animate-css/vivify.min.css') }}>
-        <link rel="stylesheet" href="{{ asset('css/site.min.css') }}>
+        <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/vendor/animate-css/vivify.min.css">
+        <link rel="stylesheet" href="/css/site.min.css">
         <link rel="stylesheet" href="{{ asset('vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
@@ -48,7 +48,7 @@
                     </div>  
                     <nav id="left-sidebar-nav" class="sidebar-nav">
                         <ul id="main-menu" class="metismenu">
-                            @include('sidebar')
+                            @include('kepkam.sidebar')
                         </ul>
                     </nav>     
                 </div>
@@ -59,9 +59,9 @@
                     <p>{{ Session::get('success') }}</p>
                     <a class="close">&times;</a>
                 </div>
-                @elseif(Session::has('error-message'))
+                @elseif(Session::has('error'))
                 <div class="alert danger-alert">
-                    <p>{{ Session::get('error-message') }}</p>
+                    <p>{{ Session::get('error') }}</p>
                     <a class="close">&times;</a>
                 </div>
                 @endif
@@ -73,11 +73,11 @@
         <script>
             const BASE_URL = "{{ url('/') }}";
         </script>
-        <script src="{{ asset('js/libscripts.bundle.js') }}></script>    
-        <script src="{{ asset('js/vendorscripts.bundle.js') }}></script>    
-        <script src="{{ asset('js/mainscripts.bundle.js') }}></script>
-        <script src="{{ asset('js/script.js') }}></script>
-        <script src="{{ asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}></script>
+        <script src="/js/libscripts.bundle.js"></script>    
+        <script src="/js/vendorscripts.bundle.js"></script>    
+        <script src="/js/mainscripts.bundle.js"></script>
+        <script src="/js/script.js"></script>
+        <!--<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2"></script>-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
         <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
         @yield('script')

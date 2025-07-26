@@ -11,9 +11,9 @@
   </head>
   <body>
     <div class="row d-flex justify-content-center align-items-center container">
-      @if(Session::has('error-message'))
+      @if(Session::has('error'))
       <div class="alert danger-alert">
-        <p>{{ Session::get('error-message') }}</p>
+        <p>{{ Session::get('error') }}</p>
         <a class="close">&times;</a>
       </div>
       @endif

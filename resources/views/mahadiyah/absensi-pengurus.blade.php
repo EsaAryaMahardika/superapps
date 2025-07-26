@@ -153,7 +153,7 @@
                                 <td>Rizky Wildan Habibi</td>
                                 <td>
                                     <select class="custom-select" name="">
-                                        <option value="H">Hadir</option>
+                                        <option value="H" selected>Hadir</option>
                                         <option value="S">Sakit</option>
                                         <option value="I">Izin</option>
                                         <option value="A">Alpa</option>

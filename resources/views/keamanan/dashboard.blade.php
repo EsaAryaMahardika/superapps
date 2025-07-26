@@ -68,5 +68,4 @@
 @endsection
 @section('script')
 <script src="{{ asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
-
 @endsection

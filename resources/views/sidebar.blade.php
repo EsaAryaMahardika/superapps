@@ -6,8 +6,9 @@
         @break
     @case('mahadiyah')
         <li><a href="/mahadiyah"><i class="fa fa-home"></i><span>Dashboard</span></a></li>
-        <li><a href="/absensi-pengurus"><i class="fa fa-list"></i><span>Absensi Pengurus</span></a></li>
-        <li><a href="/absensi-mingguan"><i class="fa fa-list"></i><span>Absensi Mingguan</span></a></li>
+        <!--<li><a href="/absensi-pengurus"><i class="fa fa-list"></i><span>Absensi Pengurus</span></a></li>-->
+        <!--<li><a href="/absensi-mingguan"><i class="fa fa-list"></i><span>Absensi Mingguan</span></a></li>-->
+        <li><a href="/absensi-kegiatan"><i class="fa fa-list"></i><span>Absensi Kegiatan</span></a></li>
         @break
     @case('diniyah')
         <li><a href="/madin"><i class="fa fa-home"></i><span>Dashboard</span></a></li>

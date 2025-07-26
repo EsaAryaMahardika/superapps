@@ -1,9 +1,9 @@
-@extends('kepkam.layout')
+@extends('layout')
 @section('content')
 <div class="body mt-5">
     <div class="table-responsive">
         <h3>Waqiah</h3>
-        <table class="table table-hover table-custom spacing5" id="waqiah">
+        <table class="table table-hover js-basic dataTable table-custom spacing5">
             <thead>
                 <tr>
                     <th>Tanggal</th>
@@ -25,10 +25,4 @@
         </table>
     </div>
 </div>
-@endsection
-
-@section('script')
-<script>
-    $('#waqiah').DataTable();
-</script>
 @endsection
