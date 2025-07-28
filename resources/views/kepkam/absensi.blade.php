@@ -30,7 +30,7 @@
                         ];
                     @endphp
                     @foreach ($waqiah as $item)
-                        <tr data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y')
+                        <tr data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y')>
                             <td>{{ $item->santri->nama ?? "-" }}</td>
                             <td>{{ $statusLabel[$item->status] ?? '-' }}</td>
                         </tr>
