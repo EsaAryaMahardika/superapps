@@ -10,7 +10,5 @@ class Kegiatan extends Model
     use HasFactory;
     protected $table = 'kegiatan';
     protected $guarded = [];
-    protected $primaryKey = 'id';
-    public $incrementing = false;
     public $timestamps = false;
 }

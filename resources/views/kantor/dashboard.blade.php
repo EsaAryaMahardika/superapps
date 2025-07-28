@@ -1,6 +1,6 @@
 @extends('layout')
 @section('content')
-<div class="row clearfix">
+{{-- <div class="row clearfix">
     <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card">
             <div class="body">
@@ -17,5 +17,5 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 @endsection

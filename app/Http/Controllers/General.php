@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Santri;
-use App\Models\Perizinan;
-use App\Models\AlasanIzin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +33,8 @@ class General extends Controller
                 return redirect('/');
             case 'mahadiyah':
                 return redirect('/mahadiyah');
+            case 'kantor':
+                return redirect('/kantor');
             default:
                 return redirect('/login');
         }

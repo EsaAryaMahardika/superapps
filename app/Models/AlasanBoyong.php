@@ -1,14 +1,14 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Pengurus extends Model
+class AlasanBoyong extends Model
 {
     use HasFactory;
-    protected $table = 'pengurus';
+    protected $table = 'alasan_boyong';
     protected $guarded = [];
     public $timestamps = false;
-    protected $primaryKey= 'nis';
 }

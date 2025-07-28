@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class asrama extends Model
 {
     use HasFactory;
-    // protected $table = 'asrama';
-    // protected $guarded = [];
+    protected $table = 'asrama';
+    protected $guarded = [];
+    public $timestamps = false;
 }

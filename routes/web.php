@@ -1,12 +1,13 @@
 <?php
 
-use App\Http\Controllers\AlurPerizinan;
+use App\Http\Controllers\Madin;
+use App\Http\Controllers\Kantor;
 use App\Http\Controllers\General;
 use App\Http\Controllers\Keamanan;
-use App\Http\Controllers\KepalaKamar;
-use App\Http\Controllers\Madin;
 use App\Http\Controllers\Mahadiyah;
+use App\Http\Controllers\KepalaKamar;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AlurPerizinan;
 
 Route::middleware(['guest'])->group(function () {
     // Route::get('/{any}', function () {
@@ -41,6 +42,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/kepkam', [KepalaKamar::class, 'dashboard']);
     Route::get('/absensi', [KepalaKamar::class, 'absensi']);
     Route::post('/absen', [KepalaKamar::class, 'absen']);
+    
+    // Kantor
+    Route::get('/kantor', [Kantor::class, 'kantor']);
+    Route::get('/boyong', [Kantor::class, 'boyong']);
+    Route::post('/boyong', [Kantor::class, 'i_boyong']);
 
     Route::get('/logout', [General::class, 'logout']);
 });

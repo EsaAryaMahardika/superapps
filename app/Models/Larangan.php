@@ -9,7 +9,6 @@ class Larangan extends Model
     use HasFactory;
     protected $table = 'larangan';
     protected $guarded = [];
-    protected $primaryKey = 'id';
     public $incrementing = false;
     public $timestamps = false;
 }

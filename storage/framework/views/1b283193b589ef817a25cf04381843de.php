@@ -4,13 +4,13 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
         <link rel="icon" href="" type="image/x-icon">
-        <title>{{ strtoupper($user) }} - An-Nur II</title>
-        <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ asset('vendor/animate-css/vivify.min.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/site.min.css') }}">
-        <link rel="stylesheet" href="{{ asset('vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
+        <title><?php echo e(strtoupper($user)); ?> - An-Nur II</title>
+        <link rel="stylesheet" href="<?php echo e(asset('vendor/bootstrap/css/bootstrap.min.css')); ?>">
+        <link rel="stylesheet" href="<?php echo e(asset('vendor/animate-css/vivify.min.css')); ?>">
+        <link rel="stylesheet" href="<?php echo e(asset('css/site.min.css')); ?>">
+        <link rel="stylesheet" href="<?php echo e(asset('vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css')); ?>">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
         <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
@@ -43,43 +43,43 @@
                     <div class="user-account">
                         <div class="dropdown">
                             <span>Selamat Datang</span>
-                            {{-- <div class="user-name"><strong>{{ $jabatan }} <span class="text-uppercase">{{ $nama }}</span></strong></div> --}}
+                            
                         </div>
                     </div>  
                     <nav id="left-sidebar-nav" class="sidebar-nav">
                         <ul id="main-menu" class="metismenu">
-                            @include('sidebar')
+                            <?php echo $__env->make('sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                         </ul>
                     </nav>     
                 </div>
             </div>
             <div id="main-content">
-                @if(Session::has('success'))
+                <?php if(Session::has('success')): ?>
                 <div class="alert success-alert">
-                    <p>{{ Session::get('success') }}</p>
+                    <p><?php echo e(Session::get('success')); ?></p>
                     <a class="close">&times;</a>
                 </div>
-                @elseif(Session::has('error-message'))
+                <?php elseif(Session::has('error-message')): ?>
                 <div class="alert danger-alert">
-                    <p>{{ Session::get('error-message') }}</p>
+                    <p><?php echo e(Session::get('error-message')); ?></p>
                     <a class="close">&times;</a>
                 </div>
-                @endif
+                <?php endif; ?>
                 <div class="container-fluid">
-                    @yield('content')
+                    <?php echo $__env->yieldContent('content'); ?>
                 </div>
             </div>
         </div>
         <script>
-            const BASE_URL = "{{ url('/') }}";
+            const BASE_URL = "<?php echo e(url('/')); ?>";
         </script>
-        <script src="{{ asset('js/libscripts.bundle.js') }}"></script>    
-        <script src="{{ asset('js/vendorscripts.bundle.js') }}"></script>    
-        <script src="{{ asset('js/mainscripts.bundle.js') }}"></script>
-        <script src="{{ asset('js/script.js') }}"></script>
-        <script src="{{ asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+        <script src="<?php echo e(asset('js/libscripts.bundle.js')); ?>"></script>    
+        <script src="<?php echo e(asset('js/vendorscripts.bundle.js')); ?>"></script>    
+        <script src="<?php echo e(asset('js/mainscripts.bundle.js')); ?>"></script>
+        <script src="<?php echo e(asset('js/script.js')); ?>"></script>
+        <script src="<?php echo e(asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js')); ?>"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
         <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
-        @yield('script')
+        <?php echo $__env->yieldContent('script'); ?>
     </body>
-</html>
+</html><?php /**PATH C:\laragon\www\superapps\resources\views/layout.blade.php ENDPATH**/ ?>
