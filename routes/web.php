@@ -50,3 +50,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/logout', [General::class, 'logout']);
 });
+Route::get('/ok', function () {
+    return "OK";
+});
