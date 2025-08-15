@@ -130,7 +130,7 @@
                 <form action="/absen" method="post" class="form-group" id="formAbsensi">
                     @csrf
                     <div class="form-group">
-                        <label for="">Jenis Absensi</label>
+                        <label for="">Jenis Kegiatan</label>
                         <select class="custom-select" name="kegiatan">
                             @foreach ($kegiatan as $item)
                             <option value="{{ $item->id }}">{{ $item->nama }}</option>
@@ -176,40 +176,27 @@
 @section('script')
 <script src="{{ asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 <script>
-var minDateFilter = "";
-var oTable = $('#waqiah').DataTable();
-$('#tanggal').datepicker({
-    format: 'dd/mm/yyyy',
-    autoclose: true
-  }).on('change', function () {
-    let val = $(this).val();
-    if (val) {
-      let parts = val.split('/');
-      minDateFilter = new Date(parts[2], parts[1] - 1, parts[0]).getTime();
-    } else {
-      minDateFilter = "";
-    }
+$(document).ready(function() {
+    var today = new Date();
+    var oTable = $('#waqiah').DataTable();
+    $('#tanggal').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true
+    })
+    .datepicker('setDate', today);
+    $.fn.dataTableExt.afnFiltering.push(
+        function(oSettings, aData, iDataIndex) {
+            let row = oSettings.aoData[iDataIndex].nTr;
+            let tanggalStr = $(row).data('tanggal');
+            if (!tanggalStr) return false;
+            let selectedDate = $('#tanggal').val();
+            return tanggalStr === selectedDate;
+        }
+    );
+    $('#tanggal').on('change', function() {
+        oTable.draw();
+    });
     oTable.draw();
-  });
-
-$.fn.dataTableExt.afnFiltering.push(
-  function(oSettings, aData, iDataIndex) {
-    // Ambil tanggal dari atribut data pada baris
-    let row = oSettings.aoData[iDataIndex].nTr;
-    let tanggalStr = $(row).data('tanggal');
-    if (!tanggalStr) return false;
-
-    let parts = tanggalStr.split('/');
-    let rowDate = new Date(parts[2], parts[1] - 1, parts[0]).getTime(); // dd/mm/yyyy
-
-    if (minDateFilter && !isNaN(minDateFilter)) {
-      if (rowDate != minDateFilter) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-);
+});
 </script>
 @endsection

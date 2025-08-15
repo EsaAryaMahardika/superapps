@@ -1,125 +1,44 @@
 @extends('layout')
 @section('content')
 <div class="body mt-5">
-    <div class="row mb-3">
-        <div class="col">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#add">Buat Absensi</button>
-        </div>
-        <div class="col">
-            <select name="bulan" id="bulan" class="custom-select">
-                <option value="">Pilih Bulan</option>
-                <option value="01">Januari</option>
-                <option value="02">Februari</option>
-                <option value="03">Maret</option>
-                <option value="04">April</option>
-                <option value="05">Mei</option>
-                <option value="06">Juni</option>
-                <option value="07">Juli</option>
-                <option value="08">Agustus</option>
-                <option value="09">September</option>
-                <option value="10">Oktober</option>
-                <option value="11">November</option>
-                <option value="12">Desember</option>
-            </select>
-        </div>
-    </div>
-    <div class="container text-center">
+    <button class="btn btn-primary" data-toggle="modal" data-target="#add">Buat Absensi</button>
+    <div class="m-2">
         <div class="row">
-            <div class="col-4">
-                <h3>Absensi Ngaji</h3>
-                <div class="table-responsive">
-                    <table class="table table-custom js-basic dataTable">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>S</th>
-                                <th>I</th>
-                                <th>A</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Rizky Wildan Habibi</td>
-                                <td>0</td>
-                                <td>10</td>
-                                <td>10</td>
-                            </tr>
-                            {{-- @foreach ($pelanggar as $item)
-                            <tr>
-                                <td>{{ $item->santri->nama }}</td>
-                                <td>{{ $item->pelanggaran->nama }}</td>
-                                <td>{{ $item->hukuman }}</td>
-                                <td>{{ date('d-m-Y', strtotime($item->data->tanggal)) }}</td>
-                            </tr>
-                            @endforeach --}}
-                        </tbody>
-                    </table>
-                </div>
+            <div class="col">
+                <h3>Absensi Ngaji Pagi</h3>
             </div>
-            <div class="col-4">
-                <h3>Absensi Wirid</h3>
-                <div class="table-responsive">
-                    <table class="table table-custom js-basic dataTable">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>S</th>
-                                <th>I</th>
-                                <th>A</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Rizky Wildan Habibi</td>
-                                <td>0</td>
-                                <td>10</td>
-                                <td>10</td>
-                            </tr>
-                            {{-- @foreach ($pelanggar as $item)
-                            <tr>
-                                <td>{{ $item->santri->nama }}</td>
-                                <td>{{ $item->pelanggaran->nama }}</td>
-                                <td>{{ $item->hukuman }}</td>
-                                <td>{{ date('d-m-Y', strtotime($item->data->tanggal)) }}</td>
-                            </tr>
-                            @endforeach --}}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="col-4">
-                <h3>Absensi Subuh</h3>
-                <div class="table-responsive">
-                    <table class="table table-custom js-basic dataTable">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>S</th>
-                                <th>I</th>
-                                <th>A</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Rizky Wildan Habibi</td>
-                                <td>0</td>
-                                <td>10</td>
-                                <td>10</td>
-                            </tr>
-                            {{-- @foreach ($pelanggar as $item)
-                            <tr>
-                                <td>{{ $item->santri->nama }}</td>
-                                <td>{{ $item->pelanggaran->nama }}</td>
-                                <td>{{ $item->hukuman }}</td>
-                                <td>{{ date('d-m-Y', strtotime($item->data->tanggal)) }}</td>
-                            </tr>
-                            @endforeach --}}
-                        </tbody>
-                    </table>
-                </div>
+            <p>Tanggal</p>
+            <div class="col-2">
+                <input id="tanggal" data-provide="datepicker" data-date-autoclose="true" class="form-control" data-date-format="dd/mm/yyyy">
             </div>
         </div>
-    </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-custom spacing5" id="waqiah">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $statusLabel = [
+                            'H' => 'Hadir',
+                            'S' => 'Sakit',
+                            'I' => 'Izin',
+                            'A' => 'Alpa',
+                        ];
+                    @endphp
+                    @foreach ($pagi as $item)
+                        <tr data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y')}}">
+                            <td>{{ $item->santri->nama ?? "-" }}</td>
+                            <td>{{ $statusLabel[$item->status] ?? '-' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        </div>
 </div>
 <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -131,15 +50,19 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/absensi-pengurus" method="post" class="form-group" id="formAbsensi">
+                <form action="/absen" method="post" class="form-group" id="formAbsensi">
                     @csrf
                     <div class="form-group">
-                        <label for="">Jenis Absensi</label>
-                        <select class="custom-select" name="jenis">
-                            <option value="N">Ngaji Bandongan</option>
-                            <option value="W">Wirid</option>
-                            <option value="S">Subuh dan Yasinan</option>
+                        <label for="">Jenis Kegiatan</label>
+                        <select class="custom-select" name="kegiatan">
+                            @foreach ($kegiatan as $item)
+                            <option value="{{ $item->id }}">{{ $item->nama }}</option>
+                            @endforeach
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Tanggal</label>
+                        <input class="form-control" name="tanggal" value="{{ \Carbon\Carbon::now()->format('d-m-Y') }}" readonly>
                     </div>
                     <table class="table table-custom">
                         <thead>
@@ -149,30 +72,18 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach ($pengurus as $item)
                             <tr>
-                                <td>Rizky Wildan Habibi</td>
+                                <td>{{ $item->nama }} - {{ $item->nis }}</td>
                                 <td>
-                                    <select class="custom-select" name="">
-                                        <option value="H" selected>Hadir</option>
-                                        <option value="S">Sakit</option>
-                                        <option value="I">Izin</option>
-                                        <option value="A">Alpa</option>
+                                    <select name="pengurus[{{ $item->nis }}]" class="custom-select">
+                                        @foreach (['H' => 'Hadir', 'S' => 'Sakit', 'I' => 'Izin', 'A' => 'Alpa'] as $kode => $label)
+                                            <option value="{{ $kode }}" {{ $kode == 'H' ? 'selected' : '' }}>{{ $label }}</option>
+                                        @endforeach
                                     </select>
                                 </td>
                             </tr>
-                            {{-- @foreach ($pengurus as $item)
-                                <tr>
-                                    <td>{{ $item->nama }}</td>
-                                    <td>
-                                        <select class="custom-select" name="pengurus[{{ $item->nis }}]">
-                                            <option value="H">Hadir</option>
-                                            <option value="S">Sakit</option>
-                                            <option value="I">Izin</option>
-                                            <option value="A">Alpa</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            @endforeach --}}
+                            @endforeach
                         </tbody>
                     </table>
                     <div class="modal-footer">
@@ -184,4 +95,44 @@
         </div>
     </div>
 </div>
+@endsection
+@section('script')
+<script src="{{ asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+<script>
+var minDateFilter = "";
+var oTable = $('#waqiah').DataTable();
+$('#tanggal').datepicker({
+    format: 'dd/mm/yyyy',
+    autoclose: true
+  }).on('change', function () {
+    let val = $(this).val();
+    if (val) {
+      let parts = val.split('/');
+      minDateFilter = new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+    } else {
+      minDateFilter = "";
+    }
+    oTable.draw();
+  });
+
+$.fn.dataTableExt.afnFiltering.push(
+  function(oSettings, aData, iDataIndex) {
+    // Ambil tanggal dari atribut data pada baris
+    let row = oSettings.aoData[iDataIndex].nTr;
+    let tanggalStr = $(row).data('tanggal');
+    if (!tanggalStr) return false;
+
+    let parts = tanggalStr.split('/');
+    let rowDate = new Date(parts[2], parts[1] - 1, parts[0]).getTime(); // dd/mm/yyyy
+
+    if (minDateFilter && !isNaN(minDateFilter)) {
+      if (rowDate != minDateFilter) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+);
+</script>
 @endsection
