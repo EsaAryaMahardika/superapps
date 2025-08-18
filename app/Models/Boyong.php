@@ -14,6 +14,9 @@ class Boyong extends Model
     public $incrementing = false;
     public $timestamps = false;
     protected $keyType = 'string';
+    protected $casts = [
+        'nis' => 'string'
+    ];
     public function kepkam() {
         return $this->belongsTo(Pengurus::class, 'kep_id', 'NIS');
     }

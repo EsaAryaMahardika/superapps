@@ -16,4 +16,7 @@ class AbsensiWaqiah extends Model
     {
         return $this->belongsTo(Santri::class, 'nis', 'nis');
     }
+    protected $casts = [
+        'nis' => 'string'
+    ];
 }

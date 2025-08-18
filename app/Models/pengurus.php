@@ -13,4 +13,7 @@ class Pengurus extends Model
     protected $primaryKey= 'NIS';
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $casts = [
+        'nis' => 'string'
+    ];
 }

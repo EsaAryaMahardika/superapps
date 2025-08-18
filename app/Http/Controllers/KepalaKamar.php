@@ -69,12 +69,12 @@ class KepalaKamar extends Controller
             $santri = Santri::where('nis', (string)$nis)->first();   
             if ($santri) {
                 match($kegiatan){
-                    '1' => AbsensiWaqiah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal],['status' => $status]),
-                    '2' => AbsensiJamaah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
-                    '3' => AbsensiJamaah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
-                    '4' => AbsensiJamaah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
-                    '5' => AbsensiJamaah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
-                    '6' => AbsensiJamaah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
+                    '1' => AbsensiWaqiah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal],['status' => $status]),
+                    '2' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
+                    '3' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
+                    '4' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
+                    '5' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
+                    '6' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
                 };
             }
         }

@@ -13,6 +13,9 @@ class Santri extends Model
     public $timestamps = false;
     protected $primaryKey = 'nis';
     protected $keyType = 'string';
+    protected $casts = [
+        'nis' => 'string'
+    ];
     // public function asrama()
     // {
     //     return $this->belongsTo(Asrama::class, 'asr_id', 'id');

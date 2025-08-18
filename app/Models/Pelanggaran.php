@@ -13,6 +13,9 @@ class Pelanggaran extends Model
     public $incrementing = false;
     public $timestamps = false;
     protected $keyType = 'string';
+    protected $casts = [
+        'nis' => 'string'
+    ];
     public function santri()
     {
         return $this->belongsTo(Santri::class, 'nis', 'nis');
