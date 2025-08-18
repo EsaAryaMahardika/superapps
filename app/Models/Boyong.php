@@ -13,6 +13,7 @@ class Boyong extends Model
     protected $primaryKey = 'nis';
     public $incrementing = false;
     public $timestamps = false;
+    protected $keyType = 'string';
     public function kepkam() {
         return $this->belongsTo(Pengurus::class, 'kep_id', 'NIS');
     }
