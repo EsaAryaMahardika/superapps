@@ -24,7 +24,8 @@
                     <td>{{ $item->nis }}</td>
                     <td>{{ $item->nama }}</td>
                     <td>{{ $item->kelas }}</td>
-                    <td>{{ $item->kepkam->nama }}</td>
+                    {{-- <td>{{ $item->nama }}</td> --}}
+                    <td>{{ $item->kepkam->Nama }}</td>
                     <td>{{ $item->asrama->nama }}</td>
                     <td>{{ $item->alasan->keterangan }}</td>
                     <td>{{ $item->rencana->keterangan }}</td>
@@ -61,9 +62,9 @@
                     </div>
                     <div class="mt-2">
                         <label for="">Kepala Kamar</label>
-                        <select class="form-control" name="kepkam">
+                        <select class="form-control select" name="kepkam">
                             @foreach ($kepkam as $item)
-                            <option value="{{ $item->nis }}">{{ $item->nama }}</option>
+                            <option value="{{ $item->NIS }}">{{ $item->Nama }}</option>
                             @endforeach
                         </select>
                     </div>

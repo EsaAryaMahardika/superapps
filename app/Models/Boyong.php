@@ -14,7 +14,7 @@ class Boyong extends Model
     public $incrementing = false;
     public $timestamps = false;
     public function kepkam() {
-        return $this->belongsTo(Pengurus::class, 'kep_id', 'nis');
+        return $this->belongsTo(Pengurus::class, 'kep_id', 'NIS');
     }
     public function asrama() {
         return $this->belongsTo(Asrama::class, 'asr_id', 'id');

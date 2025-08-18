@@ -18,7 +18,7 @@ class Keamanan extends Controller
         $pelanggaran = Pelanggaran::get();
         return view('keamanan.pelanggaran', compact('santri', 'larangan', 'pelanggaran'));
     }
-    function i_pelanggaran(Request $request) {
+    public function i_pelanggaran(Request $request) {
         $validated = $request->validate([
             'nis' => 'required',
             'pelanggaran_id' => 'required|exists:larangan,id',

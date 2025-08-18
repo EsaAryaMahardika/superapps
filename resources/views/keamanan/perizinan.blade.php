@@ -1,6 +1,7 @@
 @extends('layout')
 @section('content')
 <div class="body mt-5">
+    <h2>Perizinan</h2>
     <div>
         <button class="btn btn-primary" data-toggle="modal" data-target="#add">Buat izin</button>
     </div>
@@ -56,11 +57,7 @@
                     <div class="mt-2">
                         <label for="">Nama Santri</label>
                         <div class="input-group">
-                            <select class="selectpicker" data-live-search="true" name="nis" id="nis" data-size="5" data-width="100%">
-                                @foreach ($santri as $item)
-                                <option data-tokens="{{ $item->nis }}">{{ $item->nama }}</option>
-                                @endforeach
-                            </select>
+                            <select class="form-control santri" name="nis"></select>
                         </div>
                     </div>
                     <div class="mt-2">

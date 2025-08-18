@@ -29,19 +29,19 @@ class AlurPerizinan extends Controller
             // 'kepkam' => Santri::select(['nis','nama'])->where('kamar_id', $this->user->kamar_id)->get(),
             'kepkam' => Santri::select('nis','nama')->get(),
             'keamanan' => Santri::select('nis','nama')->get(),
-            default => abort(403, 'Unauthorized'),
+            default => redirect('/'),
         };
         $alasan = AlasanIzin::all();
         $perizinan = match ($this->user->role) {
             // 'kepkam' => Perizinan::whereHas('santri', fn($q) => $q->where('kamar_id', $this->user->kamar_id))->get(),
             'kepkam' => Perizinan::all(),
             'keamanan' => Perizinan::all(),
-            default => abort(403, 'Unauthorized'),
+            default => redirect('/'),
         };
         $view = match ($this->user->role) {
             'kepkam' => 'kepkam.perizinan',
             'keamanan' => 'keamanan.perizinan',
-            default => abort(403, 'Unauthorized'),
+            default => redirect('/'),
         };
         return view($view, compact('santri', 'alasan', 'perizinan'));
     }
@@ -51,7 +51,7 @@ class AlurPerizinan extends Controller
                 case 'kepkam': $table = 'acckepkam'; break;
                 case 'keamanan': $table = 'acckeamanan'; break;
                 case 'pengasuh': $table = 'accpengasuh'; break;
-                default: throw new \Exception((string) $this->user->role);
+                default: redirect('/');
             }
             $santri = Perizinan::where('nis', $nis)->first();
             $santri->update([
@@ -72,7 +72,7 @@ class AlurPerizinan extends Controller
                 'kepkam' => 'laporkepkam',
                 'keamanan' => 'laporkeamanan',
                 'pengasuh' => 'laporpengasuh',
-                default => null,
+                default => redirect('/'),
             };
             $santri = Perizinan::where('nis', $nis)->first();
             $santri->update([

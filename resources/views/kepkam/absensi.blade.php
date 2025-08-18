@@ -3,6 +3,9 @@
 <div class="body mt-5">
     <button class="btn btn-primary" data-toggle="modal" data-target="#add">Buat Absensi</button>
     <div class="m-2">
+        {{-- ---------------------------}}
+        {{-- <=== Absensi Waqiah ===> --}}
+        {{-- ---------------------------}}
         <div class="row">
             <div class="col">
                 <h3>Absensi Waqiah</h3>
@@ -38,83 +41,186 @@
                 </tbody>
             </table>
         </div>
-        {{-- <div class="row">
+    </div>
+    {{-- ---------------------------}}
+    {{-- <=== Absensi Subuh ===> --}}
+    {{-- ---------------------------}}
+    <div class="m-2">
+        <div class="row">
             <div class="col">
-                <h3>Absensi Jamaah</h3>
-            </div>
-            <p>Tanggal</p>
-            <div class="col-2">
-                <input data-provide="datepicker" data-date-autoclose="true" class="form-control" data-date-format="dd/mm/yyyy">
+                <h3>Absensi Subuh</h3>
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-custom js-basic dataTable">
+            <table class="table table-hover table-custom spacing5" id="subuh">
                 <thead>
                     <tr>
                         <th>Nama</th>
-                        <th>Subuh</th>
-                        <th>Dhuhur</th>
-                        <th>Ashar</th>
-                        <th>Maghrib</th>
-                        <th>Isya</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($pelanggar as $item)
-                    <tr>
-                        <td>{{ $item->santri->nama }}</td>
-                        <td>{{ $item->pelanggaran->nama }}</td>
-                        <td>{{ $item->hukuman }}</td>
-                        <td>{{ date('d-m-Y', strtotime($item->data->tanggal)) }}</td>
-                    </tr>
+                    @php
+                        $statusLabel = [
+                            'H' => 'Hadir',
+                            'S' => 'Sakit',
+                            'I' => 'Izin',
+                            'A' => 'Alpa',
+                        ];
+                    @endphp
+                    @foreach ($subuh as $item)
+                        <tr data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y')}}">
+                            <td>{{ $item->santri->nama ?? "-" }}</td>
+                            <td>{{ $statusLabel[$item->status] ?? '-' }}</td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
-        <hr> --}}
-        {{-- <div class="row">
+    </div>
+    {{-- ---------------------------}}
+    {{-- <=== Absensi Dhuhur ===> --}}
+    {{-- ---------------------------}}
+    <div class="m-2">
+        <div class="row">
             <div class="col">
-                <h3>Absensi Mingguan</h3>
-            </div>
-            <p>Pekan</p>
-            <div class="col-1">
-                <select name="pekan" id="pekan" class="custom-select">
-                    <option value=""></option>
-                    <option value="01">1</option>
-                    <option value="01">2</option>
-                    <option value="01">3</option>
-                    <option value="01">4</option>
-                    <option value="01">5</option>
-                    <option value="01">6</option>
-                    <option value="01">7</option>
-                    <option value="01">8</option>
-                    <option value="01">9</option>
-                    <option value="01">10</option>
-                </select>
+                <h3>Absensi Dhuhur</h3>
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-custom js-basic dataTable">
+            <table class="table table-hover table-custom spacing5" id="dhuhur">
                 <thead>
                     <tr>
-                        <th>Pelanggaran</th>
-                        <th>S</th>
-                        <th>I</th>
-                        <th>A</th>
+                        <th>Nama</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($pelanggar as $item)
-                    <tr>
-                        <td>{{ $item->santri->nama }}</td>
-                        <td>{{ $item->pelanggaran->nama }}</td>
-                        <td>{{ $item->hukuman }}</td>
-                        <td>{{ date('d-m-Y', strtotime($item->data->tanggal)) }}</td>
-                    </tr>
+                    @php
+                        $statusLabel = [
+                            'H' => 'Hadir',
+                            'S' => 'Sakit',
+                            'I' => 'Izin',
+                            'A' => 'Alpa',
+                        ];
+                    @endphp
+                    @foreach ($dhuhur as $item)
+                        <tr data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y')}}">
+                            <td>{{ $item->santri->nama ?? "-" }}</td>
+                            <td>{{ $statusLabel[$item->status] ?? '-' }}</td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
-        </div> --}}
+        </div>
+    </div>
+    {{-- ---------------------------}}
+    {{-- <=== Absensi Ashar ===> --}}
+    {{-- ---------------------------}}
+    <div class="m-2">
+        <div class="row">
+            <div class="col">
+                <h3>Absensi Ashar</h3>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-custom spacing5" id="ashar">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $statusLabel = [
+                            'H' => 'Hadir',
+                            'S' => 'Sakit',
+                            'I' => 'Izin',
+                            'A' => 'Alpa',
+                        ];
+                    @endphp
+                    @foreach ($ashar as $item)
+                        <tr data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y')}}">
+                            <td>{{ $item->santri->nama ?? "-" }}</td>
+                            <td>{{ $statusLabel[$item->status] ?? '-' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{-- ---------------------------}}
+    {{-- <=== Absensi Maghrib ===> --}}
+    {{-- ---------------------------}}
+    <div class="m-2">
+        <div class="row">
+            <div class="col">
+                <h3>Absensi Maghrib</h3>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-custom spacing5" id="maghrib">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $statusLabel = [
+                            'H' => 'Hadir',
+                            'S' => 'Sakit',
+                            'I' => 'Izin',
+                            'A' => 'Alpa',
+                        ];
+                    @endphp
+                    @foreach ($maghrib as $item)
+                        <tr data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y')}}">
+                            <td>{{ $item->santri->nama ?? "-" }}</td>
+                            <td>{{ $statusLabel[$item->status] ?? '-' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{-- ---------------------------}}
+    {{-- <=== Absensi Isya ===> --}}
+    {{-- ---------------------------}}
+    <div class="m-2">
+        <div class="row">
+            <div class="col">
+                <h3>Absensi Isya</h3>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-custom spacing5" id="isya">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $statusLabel = [
+                            'H' => 'Hadir',
+                            'S' => 'Sakit',
+                            'I' => 'Izin',
+                            'A' => 'Alpa',
+                        ];
+                    @endphp
+                    @foreach ($isya as $item)
+                        <tr data-tanggal="{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y')}}">
+                            <td>{{ $item->santri->nama ?? "-" }}</td>
+                            <td>{{ $statusLabel[$item->status] ?? '-' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-hidden="true">
@@ -132,6 +238,7 @@
                     <div class="form-group">
                         <label for="">Jenis Kegiatan</label>
                         <select class="custom-select" name="kegiatan">
+                            <option>Pilih kegiatan</option>
                             @foreach ($kegiatan as $item)
                             <option value="{{ $item->id }}">{{ $item->nama }}</option>
                             @endforeach
@@ -178,7 +285,12 @@
 <script>
 $(document).ready(function() {
     var today = new Date();
-    var oTable = $('#waqiah').DataTable();
+    var subuh = $('#subuh').DataTable();
+    var dhuhur = $('#dhuhur').DataTable();
+    var ashar = $('#ashar').DataTable();
+    var maghrib = $('#maghrib').DataTable();
+    var isya = $('#isya').DataTable();
+    var waqiah = $('#waqiah').DataTable();
     $('#tanggal').datepicker({
         format: 'dd/mm/yyyy',
         autoclose: true
@@ -194,9 +306,19 @@ $(document).ready(function() {
         }
     );
     $('#tanggal').on('change', function() {
-        oTable.draw();
+        waqiah.draw();
+        subuh.draw();
+        dhuhur.draw();
+        ashar.draw();
+        maghrib.draw();
+        isya.draw();
     });
-    oTable.draw();
+    waqiah.draw();
+    subuh.draw();
+    dhuhur.draw();
+    ashar.draw();
+    maghrib.draw();
+    isya.draw();
 });
 </script>
 @endsection

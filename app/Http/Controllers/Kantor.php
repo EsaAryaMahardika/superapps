@@ -13,14 +13,15 @@ use Illuminate\Http\Request;
 class Kantor extends Controller
 {
     public function kantor(){
-        return view('kantor.dashboard');
+        $boyong = Boyong::select('nis')->get();
+        return view('kantor.dashboard', compact('boyong'));
     }
     public function boyong(){
         $boyong = Boyong::all();
         $alasan = AlasanBoyong::all();
         $asrama = Asrama::all();
         $kelas = Kelas::all();
-        $kepkam = Pengurus::where('jab_id', 1)->get();
+        $kepkam = Pengurus::where('Jabatan', 'like', "Kepala Kamar%")->get();
         $rencana = Rencana::all();
         return view('kantor.boyong', compact('boyong','alasan', 'asrama', 'kelas', 'kepkam', 'rencana'));
     }

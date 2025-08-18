@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Santri;
 use App\Models\Kegiatan;
 use Illuminate\Http\Request;
+use App\Models\AbsensiJamaah;
 use App\Models\AbsensiWaqiah;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class KepalaKamar extends Controller
 {
@@ -35,33 +36,49 @@ class KepalaKamar extends Controller
     }
     public function absensi() {
         $waqiah = AbsensiWaqiah::with('santri')->get();
+        $subuh = AbsensiJamaah::where('sholat', 2)->with('santri')->get();
+        $dhuhur = AbsensiJamaah::where('sholat', 3)->with('santri')->get();
+        $ashar = AbsensiJamaah::where('sholat', 4)->with('santri')->get();
+        $maghrib = AbsensiJamaah::where('sholat', 5)->with('santri')->get();
+        $isya = AbsensiJamaah::where('sholat', 6)->with('santri')->get();
         $kegiatan = Kegiatan::all();
         $santri = Santri::select('nis', 'nama')->get();
-        return view('kepkam.absensi', compact('waqiah', 'kegiatan', 'santri'));
-        // return dd($waqiah->santri->nama);
+        return view('kepkam.absensi', compact(
+            'waqiah',
+            'kegiatan',
+            'santri',
+            'subuh',
+            'dhuhur',
+            'ashar',
+            'maghrib',
+            'isya',
+        ));
     }
-    public function absen(Request $request){
+    public function absen(Request $request) {
+        $tanggal = $request->tanggal;
+        $kegiatan = $request->kegiatan;
+        match($kegiatan) {
+            '1' => $exists = AbsensiWaqiah::where('tanggal', $tanggal)->exists(),
+            default => $exists = AbsensiJamaah::where(['tanggal' => $tanggal, 'sholat' => $kegiatan])->exists()
+        };
+        if ($exists) {
+            session()->flash('error', 'Absensi hari ini sudah dibuat');
+            return redirect('/absensi');
+        }
         foreach ($request->santri as $nis => $status) {
-            $nis = (string) $nis;
-            $santri = Santri::where('nis', $nis)->first();
+            $santri = Santri::where('nis', (string)$nis)->first();   
             if ($santri) {
-                $cek = AbsensiWaqiah::where('tanggal', $request->tanggal)->get();
-                if ($cek != NULL){
-                    AbsensiWaqiah::updateOrCreate(
-                        [
-                            'nis' => $nis,
-                            'tanggal' => $request->tanggal
-                        ],
-                        [
-                            'status' => $status,
-                        ]
-                    );
-                    session()->flash('success', 'Absensi berhasil dibuat');
-                } else {
-                    session()->flash('error', 'Absensi hari ini sudah dibuat');
-                }
+                match($kegiatan){
+                    '1' => AbsensiWaqiah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal],['status' => $status]),
+                    '2' => AbsensiJamaah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
+                    '3' => AbsensiJamaah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
+                    '4' => AbsensiJamaah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
+                    '5' => AbsensiJamaah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
+                    '6' => AbsensiJamaah::updateOrCreate(['nis' => $nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
+                };
             }
         }
+        session()->flash('success', 'Absensi berhasil dibuat');
         return redirect('/absensi');
     }
 }

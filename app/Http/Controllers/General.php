@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Santri;
+use App\Models\Pengurus;
+use App\Models\Asrama;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 
 class General extends Controller
 {
@@ -42,5 +45,31 @@ class General extends Controller
     public function logout(){
         Auth::logout();
         return redirect('/login');
+    }
+    public function santrikepkam(Request $request){
+        $nis = Auth::user()->id;
+        $asrama = Asrama::select('id')->where('kepkam', $nis)->get();
+        $search = $request->get('q');
+        $santri = Santri::select('nis','nama')
+            ->where('nama', 'like', '%'.$search.'%', 'and', 'asr_id', $asrama)
+            ->limit(5)
+            ->get();
+        return response()->json($santri);
+    }
+    public function santri(Request $request){
+        $search = $request->get('q');
+        $santri = Santri::select('nis','nama')
+            ->where('nama', 'like', '%'.$search.'%')
+            ->limit(5)
+            ->get();
+        return response()->json($santri);
+    }
+    public function pengurus(Request $request){
+        $search = $request->get('q');
+        $pengurus = Pengurus::select('nis','nama')
+            ->where('nama', 'like', '%'.$search.'%')
+            ->limit(5)
+            ->get();
+        return response()->json($pengurus);
     }
 }

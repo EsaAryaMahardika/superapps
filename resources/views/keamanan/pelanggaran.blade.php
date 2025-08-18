@@ -43,9 +43,9 @@
                     <div class="mt-2">
                         <label for="">Nama Santri</label>
                         <div class="input-group">
-                            <select class="selectpicker" data-live-search="true" name="nis" id="nis" data-size="5" data-width="100%">
+                            <select class="select2" name="nis">
                                 @foreach ($santri as $item)
-                                <option data-tokens="{{ $item->nis }}" value="{{ $item->nis }}">{{ $item->nama }}</option>
+                                <option value="{{ $item->nis }}">{{ $item->nama }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -77,7 +77,3 @@
     </div>
 </div>
 @endsection
-
-@section('script')
-
-@stop

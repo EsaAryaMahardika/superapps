@@ -19,6 +19,8 @@ Route::post('/login', [General::class, 'auth']);
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [General::class, 'dashboard']);
+    Route::get('/santri', [General::class, 'santri']);
+    Route::get('/pengurus', [General::class, 'pengurus']);
     Route::get('/perizinan', [AlurPerizinan::class, 'perizinan']);
     Route::put('/perizinan/{nis}', [AlurPerizinan::class, 'accizin']);
 

@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class AbsensiWaqiah extends Model
+class AbsensiJamaah extends Model
 {
     use HasFactory;
-    protected $table = 'absen_waqiah';
+    protected $table = 'absen_jamaah';
     protected $guarded = [];
     public $incrementing = true;
     public $timestamps = false;
