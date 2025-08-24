@@ -14,20 +14,6 @@ function myFunction() {
 
 }
 
-function initSparkline() {
-
-    $(".sparkline").each(function () {
-
-        var e = $(this);
-
-        e.sparkline("html", e.data());
-
-    }),
-
-        $(".sparkbar").sparkline("html", { type: "bar" });
-
-}
-
 function skinChanger() {
 
     $(".choose-skin li").on("click", function () {
@@ -51,110 +37,6 @@ function skinChanger() {
     });
 
 }
-
-$(function () {
-
-    "use strict";
-
-    skinChanger(),
-
-        initSparkline(),
-
-        setTimeout(function () {
-
-            $(".page-loader-wrapper").fadeOut();
-
-        }, 50),
-
-        $(window).on("load resize", function () {
-
-            $(window).innerWidth() < 1201
-
-                ? $(".mini-sidebar-btn, .hmenu-btn").attr(
-
-                      "disabled",
-
-                      "disabled"
-
-                  )
-
-                : $(".mini-sidebar-btn, .hmenu-btn").removeAttr(
-
-                      "disabled",
-
-                      "disabled"
-
-                  );
-
-        }),
-
-        $(window)
-
-            .bind("resize", function () {
-
-                console.log($(this).width()),
-
-                    $(this).width() < 1201
-
-                        ? $("body.box_layout").removeClass("h-menu")
-
-                        : $("body.box_layout").addClass("h-menu");
-
-            })
-
-            .trigger("resize");
-
-    var e = (function () {
-
-            for (var e = new Array(20), t = 0; t < e.length; t++)
-
-                e[t] = [
-
-                    5 + n(),
-
-                    10 + n(),
-
-                    15 + n(),
-
-                    20 + n(),
-
-                    30 + n(),
-
-                    35 + n(),
-
-                    40 + n(),
-
-                    45 + n(),
-
-                    50 + n(),
-
-                ];
-
-            return e;
-
-        })(),
-
-        t = { type: "bar", barWidth: 3, height: 15, barColor: "#0E9BE2" };
-
-    function n() {
-
-        return Math.floor(80 * Math.random());
-
-    }
-
-    $("#mini-bar-chart1").sparkline(e[0], t),
-
-        (t.barColor = "#7CAC25"),
-
-        $("#mini-bar-chart2").sparkline(e[1], t),
-
-        (t.barColor = "#FF4402"),
-
-        $("#mini-bar-chart3").sparkline(e[2], t),
-
-        (t.barColor = "#ff9800");
-
-}),
 
     (window.onscroll = function () {
 
@@ -459,9 +341,168 @@ $(function () {
                 }
 
             });
+            // DataTables berdasarkan tanggal
+            var today = new Date();
+            var tabel = $('.tabel').DataTable();
+            $('#tanggal').datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true
+            })
+            .datepicker('setDate', today);
+            $.fn.dataTableExt.afnFiltering.push(
+                function(oSettings, aData, iDataIndex) {
+                    let row = oSettings.aoData[iDataIndex].nTr;
+                    let tanggalStr = $(row).data('tanggal');
+                    if (!tanggalStr) return false;
+                    let selectedDate = $('#tanggal').val();
+                    return tanggalStr === selectedDate;
+                }
+            );
+            $('#tanggal').on('change', function() {
+                tabel.draw();
+            });
+            tabel.draw();
 
-            $('.js-basic').DataTable({"ordering": false});
+            $(document).on("change", "#a_sta", function () {
+                var status = $(this).val();
+                if (status === "M") {
+                    $(".ayah").prop("disabled", true);
+                } else {
+                    $(".ayah").prop("disabled", false);
+                }
+            });
+            $(document).on("change", "#i_sta", function () {
+                var status = $(this).val();
+                if (status === "M") {
+                    $(".ibu").prop("disabled", true);
+                } else {
+                    $(".ibu").prop("disabled", false);
+                }
+            });
+            $(document).on("change", "#w_sta", function () {
+                var status = $(this).val();
+                if (status === "tidak") {
+                    $(".wali").prop("disabled", true);
+                } else {
+                    $(".wali").prop("disabled", false);
+                }
+            });
+            $(document).on("change", "#prov", function () {
+                var prov_id = $(this).val();
+                if (prov_id) {
+                    $.ajax({
+                        url: BASE_URL + "/kab/" + prov_id,
+                        type: "GET",
+                        dataType: "json",
+                        success: function (data) {
+                            $("#kab").empty();
+                            $.each(data, function (key, value) {
+                                $("#kab").append(
+                                    '<option value="' + key + '">' + value + "</option>"
+                                );
+                            });
+                        },
+                    });
+                } else {
+                    $("#kab").empty();
+                }
+            });
+            $(document).on("change", "#kab", function () {
+                var kab_id = $(this).val();
+                if (kab_id) {
+                    $.ajax({
+                        url: BASE_URL + "/kec/" + kab_id,
+                        type: "GET",
+                        success: function (data) {
+                            $("#kec").empty();
+                            $.each(data, function (key, value) {
+                                $("#kec").append(
+                                    '<option value="' + key + '">' + value + "</option>"
+                                );
+                            });
+                        },
+                    });
+                } else {
+                    $("#kec").empty();
+                }
+            });
+            $(document).on("change", "#kec", function () {
+                var kec_id = $(this).val();
+                if (kec_id) {
+                    $.ajax({
+                        url: BASE_URL + "/kel/" + kec_id,
+                        type: "GET",
+                        success: function (data) {
+                            $("#des").empty();
+                            $.each(data, function (key, value) {
+                                $("#des").append(
+                                    '<option value="' + key + '">' + value + "</option>"
+                                );
+                            });
+                        },
+                    });
+                } else {
+                    $("#des").empty();
+                }
+            });
+            $(".close").click(function () {
+                $(this).parent(".alert").fadeOut();
+            });
 
+            // Dark Mode
+            const htmlElement = $("html");
+            const switchElement = $("#darkModeSwitch");
+            const prefersDarkScheme = window.matchMedia(
+                "(prefers-color-scheme: dark)"
+            ).matches;
+            const currentTheme =
+                localStorage.getItem("bsTheme") || (prefersDarkScheme ? "dark" : "light");
+            htmlElement.attr("data-bs-theme", currentTheme);
+            switchElement.prop("checked", currentTheme === "dark");
+            switchElement.on("change", function () {
+                const newTheme = this.checked ? "dark" : "light";
+                htmlElement.attr("data-bs-theme", newTheme);
+                localStorage.setItem("bsTheme", newTheme);
+            });
+
+            $('[data-bs-toggle="tooltip"]').each(function () {
+                new bootstrap.Tooltip(this);
+            });
+
+            // Untuk input hanya angka
+            $(document).on("keypress", ".number", function () {
+                return event.which >= 48 && event.which <= 57;
+            });
+            // Pencarian Data Santri dan Pengurus
+            $('.santri, .pengurus, .kepkam').select2({
+                dropdownParent: $('.modal'),
+                placeholder: 'Cari nama',
+                width: '100%',
+                ajax: {
+                    url: function () {
+                        if ($(this).hasClass('santri')) {
+                            return BASE_URL + '/search-santri';
+                        } else if ($(this).hasClass('pengurus')) {
+                            return BASE_URL + '/search-pengurus';
+                        } else if ($(this).hasClass('kepkam')) {
+                            return BASE_URL + '/search-kepkam';
+                        }
+                        return BASE_URL;
+                    },
+                    delay: 250,
+                    cache: true,
+                    processResults: function({data}){
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    id:item.nis,
+                                    text: item.nama
+                                }
+                            })
+                        }
+                    },
+                }
+            });
     }),
 
     ($.fn.clickToggle = function (t, n) {
@@ -482,128 +523,4 @@ $(function () {
 
         });
 
-    }),
-
-    particlesJS("particles-js", {
-
-        particles: {
-
-            number: { value: 30, density: { enable: !0, value_area: 700 } },
-
-            color: {
-
-                value: ["#fc3c5f", "#993cfc", "#3ca9fc", "#3cfc5f", "#fcdf3c"],
-
-            },
-
-            shape: {
-
-                type: "circle",
-
-                stroke: { width: 0, color: "#000000" },
-
-                polygon: { nb_sides: 15 },
-
-            },
-
-            opacity: {
-
-                value: 0.5,
-
-                random: !1,
-
-                anim: { enable: !1, speed: 1.2, opacity_min: 0.15, sync: !1 },
-
-            },
-
-            size: {
-
-                value: 2.5,
-
-                random: !1,
-
-                anim: { enable: !0, speed: 2, size_min: 0.15, sync: !1 },
-
-            },
-
-            line_linked: {
-
-                enable: !0,
-
-                distance: 110,
-
-                color: "#2b313c",
-
-                opacity: 1,
-
-                width: 1,
-
-            },
-
-            move: {
-
-                enable: !0,
-
-                speed: 1.6,
-
-                direction: "none",
-
-                random: !1,
-
-                straight: !1,
-
-                out_mode: "out",
-
-                bounce: !1,
-
-                attract: { enable: !1, rotateX: 600, rotateY: 1200 },
-
-            },
-
-        },
-
-        interactivity: {
-
-            detect_on: "canvas",
-
-            events: {
-
-                onhover: { enable: !1, mode: "repulse" },
-
-                onclick: { enable: !1, mode: "push" },
-
-                resize: !0,
-
-            },
-
-            modes: {
-
-                grab: { distance: 400, line_linked: { opacity: 1 } },
-
-                bubble: {
-
-                    distance: 400,
-
-                    size: 30,
-
-                    duration: 2,
-
-                    opacity: 8,
-
-                    speed: 3,
-
-                },
-
-                repulse: { distance: 200, duration: 0.4 },
-
-                push: { particles_nb: 4 },
-
-                remove: { particles_nb: 2 },
-
-            },
-
-        },
-
-        retina_detect: !0,
-
-    });
+    })

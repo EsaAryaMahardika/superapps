@@ -1,6 +1,6 @@
 @extends('layout')
 @section('content')
-<div class="d-flex justify-content-between my-3">
+{{-- <div class="d-flex justify-content-between my-3">
     <div class="row">
         <div class="col-6">
             <p>Mulai</p>
@@ -11,8 +11,8 @@
             <input data-provide="datepicker" data-date-autoclose="true" class="form-control" data-date-format="dd/mm/yyyy">
         </div>
     </div>
-</div>
-<div class="row clearfix">
+</div> --}}
+<div class="row clearfix m-5">
     <div class="col-lg-3 col-md-6 col-sm-12">
         <div class="card">
             <div class="body">

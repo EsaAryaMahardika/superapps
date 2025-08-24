@@ -10,7 +10,6 @@ class AbsensiJamaah extends Model
     use HasFactory;
     protected $table = 'absen_jamaah';
     protected $guarded = [];
-    public $incrementing = true;
     public $timestamps = false;
     public function santri()
     {

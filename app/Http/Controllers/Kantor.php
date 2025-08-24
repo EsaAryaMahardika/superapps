@@ -21,7 +21,7 @@ class Kantor extends Controller
         $alasan = AlasanBoyong::all();
         $asrama = Asrama::all();
         $kelas = Kelas::all();
-        $kepkam = Pengurus::where('Jabatan', 'like', "Kepala Kamar%")->get();
+        $kepkam = Pengurus::all();
         $rencana = Rencana::all();
         return view('kantor.boyong', compact('boyong','alasan', 'asrama', 'kelas', 'kepkam', 'rencana'));
     }
@@ -30,10 +30,10 @@ class Kantor extends Controller
             'nis' => $request->nis,
             'nama' => $request->nama,
             'kelas' => $request->kelas,
-            'kepkam' => $request->kepkam,
+            'kep_id' => $request->kepkam,
             'asr_id' => $request->asrama,
-            'alasan' => $request->alasan,
-            'rencana' => $request->rencana
+            'ala_id' => $request->alasan,
+            'ren_id' => $request->rencana
         ]);
         session()->flash('success', 'Data berhasil disimpan');
         return redirect('/boyong');

@@ -5,7 +5,7 @@
         <button class="btn btn-primary m-3" data-toggle="modal" data-target="#add">Buat Tagihan</button>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover js-basic dataTable table-custom spacing5">
+        <table class="table table-hover spacing5 tabel">
             <thead>
                 <tr>
                     <th>Nama</th>

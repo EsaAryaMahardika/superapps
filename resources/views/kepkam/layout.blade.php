@@ -82,6 +82,7 @@
         <!--<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2"></script>-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
         <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+        <script src="{{ asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
         @yield('script')
     </body>
 </html>

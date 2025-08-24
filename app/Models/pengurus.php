@@ -10,7 +10,7 @@ class Pengurus extends Model
     protected $table = 'pengurus';
     protected $guarded = [];
     public $timestamps = false;
-    protected $primaryKey= 'NIS';
+    protected $primaryKey= 'nis';
     public $incrementing = false;
     protected $keyType = 'string';
     protected $casts = [

@@ -5,14 +5,14 @@
         <button class="btn btn-primary" data-toggle="modal" data-target="#add">Boyong</button>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover js-basic dataTable table-custom spacing5">
+        <table class="table table-hover spacing5 tabel">
             <thead>
                 <tr>
                     <th>NIS</th>
                     <th>Nama</th>
                     <th>Kelas</th>
                     <th>Kepala Kamar</th>
-                    <th>Asrama</th>
+                    {{-- <th>Asrama</th> --}}
                     <th>Alasan Boyong</th>
                     <th>Rencana</th>
                     <th>Tanggal</th>
@@ -24,9 +24,8 @@
                     <td>{{ $item->nis }}</td>
                     <td>{{ $item->nama }}</td>
                     <td>{{ $item->kelas }}</td>
-                    {{-- <td>{{ $item->nama }}</td> --}}
-                    <td>{{ $item->kepkam->Nama }}</td>
-                    <td>{{ $item->asrama->nama }}</td>
+                    <td>{{ $item->kepkam->nama }}</td>
+                    {{-- <td>{{ $item->asrama->nama }}</td> --}}
                     <td>{{ $item->alasan->keterangan }}</td>
                     <td>{{ $item->rencana->keterangan }}</td>
                     <td>{{ date('d-m-Y', strtotime($item->tanggal)) }}</td>
@@ -50,27 +49,23 @@
                     @csrf
                     <div class="mt-2">
                         <label for="">NIS</label>
-                        <input class="form-control" type="text" name="nis">
+                        <input class="form-control" type="text" name="nis" required>
                     </div>
                     <div class="mt-2">
                         <label for="">Nama Santri</label>
-                        <input class="form-control" type="text" name="nama">
+                        <input class="form-control" type="text" name="nama" required>
                     </div>
                     <div class="mt-2">
                         <label for="">Kelas</label>
-                        <input class="form-control" type="text" name="kelas">
+                        <input class="form-control" type="text" name="kelas" required>
                     </div>
                     <div class="mt-2">
                         <label for="">Kepala Kamar</label>
-                        <select class="form-control select" name="kepkam">
-                            @foreach ($kepkam as $item)
-                            <option value="{{ $item->NIS }}">{{ $item->Nama }}</option>
-                            @endforeach
-                        </select>
+                        <select class="form-select kepkam" name="kepkam" required></select>
                     </div>
                     <div class="mt-2">
                         <label for="">Asrama</label>
-                        <select class="form-control" name="asrama">
+                        <select class="form-control" name="asrama" required>
                             @foreach ($asrama as $item)
                             <option value="{{ $item->id }}">{{ $item->nama }}</option>
                             @endforeach
@@ -78,7 +73,7 @@
                     </div>
                     <div class="mt-2">
                         <label for="">Alasan Boyong</label>
-                        <select class="form-control" name="alasan">
+                        <select class="form-control" name="alasan" required>
                             @foreach ($alasan as $item)
                             <option value="{{ $item->id }}">{{ $item->keterangan }}</option>
                             @endforeach
@@ -86,7 +81,7 @@
                     </div>
                     <div class="mt-2">
                         <label for="">Rencana</label>
-                        <select class="form-control" name="rencana">
+                        <select class="form-control" name="rencana" required>
                             @foreach ($rencana as $item)
                             <option value="{{ $item->id }}">{{ $item->keterangan }}</option>
                             @endforeach

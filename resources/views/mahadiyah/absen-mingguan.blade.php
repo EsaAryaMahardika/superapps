@@ -19,7 +19,7 @@
         </select>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover js-basic dataTable table-custom spacing5">
+        <table class="table table-hover spacing5 tabel">
             <thead>
                 <tr>
                     <th>Kepala Kamar</th>

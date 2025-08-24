@@ -46,30 +46,31 @@ class General extends Controller
         Auth::logout();
         return redirect('/login');
     }
-    public function santrikepkam(Request $request){
+    public function santrikepkam(){
         $nis = Auth::user()->id;
-        $asrama = Asrama::select('id')->where('kepkam', $nis)->get();
-        $search = $request->get('q');
-        $santri = Santri::select('nis','nama')
-            ->where('nama', 'like', '%'.$search.'%', 'and', 'asr_id', $asrama)
-            ->limit(5)
-            ->get();
-        return response()->json($santri);
+        $asrama = Asrama::select('id')->where('kepkam', $nis)->first();
+        $data = Santri::select('nis','nama')
+            ->where('nama', 'like', '%'.request('q').'%')
+            ->where('asr_id', $asrama)
+            ->paginate(10);
+        return response()->json($data);
     }
-    public function santri(Request $request){
-        $search = $request->get('q');
-        $santri = Santri::select('nis','nama')
-            ->where('nama', 'like', '%'.$search.'%')
-            ->limit(5)
-            ->get();
-        return response()->json($santri);
+    public function santri(){
+        $data = Santri::select('nis','nama')
+            ->where('nama', 'like', '%'.request('q').'%')
+            ->paginate(10);
+        return response()->json($data);
     }
-    public function pengurus(Request $request){
-        $search = $request->get('q');
-        $pengurus = Pengurus::select('nis','nama')
-            ->where('nama', 'like', '%'.$search.'%')
-            ->limit(5)
-            ->get();
-        return response()->json($pengurus);
+    public function kepkam(){
+        $data = Pengurus::select('nis','nama')
+            ->where('nama', 'like', '%'.request('q').'%')
+            ->paginate(10);
+        return response()->json($data);
+    }
+    public function pengurus(){
+        $data = Pengurus::select('nis','nama')
+            ->where('nama', 'like', '%'.request('q').'%')
+            ->paginate(10);
+        return response()->json($data);
     }
 }

@@ -41,7 +41,7 @@ class KepalaKamar extends Controller
         $ashar = AbsensiJamaah::where('sholat', 4)->with('santri')->get();
         $maghrib = AbsensiJamaah::where('sholat', 5)->with('santri')->get();
         $isya = AbsensiJamaah::where('sholat', 6)->with('santri')->get();
-        $kegiatan = Kegiatan::all();
+        $kegiatan = Kegiatan::where('ket', 'S')->get();
         $santri = Santri::select('nis', 'nama')->get();
         return view('kepkam.absensi', compact(
             'waqiah',
@@ -69,12 +69,12 @@ class KepalaKamar extends Controller
             $santri = Santri::where('nis', (string)$nis)->first();   
             if ($santri) {
                 match($kegiatan){
-                    '1' => AbsensiWaqiah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal],['status' => $status]),
-                    '2' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
-                    '3' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
-                    '4' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
-                    '5' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
-                    '6' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan],['status' => $status]),
+                    '1' => AbsensiWaqiah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'status' => $status]),
+                    '2' => AbsensiJamaah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan, 'status' => $status]),
+                    '3' => AbsensiJamaah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan, 'status' => $status]),
+                    '4' => AbsensiJamaah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan, 'status' => $status]),
+                    '5' => AbsensiJamaah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan, 'status' => $status]),
+                    '6' => AbsensiJamaah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan, 'status' => $status]),
                 };
             }
         }

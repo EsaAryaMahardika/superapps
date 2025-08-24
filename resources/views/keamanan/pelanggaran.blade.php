@@ -1,11 +1,12 @@
 @extends('layout')
 @section('content')
 <div class="body mt-5">
-    <div>
+    <h2>Pelanggaran</h2>
+    <div class="mt-3">
         <button class="btn btn-primary" data-toggle="modal" data-target="#add">Tambah Santri Melanggar</button>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover js-basic dataTable table-custom spacing5" id="pelanggaran">
+        <table class="table table-hover spacing5" id="pelanggaran">
             <thead>
                 <tr>
                     <th>Nama</th>
@@ -38,22 +39,18 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/pelanggaran" method="post" class="form-group">
+                <form action="/keamanan/pelanggaran" method="post" class="form-group">
                     @csrf
                     <div class="mt-2">
                         <label for="">Nama Santri</label>
                         <div class="input-group">
-                            <select class="select2" name="nis">
-                                @foreach ($santri as $item)
-                                <option value="{{ $item->nis }}">{{ $item->nama }}</option>
-                                @endforeach
-                            </select>
+                            <select class="form-select santri" name="nis" required></select>
                         </div>
                     </div>
                     <div class="mt-2">
                         <label for="">Pelanggaran</label>
                         <div class="input-group">
-                            <select class="form-control" name="pelanggaran_id">
+                            <select class="form-control" name="pelanggaran_id" required>
                                 <option value="">Pilih Pelanggaran</option>
                                 @foreach ($larangan as $item)
                                 <option value="{{ $item->id }}">{{ $item->nama }}</option>
@@ -64,7 +61,7 @@
                     <div class="mt-2">
                         <label for="">Hukuman</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" name="hukuman" id="hukuman">
+                            <input type="text" class="form-control" name="hukuman" id="hukuman" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -76,4 +73,9 @@
         </div>
     </div>
 </div>
+@endsection
+@section('script')
+<script>
+    $('#pelanggaran').DataTable();
+</script>
 @endsection

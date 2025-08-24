@@ -3,7 +3,7 @@
 <div class="body mt-5">
     <div class="table-responsive">
         <h3>Waqiah</h3>
-        <table class="table table-hover table-custom spacing5" id="waqiah">
+        <table class="table table-hover spacing5 tabel">
             <thead>
                 <tr>
                     <th>Tanggal</th>

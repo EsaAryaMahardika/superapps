@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover table-custom spacing5" id="waqiah">
+            <table class="table table-hover spacing5 tabel">
                 <thead>
                     <tr>
                         <th>Nama</th>
@@ -52,7 +52,7 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover table-custom spacing5" id="subuh">
+            <table class="table table-hover spacing5 tabel">
                 <thead>
                     <tr>
                         <th>Nama</th>
@@ -88,7 +88,7 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover table-custom spacing5" id="dhuhur">
+            <table class="table table-hover spacing5 tabel">
                 <thead>
                     <tr>
                         <th>Nama</th>
@@ -124,7 +124,7 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover table-custom spacing5" id="ashar">
+            <table class="table table-hover spacing5 tabel">
                 <thead>
                     <tr>
                         <th>Nama</th>
@@ -160,7 +160,7 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover table-custom spacing5" id="maghrib">
+            <table class="table table-hover spacing5 tabel">
                 <thead>
                     <tr>
                         <th>Nama</th>
@@ -196,7 +196,7 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover table-custom spacing5" id="isya">
+            <table class="table table-hover spacing5 tabel">
                 <thead>
                     <tr>
                         <th>Nama</th>
@@ -279,46 +279,4 @@
         </div>
     </div>
 </div>
-@endsection
-@section('script')
-<script src="{{ asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
-<script>
-$(document).ready(function() {
-    var today = new Date();
-    var subuh = $('#subuh').DataTable();
-    var dhuhur = $('#dhuhur').DataTable();
-    var ashar = $('#ashar').DataTable();
-    var maghrib = $('#maghrib').DataTable();
-    var isya = $('#isya').DataTable();
-    var waqiah = $('#waqiah').DataTable();
-    $('#tanggal').datepicker({
-        format: 'dd/mm/yyyy',
-        autoclose: true
-    })
-    .datepicker('setDate', today);
-    $.fn.dataTableExt.afnFiltering.push(
-        function(oSettings, aData, iDataIndex) {
-            let row = oSettings.aoData[iDataIndex].nTr;
-            let tanggalStr = $(row).data('tanggal');
-            if (!tanggalStr) return false;
-            let selectedDate = $('#tanggal').val();
-            return tanggalStr === selectedDate;
-        }
-    );
-    $('#tanggal').on('change', function() {
-        waqiah.draw();
-        subuh.draw();
-        dhuhur.draw();
-        ashar.draw();
-        maghrib.draw();
-        isya.draw();
-    });
-    waqiah.draw();
-    subuh.draw();
-    dhuhur.draw();
-    ashar.draw();
-    maghrib.draw();
-    isya.draw();
-});
-</script>
 @endsection

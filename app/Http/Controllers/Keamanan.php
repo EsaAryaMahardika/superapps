@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Santri;
 use App\Models\Larangan;
 use App\Models\Perizinan;
 use App\Models\AlasanIzin;
 use App\Models\Pelanggaran;
-use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Session\Session;
 
 class Keamanan extends Controller
 {
@@ -31,13 +32,14 @@ class Keamanan extends Controller
         ]);
         // Flash message using session helper
         session()->flash('success', 'Pelanggaran berhasil ditambahkan');
-        return redirect('/pelanggaran');
+        return redirect('/keamanan/pelanggaran');
     }
     public function dashboard() {
-        $currentYear = date('Y');
-        $pelanggar = Pelanggaran::whereYear('tanggal', $currentYear)->count();
-        $keluar = Perizinan::where('jenis', 'K')->whereYear('berangkat', $currentYear)->count();
-        $pulang = Perizinan::where('jenis', 'P')->whereYear('berangkat', $currentYear)->count();
+        // $currentMonth = date('M');
+        $currentMonth = Carbon::now()->month;
+        $pelanggar = Pelanggaran::whereMonth ('tanggal', $currentMonth)->count();
+        $keluar = Perizinan::where('jenis', 'K')->whereMonth ('berangkat', $currentMonth)->count();
+        $pulang = Perizinan::where('jenis', 'P')->whereMonth ('berangkat', $currentMonth)->count();
         return view('keamanan.dashboard', compact('pelanggar', 'keluar', 'pulang'));
     }
 }
