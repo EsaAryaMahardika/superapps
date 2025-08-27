@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use App\Models\Santri;
 use App\Models\Kegiatan;
 use Illuminate\Http\Request;
 use App\Models\AbsensiJamaah;
+use App\Models\AbsensiMingguan;
 use App\Models\AbsensiWaqiah;
+use App\Models\Larangan;
+use App\Models\Pelanggaran;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -62,8 +64,8 @@ class KepalaKamar extends Controller
             default => $exists = AbsensiJamaah::where(['tanggal' => $tanggal, 'sholat' => $kegiatan])->exists()
         };
         if ($exists) {
-            session()->flash('error', 'Absensi hari ini sudah dibuat');
-            return redirect('/absensi');
+            session()->flash('error', 'Absensi hari ini sudah pernah dibuat');
+            return redirect('/kepkam/absensi');
         }
         foreach ($request->santri as $nis => $status) {
             $santri = Santri::where('nis', (string)$nis)->first();   
@@ -78,7 +80,32 @@ class KepalaKamar extends Controller
                 };
             }
         }
-        session()->flash('success', 'Absensi berhasil dibuat');
-        return redirect('/absensi');
+        session()->flash('success', 'Absensi berhasil disimpan');
+        return redirect('/kepkam/absensi');
+    }
+    public function mingguan() {
+        $santri = Santri::select('nis', 'nama')->get();
+        $larangan = Larangan::select('id', 'nama')->where('ket' , 'K')->get();
+        $mingguan = AbsensiMingguan::with('santri', 'larangan')->get();
+        return view('kepkam.mingguan', compact('larangan', 'mingguan', 'santri'));
+    }
+    public function i_mingguan(Request $request) {
+        $tanggal = $request->tanggal;
+        $larangan = $request->larangan;
+        $pelanggaran = Larangan::where('id', $larangan)->first();
+        $existsLarangan = AbsensiMingguan::where('pelanggaran', $larangan)->exists();
+        $existsTanggal = AbsensiMingguan::where('tanggal', $tanggal)->exists();
+        if ($existsLarangan && $existsTanggal) {
+            session()->flash('error', 'Absensi pelanggaran '. $pelanggaran->nama .' minggu ini sudah pernah dibuat');
+            return redirect('/kepkam/mingguan');
+        }
+        foreach ($request->santri as $nis) {
+            $santri = Santri::where('nis', (string)$nis)->first();
+            if ($santri) {
+                AbsensiMingguan::create(['nis' => (string)$nis, 'pelanggaran' => $larangan, 'tanggal' => $tanggal]);
+            }
+        }
+        session()->flash('success', 'Absensi berhasil disimpan');
+        return redirect('/kepkam/mingguan');
     }
 }

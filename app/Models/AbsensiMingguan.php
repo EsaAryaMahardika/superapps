@@ -3,19 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class AbsensiWaqiah extends Model
+class AbsensiMingguan extends Model
 {
-    use HasFactory;
-    protected $table = 'absen_waqiah';
+    protected $table = 'absen_mingguan';
     protected $guarded = [];
     public $timestamps = false;
     public function santri()
     {
         return $this->belongsTo(Santri::class, 'nis', 'nis');
     }
-    protected $casts = [
-        'nis' => 'string'
-    ];
+    public function larangan()
+    {
+        return $this->belongsTo(Larangan::class, 'pelanggaran', 'id');
+    }
 }

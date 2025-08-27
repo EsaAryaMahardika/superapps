@@ -1,11 +1,12 @@
 @extends('kepkam.layout')
 @section('content')
 <div class="body mt-5">
+    <h2>Perizinan</h2>
     <div>
         <button class="btn btn-primary" data-toggle="modal" data-target="#add">Buat izin</button>
     </div>
     <div class="table-responsive">
-        <table class="table table-hover spacing5 tabel">
+        <table class="table table-hover spacing5" id="perizinan">
             <thead>
                 <tr>
                     <th>Nama</th>
@@ -30,8 +31,8 @@
                     @else
                     <td>-</td>
                     @endif
-                    @if($item->status == 1)
-                    <td><button class="btn btn-info izin" data-toggle="modal" data-target="#status" data-nis="{{ $item->santri->nis }}">Beri Izin</button></td>
+                     @if($item->status == 5)
+                    <td><button class="btn btn-info lapor" data-nis="{{ $item->santri->nis }}">Lapor Kembali</button></td>
                     @else
                     <td><span class="badge badge-info">{{ $item->statusizin->nama }}</span></td>
                     @endif
@@ -51,17 +52,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/pelanggaran" method="post" class="form-group">
+                <form action="/perizinan" method="post" class="form-group">
                     @csrf
                     <div class="mt-2">
                         <label for="">Nama Santri</label>
                         <div class="input-group">
-                            <select class="selectpicker" name="nis" id="nis" data-size="5" data-width="100%">
-                            <!--<select name="nis" id="nis">-->
-                                @foreach ($santri as $item)
-                                <option data-tokens="{{ $item->nis }}" value="{{ $item->nis }}">{{ $item->nama }}</option>
-                                @endforeach
-                            </select>
+                            <select class="form-select santri" name="nis" required></select>
                         </div>
                     </div>
                     <div class="mt-2">
@@ -129,20 +125,21 @@
 
 @section('script')
 <script>
+    $('#perizinan').DataTable();
     $(document).on('click', '.izin', function() {
         let nis = $(this).data('nis');
         $('#izin').data('nis', nis);
     });
-    $(document).on('click', '#izin', function() {
+    $(document).on('click', '.lapor', function() {
         let nis = $(this).data('nis');
         $.ajax({
-            url: `/perizinan/${nis}`,
+            url: `/lapor/${nis}`,
             method: 'PUT',
             data: {
-                _token: '{{ csrf_token() }}',
-                status: $('#konfirmasi').val(),
+                _token: "{{ csrf_token() }}",
+                status: 6
             },
-            success: function(data) {
+            success: function(data){
                 window.location.href = '/perizinan'
             },
             error: function(xhr) {
@@ -150,7 +147,7 @@
                 let errorDetail = error.responseJSON?.error || "";
                 alert(`${errorMessage}\n\nDetail: ${errorDetail}`);
             }
-        });
+        })
     });
 </script>
 @stop

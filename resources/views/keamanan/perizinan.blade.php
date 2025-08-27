@@ -86,7 +86,7 @@
                 status: 5
             },
             success: function(data){
-                window.location.href = '/keamanan/perizinan'
+                window.location.href = '/perizinan'
             },
             error: function(xhr) {
                 let errorMessage = error.responseJSON?.message || "Terjadi kesalahan tidak diketahui.";
@@ -105,7 +105,7 @@
                 status: $('#konfirmasi').val()
             },
             success: function(data) {
-                window.location.href = '/keamanan/perizinan'
+                window.location.href = '/perizinan'
             },
             error: function(xhr) {
                 let errorMessage = error.responseJSON?.message || "Terjadi kesalahan tidak diketahui.";

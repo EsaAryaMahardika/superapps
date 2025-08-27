@@ -16,12 +16,16 @@ Route::middleware(['guest'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [General::class, 'dashboard']);
+
     Route::get('/search-santri', [General::class, 'santri']);
     Route::get('/search-pengurus', [General::class, 'pengurus']);
     Route::get('/search-kepkam', [General::class, 'kepkam']);
+
     Route::get('/perizinan', [AlurPerizinan::class, 'perizinan']);
+    Route::post('/perizinan', [AlurPerizinan::class, 'createizin']);
     Route::put('/perizinan/{nis}', [AlurPerizinan::class, 'accizin']);
     Route::put('/lapor/{nis}', [AlurPerizinan::class, 'lapor']);
+
     Route::get('/logout', [General::class, 'logout']);
 
     // Keamanan
@@ -60,6 +64,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [KepalaKamar::class, 'dashboard']);
         Route::get('/absensi', [KepalaKamar::class, 'absensi']);
         Route::post('/absen', [KepalaKamar::class, 'absen']);
+        Route::get('/mingguan', [KepalaKamar::class, 'mingguan']);
+        Route::post('/mingguan', [KepalaKamar::class, 'i_mingguan']);
     });
 });
 Route::get('/ok', function () {

@@ -7,15 +7,14 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="icon" href="" type="image/x-icon">
         <title>{{ strtoupper($user) }} - An-Nur II</title>
-        <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/vendor/animate-css/vivify.min.css">
-        <link rel="stylesheet" href="/css/site.min.css">
+        <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('vendor/animate-css/vivify.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/site.min.css') }}">
         <link rel="stylesheet" href="{{ asset('vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
         <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css" />
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     </head>
     <body class="theme-light font-montserrat light_version">
         <div id="wrapper">
@@ -75,14 +74,13 @@
         <script>
             const BASE_URL = "{{ url('/') }}";
         </script>
-        <script src="/js/libscripts.bundle.js"></script>    
-        <script src="/js/vendorscripts.bundle.js"></script>    
-        <script src="/js/mainscripts.bundle.js"></script>
-        <script src="/js/script.js"></script>
-        <!--<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2"></script>-->
+        <script src="{{ asset('js/libscripts.bundle.js') }}"></script>    
+        <script src="{{ asset('js/vendorscripts.bundle.js') }}"></script>    
+        <script src="{{ asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+        <script src="{{ asset('js/mainscripts.bundle.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
         <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
-        <script src="{{ asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         @yield('script')
     </body>
 </html>

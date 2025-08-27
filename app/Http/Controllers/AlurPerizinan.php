@@ -45,6 +45,9 @@ class AlurPerizinan extends Controller
         };
         return view($view, compact('santri', 'alasan', 'perizinan'));
     }
+    public function createizin(Request $request) {
+        $nis = $request->nis;
+    }
     public function accizin(Request $request, $nis){
         try {
             switch ($this->user->role) {
