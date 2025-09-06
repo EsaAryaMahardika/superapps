@@ -26,6 +26,31 @@ class KepalaKamar extends Controller
         });
     }
     public function dashboard(){
+        $absen_kegiatan = function($model, $kegiatan, $value) {
+            $modelClass = "\\App\\Models\\$model";
+            $result = $modelClass::select(
+                'tanggal',
+                DB::raw("SUM(CASE WHEN status = 'H' THEN 1 ELSE 0 END) as hadir"),
+                DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
+                DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
+                DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
+            )
+            ->whereHas('santri', function($q) {
+                $q->where('kepkam', $this->user->username);
+            })
+            ->where($kegiatan, $value)
+            ->groupBy('tanggal')
+            ->orderBy('tanggal', 'desc')
+            ->get();
+            return $result;
+        };
+        $subuh = $absen_kegiatan('AbsensiJamaah', 'sholat', 2);
+        $dhuhur = $absen_kegiatan('AbsensiJamaah', 'sholat', 3);
+        $ashar = $absen_kegiatan('AbsensiJamaah', 'sholat', 4);
+        $maghrib = $absen_kegiatan('AbsensiJamaah', 'sholat', 5);
+        $isya = $absen_kegiatan('AbsensiJamaah', 'sholat', 6);
+        $ngasore = $absen_kegiatan('AbsensiNgaji', 'ngaji', 10);
+        $ngamalam = $absen_kegiatan('AbsensiNgaji', 'ngaji', 11);
         $waqiah = AbsensiWaqiah::select(
             'tanggal',
             DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
@@ -33,83 +58,6 @@ class KepalaKamar extends Controller
             DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
         )
         ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
-        ->groupBy('tanggal')
-        ->orderBy('tanggal', 'desc')
-        ->get();
-        $subuh = AbsensiJamaah::select(
-            'tanggal',
-            DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
-            DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
-            DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
-        )
-        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
-        ->where('sholat', 2)
-        ->groupBy('tanggal')
-        ->orderBy('tanggal', 'desc')
-        ->get();
-        $dhuhur = AbsensiJamaah::select(
-            'tanggal',
-            DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
-            DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
-            DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
-        )
-        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
-        ->where('sholat', 3)
-        ->groupBy('tanggal')
-        ->orderBy('tanggal', 'desc')
-        ->get();
-        $ashar = AbsensiJamaah::select(
-            'tanggal',
-            DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
-            DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
-            DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
-        )
-        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
-        ->where('sholat', 4)
-        ->groupBy('tanggal')
-        ->orderBy('tanggal', 'desc')
-        ->get();
-        $maghrib = AbsensiJamaah::select(
-            'tanggal',
-            DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
-            DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
-            DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
-        )
-        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
-        ->where('sholat', 5)
-        ->groupBy('tanggal')
-        ->orderBy('tanggal', 'desc')
-        ->get();
-        $isya = AbsensiJamaah::select(
-            'tanggal',
-            DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
-            DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
-            DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
-        )
-        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
-        ->where('sholat', 6)
-        ->groupBy('tanggal')
-        ->orderBy('tanggal', 'desc')
-        ->get();
-        $ngasore = AbsensiNgaji::select(
-            'tanggal',
-            DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
-            DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
-            DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
-        )
-        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
-        ->where('ngaji', 10)
-        ->groupBy('tanggal')
-        ->orderBy('tanggal', 'desc')
-        ->get();
-        $ngamalam = AbsensiNgaji::select(
-            'tanggal',
-            DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
-            DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
-            DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
-        )
-        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
-        ->where('ngaji', 11)
         ->groupBy('tanggal')
         ->orderBy('tanggal', 'desc')
         ->get();
@@ -130,34 +78,20 @@ class KepalaKamar extends Controller
         $waqiah = AbsensiWaqiah::whereHas('santri', function($q) {
             $q->where('kepkam', $this->user->username);
         })->with('santri')->get();
-        $subuh = AbsensiJamaah::where('sholat', 2)
-            ->whereHas('santri', function($q) {
-            $q->where('kepkam', $this->user->username);
+        $absensiharian = function($model, $kegiatan, $value) {
+            $class = "\\App\\Models\\$model";
+            $result = $class::where($kegiatan, $value)->whereHas('santri', function($q) {
+                $q->where('kepkam', $this->user->username);
             })->with('santri')->get();
-        $dhuhur = AbsensiJamaah::where('sholat', 3)
-            ->whereHas('santri', function($q) {
-            $q->where('kepkam', $this->user->username);
-            })->with('santri')->get();
-        $ashar = AbsensiJamaah::where('sholat', 4)
-            ->whereHas('santri', function($q) {
-            $q->where('kepkam', $this->user->username);
-            })->with('santri')->get();
-        $maghrib = AbsensiJamaah::where('sholat', 5)
-            ->whereHas('santri', function($q) {
-            $q->where('kepkam', $this->user->username);
-            })->with('santri')->get();
-        $isya = AbsensiJamaah::where('sholat', 6)
-            ->whereHas('santri', function($q) {
-            $q->where('kepkam', $this->user->username);
-            })->with('santri')->get();
-        $ngasore = AbsensiNgaji::where('ngaji', 10)
-            ->whereHas('santri', function($q) {
-            $q->where('kepkam', $this->user->username);
-            })->with('santri')->get();
-        $ngamalam = AbsensiNgaji::where('ngaji', 11)
-            ->whereHas('santri', function($q) {
-            $q->where('kepkam', $this->user->username);
-            })->with('santri')->get();
+            return $result;
+        };
+        $subuh = $absensiharian('AbsensiJamaah', 'sholat', 2);
+        $dhuhur = $absensiharian('AbsensiJamaah', 'sholat', 3);
+        $ashar = $absensiharian('AbsensiJamaah', 'sholat', 4);
+        $maghrib = $absensiharian('AbsensiJamaah', 'sholat', 5);
+        $isya = $absensiharian('AbsensiJamaah', 'sholat', 6);
+        $ngasore = $absensiharian('AbsensiNgaji', 'ngaji', 10);
+        $ngamalam = $absensiharian('AbsensiNgaji', 'ngaji', 11);
         $kegiatan = Kegiatan::where('ket', 'S')->get();
         $santri = Santri::select('nis', 'nama')->where('kepkam', $this->user->username)->get();
         return view('kepkam.absensi', compact(

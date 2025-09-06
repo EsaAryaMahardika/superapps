@@ -7,6 +7,7 @@
             <thead>
                 <tr>
                     <th>Tanggal</th>
+                    <th>Hadir</th>
                     <th>Sakit</th>
                     <th>Izin</th>
                     <th>Alfa</th>
@@ -16,6 +17,7 @@
                 @foreach ($subuh as $item)
                 <tr>
                     <td>{{ $item->tanggal }}</td>
+                    <td>{{ $item->hadir }}</td>
                     <td>{{ $item->sakit }}</td>
                     <td>{{ $item->izin }}</td>
                     <td>{{ $item->alfa }}</td>
@@ -30,6 +32,7 @@
             <thead>
                 <tr>
                     <th>Tanggal</th>
+                    <th>Hadir</th>
                     <th>Sakit</th>
                     <th>Izin</th>
                     <th>Alfa</th>
@@ -39,6 +42,7 @@
                 @foreach ($dhuhur as $item)
                 <tr>
                     <td>{{ $item->tanggal }}</td>
+                    <td>{{ $item->hadir }}</td>
                     <td>{{ $item->sakit }}</td>
                     <td>{{ $item->izin }}</td>
                     <td>{{ $item->alfa }}</td>
@@ -53,6 +57,7 @@
             <thead>
                 <tr>
                     <th>Tanggal</th>
+                    <th>Hadir</th>
                     <th>Sakit</th>
                     <th>Izin</th>
                     <th>Alfa</th>
@@ -62,6 +67,7 @@
                 @foreach ($waqiah as $item)
                 <tr>
                     <td>{{ $item->tanggal }}</td>
+                    <td>{{ $item->hadir }}</td>
                     <td>{{ $item->sakit }}</td>
                     <td>{{ $item->izin }}</td>
                     <td>{{ $item->alfa }}</td>
@@ -76,6 +82,7 @@
             <thead>
                 <tr>
                     <th>Tanggal</th>
+                    <th>Hadir</th>
                     <th>Sakit</th>
                     <th>Izin</th>
                     <th>Alfa</th>
@@ -85,6 +92,7 @@
                 @foreach ($ashar as $item)
                 <tr>
                     <td>{{ $item->tanggal }}</td>
+                    <td>{{ $item->hadir }}</td>
                     <td>{{ $item->sakit }}</td>
                     <td>{{ $item->izin }}</td>
                     <td>{{ $item->alfa }}</td>
@@ -99,6 +107,7 @@
             <thead>
                 <tr>
                     <th>Tanggal</th>
+                    <th>Hadir</th>
                     <th>Sakit</th>
                     <th>Izin</th>
                     <th>Alfa</th>
@@ -108,6 +117,7 @@
                 @foreach ($maghrib as $item)
                 <tr>
                     <td>{{ $item->tanggal }}</td>
+                    <td>{{ $item->hadir }}</td>
                     <td>{{ $item->sakit }}</td>
                     <td>{{ $item->izin }}</td>
                     <td>{{ $item->alfa }}</td>
@@ -122,6 +132,7 @@
             <thead>
                 <tr>
                     <th>Tanggal</th>
+                    <th>Hadir</th>
                     <th>Sakit</th>
                     <th>Izin</th>
                     <th>Alfa</th>
@@ -131,6 +142,7 @@
                 @foreach ($isya as $item)
                 <tr>
                     <td>{{ $item->tanggal }}</td>
+                    <td>{{ $item->hadir }}</td>
                     <td>{{ $item->sakit }}</td>
                     <td>{{ $item->izin }}</td>
                     <td>{{ $item->alfa }}</td>
@@ -145,6 +157,7 @@
             <thead>
                 <tr>
                     <th>Tanggal</th>
+                    <th>Hadir</th>
                     <th>Sakit</th>
                     <th>Izin</th>
                     <th>Alfa</th>
@@ -154,6 +167,7 @@
                 @foreach ($ngasore as $item)
                 <tr>
                     <td>{{ $item->tanggal }}</td>
+                    <td>{{ $item->hadir }}</td>
                     <td>{{ $item->sakit }}</td>
                     <td>{{ $item->izin }}</td>
                     <td>{{ $item->alfa }}</td>
@@ -168,6 +182,7 @@
             <thead>
                 <tr>
                     <th>Tanggal</th>
+                    <th>Hadir</th>
                     <th>Sakit</th>
                     <th>Izin</th>
                     <th>Alfa</th>
@@ -177,6 +192,7 @@
                 @foreach ($ngamalam as $item)
                 <tr>
                     <td>{{ $item->tanggal }}</td>
+                    <td>{{ $item->hadir }}</td>
                     <td>{{ $item->sakit }}</td>
                     <td>{{ $item->izin }}</td>
                     <td>{{ $item->alfa }}</td>

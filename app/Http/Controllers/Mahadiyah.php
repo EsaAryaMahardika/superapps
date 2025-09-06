@@ -63,12 +63,17 @@ class Mahadiyah extends Controller
     }
     public function kegiatan()
     {
+        $nis = Pengurus::select('nis')->get();
+
         $waqiah = AbsensiWaqiah::select(
             'tanggal',
             DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
             DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
             DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
         )
+        ->whereHas('santri', function($q, $nis) {
+            $q->where('kepkam', $nis);
+        })
         ->groupBy('tanggal')
         ->orderBy('tanggal', 'desc')
         ->get();
