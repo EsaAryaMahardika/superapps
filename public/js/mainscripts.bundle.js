@@ -1,19 +1,3 @@
-function myFunction() {
-
-    var e =
-
-        ((document.body.scrollTop || document.documentElement.scrollTop) /
-
-            (document.documentElement.scrollHeight -
-
-                document.documentElement.clientHeight)) *
-
-        100;
-
-    document.getElementById("myBar").style.width = e + "%";
-
-}
-
 function skinChanger() {
 
     $(".choose-skin li").on("click", function () {
@@ -37,13 +21,6 @@ function skinChanger() {
     });
 
 }
-
-    (window.onscroll = function () {
-
-        myFunction();
-
-    }),
-
     $(document).ready(function () {
 
         $("#main-menu").metisMenu(),
@@ -265,25 +242,6 @@ function skinChanger() {
                 console.log(e), $("body").removeClass(e).addClass(this.value);
 
             }),
-
-            $(".setting_switch .mini-sidebar-btn").on("change", function () {
-
-                this.checked
-
-                    ? ($("body").addClass("mini_sidebar"),
-
-                      $("#left-sidebar").addClass("mini_sidebar_on"),
-
-                      $(".hmenu-btn").attr("disabled", "disabled"))
-
-                    : ($("body").removeClass("mini_sidebar"),
-
-                      $("#left-sidebar").removeClass("mini_sidebar_on"),
-
-                      $(".hmenu-btn").removeAttr("disabled", "disabled"));
-
-            }),
-
             $("#left-sidebar").hover(function () {
 
                 $("body").toggleClass("mini_hover"),
@@ -291,57 +249,18 @@ function skinChanger() {
                     $("#left-sidebar").toggleClass("mini_sidebar_on");
 
             }),
-
-            $(".setting_switch .hmenu-btn").on("change", function () {
-
-                this.checked
-
-                    ? ($("body").addClass("h-menu"),
-
-                      $(".mini-sidebar-btn").attr("disabled", "disabled"))
-
-                    : ($("body").removeClass("h-menu"),
-
-                      $(".mini-sidebar-btn").removeAttr(
-
-                          "disabled",
-
-                          "disabled"
-
-                      ));
-
-            }),
-
-            $(".setting_switch .rtl-btn").on("change", function () {
-
-                this.checked
-
-                    ? $("body").addClass("rtl")
-
-                    : $("body").removeClass("rtl");
-
-            });
-
             $('#mode').on('click', function() {
-
                 let icon = $('#icon');
-
                 if (icon.hasClass('fa-sun')) {
-
                     $('body').removeClass('light_version');
-
                     icon.removeClass('fa fa-2x fa-sun').addClass('fa fa-2x fa-moon');
-
                 } else {
-
                     $('body').addClass('light_version');
-
                     icon.removeClass('fa fa-2x fa-moon').addClass('fa fa-2x fa-sun');
-
                 }
-
             });
-            // DataTables berdasarkan tanggal
+            // CUSTOM SCRIPT //
+            $('.tablenotime').DataTable();
             var today = new Date();
             var tabel = $('.tabel').DataTable();
             $('#tanggal').datepicker({
