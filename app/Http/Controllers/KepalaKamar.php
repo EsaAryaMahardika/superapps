@@ -32,6 +32,7 @@ class KepalaKamar extends Controller
             DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
             DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
         )
+        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
         ->groupBy('tanggal')
         ->orderBy('tanggal', 'desc')
         ->get();
@@ -41,6 +42,7 @@ class KepalaKamar extends Controller
             DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
             DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
         )
+        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
         ->where('sholat', 2)
         ->groupBy('tanggal')
         ->orderBy('tanggal', 'desc')
@@ -51,6 +53,7 @@ class KepalaKamar extends Controller
             DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
             DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
         )
+        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
         ->where('sholat', 3)
         ->groupBy('tanggal')
         ->orderBy('tanggal', 'desc')
@@ -61,6 +64,7 @@ class KepalaKamar extends Controller
             DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
             DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
         )
+        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
         ->where('sholat', 4)
         ->groupBy('tanggal')
         ->orderBy('tanggal', 'desc')
@@ -71,6 +75,7 @@ class KepalaKamar extends Controller
             DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
             DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
         )
+        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
         ->where('sholat', 5)
         ->groupBy('tanggal')
         ->orderBy('tanggal', 'desc')
@@ -81,6 +86,7 @@ class KepalaKamar extends Controller
             DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
             DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
         )
+        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
         ->where('sholat', 6)
         ->groupBy('tanggal')
         ->orderBy('tanggal', 'desc')
@@ -91,6 +97,7 @@ class KepalaKamar extends Controller
             DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
             DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
         )
+        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
         ->where('ngaji', 10)
         ->groupBy('tanggal')
         ->orderBy('tanggal', 'desc')
@@ -101,6 +108,7 @@ class KepalaKamar extends Controller
             DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
             DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
         )
+        ->whereHas('santri', function($q) {$q->where('kepkam', $this->user->username);})
         ->where('ngaji', 11)
         ->groupBy('tanggal')
         ->orderBy('tanggal', 'desc')
