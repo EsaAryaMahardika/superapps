@@ -321,7 +321,7 @@
                         <label for="">Tanggal</label>
                         <input type="date" class="form-control" name="tanggal">
                     </div>
-                    <table class="table table-custom">
+                    <table class="table table-custom search">
                         <thead>
                             <tr>
                                 <th>Nama</th>

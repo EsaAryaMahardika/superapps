@@ -110,43 +110,18 @@ class KepalaKamar extends Controller
     public function absen(Request $request) {
         $tanggal = Carbon::parse($request->tanggal)->format('d/m/Y');
         $kegiatan = $request->kegiatan;
-        $option = [
-            1 => 'Waqiah',
-            2 => 'Subuh',
-            3 => 'Dhuhur',
-            4 => 'Ashar',
-            5 => 'Maghrib',
-            6 => 'Isya',
-            10 => 'Ngaji Sore',
-            11 => 'Ngaji Malam'
-        ];
-        $selected = $option[$kegiatan];
-        match($kegiatan) {
-            '1' => $exists = AbsensiWaqiah::where('tanggal', $tanggal)->exists(),
-            '2' => $exists = AbsensiJamaah::where(['tanggal' => $tanggal, 'sholat' => $kegiatan])->exists(),
-            '3' => $exists = AbsensiJamaah::where(['tanggal' => $tanggal, 'sholat' => $kegiatan])->exists(),
-            '4' => $exists = AbsensiJamaah::where(['tanggal' => $tanggal, 'sholat' => $kegiatan])->exists(),
-            '5' => $exists = AbsensiJamaah::where(['tanggal' => $tanggal, 'sholat' => $kegiatan])->exists(),
-            '6' => $exists = AbsensiJamaah::where(['tanggal' => $tanggal, 'sholat' => $kegiatan])->exists(),
-            '10' => $exists = AbsensiNgaji::where(['tanggal' => $tanggal, 'ngaji' => $kegiatan])->exists(),
-            '11' => $exists = AbsensiNgaji::where(['tanggal' => $tanggal, 'ngaji' => $kegiatan])->exists()
-        };
-        if ($exists) {
-            session()->flash('error', 'Absensi '.$selected.' tanggal '.$tanggal.' sudah pernah dibuat');
-            return redirect('/kepkam/absensi');
-        }
         foreach ($request->santri as $nis => $status) {
             $santri = Santri::where('nis', (string)$nis)->first();   
             if ($santri) {
                 match($kegiatan){
-                    '1' => AbsensiWaqiah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'status' => $status]),
-                    '2' => AbsensiJamaah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan, 'status' => $status]),
-                    '3' => AbsensiJamaah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan, 'status' => $status]),
-                    '4' => AbsensiJamaah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan, 'status' => $status]),
-                    '5' => AbsensiJamaah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan, 'status' => $status]),
-                    '6' => AbsensiJamaah::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan, 'status' => $status]),
-                    '10' => AbsensiNgaji::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'ngaji' => $kegiatan, 'status' => $status]),
-                    '11' => AbsensiNgaji::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'ngaji' => $kegiatan, 'status' => $status]),
+                    '1' => AbsensiWaqiah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal], ['status' => $status]),
+                    '2' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan], ['status' => $status]),
+                    '3' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan], ['status' => $status]),
+                    '4' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan], ['status' => $status]),
+                    '5' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan], ['status' => $status]),
+                    '6' => AbsensiJamaah::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'sholat' => $kegiatan], ['status' => $status]),
+                    '10' => AbsensiNgaji::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'ngaji' => $kegiatan], ['status' => $status]),
+                    '11' => AbsensiNgaji::updateOrCreate(['nis' => (string)$nis, 'tanggal' => $tanggal, 'ngaji' => $kegiatan], ['status' => $status]),
                 };
             }
         }
@@ -167,13 +142,6 @@ class KepalaKamar extends Controller
     public function i_mingguan(Request $request) {
         $tanggal = Carbon::parse($request->tanggal)->format('d/m/Y');
         $larangan = $request->larangan;
-        $pelanggaran = Larangan::where('id', $larangan)->first();
-        $existsLarangan = AbsensiMingguan::where('pelanggaran', $larangan)->exists();
-        $existsTanggal = AbsensiMingguan::where('tanggal', $tanggal)->exists();
-        if ($existsLarangan && $existsTanggal) {
-            session()->flash('error', 'Absensi pelanggaran '. $pelanggaran->nama .' minggu ini sudah pernah dibuat');
-            return redirect('/kepkam/mingguan');
-        }
         foreach ($request->santri as $nis) {
             $santri = Santri::where('nis', (string)$nis)->first();
             if ($santri) {

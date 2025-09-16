@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="icon" href="" type="image/x-icon">
-        <title>{{ strtoupper($user) }} - An-Nur II</title>
+        <title>{{ strtoupper($user->pengurus->nama) }} - An-Nur II</title>
         <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ asset('vendor/animate-css/vivify.min.css') }}">
         <link rel="stylesheet" href="{{ asset('css/site.min.css') }}">
@@ -44,7 +44,10 @@
                     <div class="user-account">
                         <div class="dropdown">
                             <span>Selamat Datang</span>
-                            {{-- <div class="user-name"><strong>{{ $jabatan }} <span class="text-uppercase">{{ $nama }}</span></strong></div> --}}
+                            <div class="user-name">
+                                <strong>Kepala Kamar</strong>
+                            </div>
+                            <span class="text-uppercase">{{ $user->pengurus->nama }}</span>
                         </div>
                     </div>  
                     <nav id="left-sidebar-nav" class="sidebar-nav">

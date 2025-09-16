@@ -260,20 +260,28 @@ function skinChanger() {
                 }
             });
             // CUSTOM SCRIPT //
-            $('.tablenotime').DataTable();
+            $('.search').DataTable({
+                paging: false,
+                info: false
+            });
+            $('.tablenotime').DataTable({
+                info: false
+            });
             var today = new Date();
             var tabel = $('.tabel').DataTable();
             $('#tanggal').datepicker({
                 format: 'dd/mm/yyyy',
                 autoclose: true
-            })
-            .datepicker('setDate', today);
-            $.fn.dataTableExt.afnFiltering.push(
-                function(oSettings, aData, iDataIndex) {
-                    let row = oSettings.aoData[iDataIndex].nTr;
-                    let tanggalStr = $(row).data('tanggal');
-                    if (!tanggalStr) return false;
-                    let selectedDate = $('#tanggal').val();
+            }).datepicker('setDate', today);
+            $.fn.dataTable.ext.search.push(
+                function(settings, data, dataIndex) {
+                    if (!$(settings.nTable).hasClass('tabel')) {
+                        return true;
+                    }
+                    let row = settings.aoData[dataIndex].nTr;
+                    let tanggalStr = ($(row).data('tanggal') || '').trim();
+                    let selectedDate = ($('#tanggal').val() || '').trim();
+                    if (!selectedDate) return true;
                     return tanggalStr === selectedDate;
                 }
             );

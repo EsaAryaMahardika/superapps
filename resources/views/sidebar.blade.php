@@ -1,4 +1,4 @@
-@switch($user)
+@switch($user->role)
     @case('keamanan')
         <li><a href="/keamanan"><i class="fa fa-home"></i><span>Dashboard</span></a></li>
         <li><a href="/perizinan"><i class="fa fa-hand"></i><span>Perizinan</span></a></li>

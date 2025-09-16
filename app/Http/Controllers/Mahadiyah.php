@@ -4,17 +4,71 @@ namespace App\Http\Controllers;
 
 use App\Models\Wirid;
 use App\Models\Yasinan;
-use App\Models\Bandongan;
-use Illuminate\Http\Request;
-use App\Models\AbsensiWaqiah;
 use App\Models\Kegiatan;
 use App\Models\Pengurus;
+use App\Models\Bandongan;
+use Illuminate\Http\Request;
+use App\Models\AbsensiJamaah;
+use App\Models\AbsensiWaqiah;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class Mahadiyah extends Controller
 {
-    public function dashboard(){
-        return view('mahadiyah.dashboard');
+    public function dashboard(Request $request){
+        $waqiah = User::leftJoin('pengurus as p', 'user.username', '=', 'p.nis')
+            ->leftJoin('santri as s', 's.kepkam', '=', 'p.nis')
+            ->leftJoin('absen_waqiah as w', function($join) {
+                $join->on('w.nis', '=', 's.nis');
+            })
+            ->select(
+                'p.nama',
+                'w.tanggal',
+                DB::raw("COALESCE(SUM(CASE WHEN w.status = 'H' THEN 1 ELSE 0 END), 0) AS hadir"),
+                DB::raw("COALESCE(SUM(CASE WHEN w.status = 'S' THEN 1 ELSE 0 END), 0) AS sakit"),
+                DB::raw("COALESCE(SUM(CASE WHEN w.status = 'I' THEN 1 ELSE 0 END), 0) AS izin"),
+                DB::raw("COALESCE(SUM(CASE WHEN w.status = 'A' THEN 1 ELSE 0 END), 0) AS alfa")
+            )
+            ->where('user.role', 's.kepkam')
+            ->groupBy('p.nama', 'w.tanggal')
+            ->get();
+        $absensi = function($tabel, $kegiatan, $value){
+            $result = User::leftJoin('pengurus as p', 'user.username', '=', 'p.nis')
+            ->leftJoin('santri as s', 's.kepkam', '=', 'p.nis')
+            ->leftJoin($tabel.' as k', function($join) use($kegiatan, $value){
+                $join->on('k.nis', '=', 's.nis')
+                ->where("k.$kegiatan", $value);
+            })
+            ->select(
+                'p.nama',
+                "k.tanggal",
+                DB::raw("COALESCE(SUM(CASE WHEN k.status = 'H' THEN 1 ELSE 0 END), 0) AS hadir"),
+                DB::raw("COALESCE(SUM(CASE WHEN k.status = 'S' THEN 1 ELSE 0 END), 0) AS sakit"),
+                DB::raw("COALESCE(SUM(CASE WHEN k.status = 'I' THEN 1 ELSE 0 END), 0) AS izin"),
+                DB::raw("COALESCE(SUM(CASE WHEN k.status = 'A' THEN 1 ELSE 0 END), 0) AS alfa")
+            )
+            ->where('user.role', 'kepkam')
+            ->groupBy('p.nama', 'k.tanggal')
+            ->get();
+            return $result;
+        };
+        $subuh = $absensi('absen_jamaah', 'sholat', 2);
+        $dhuhur = $absensi('absen_jamaah', 'sholat', 3);
+        $ashar = $absensi('absen_jamaah', 'sholat', 4);
+        $maghrib = $absensi('absen_jamaah', 'sholat', 5);
+        $isya = $absensi('absen_jamaah', 'sholat', 6);
+        $ngasore = $absensi('absen_ngaji', 'ngaji', 10);
+        $ngamalam = $absensi('absen_ngaji', 'ngaji', 11);
+        return view('mahadiyah.dashboard', compact(
+            'waqiah',
+            'subuh',
+            'dhuhur',
+            'ashar',
+            'maghrib',
+            'isya',
+            'ngasore',
+            'ngamalam',
+        ));
     }
     public function absensi()
     {
@@ -63,20 +117,6 @@ class Mahadiyah extends Controller
     }
     public function kegiatan()
     {
-        $nis = Pengurus::select('nis')->get();
-
-        $waqiah = AbsensiWaqiah::select(
-            'tanggal',
-            DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
-            DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
-            DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
-        )
-        ->whereHas('santri', function($q, $nis) {
-            $q->where('kepkam', $nis);
-        })
-        ->groupBy('tanggal')
-        ->orderBy('tanggal', 'desc')
-        ->get();
-        return view('mahadiyah.absensi-kegiatan', compact('waqiah'));
+        
     }
 }

@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer(['sidebar', 'layout', 'kepkam.layout'], function ($view) {
-        $view->with('user', Auth::user()->pengurus->nama);
+        $view->with('user', Auth::user());
     });
     }
 }

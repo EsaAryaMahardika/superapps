@@ -15,7 +15,7 @@
             <label for="">Tanggal</label>
             <input class="form-control" name="tanggal" value="{{ \Carbon\Carbon::now()->format('d-m-Y') }}" readonly>
         </div>
-        <table class="table table-custom">
+        <table class="table table-custom search">
             <thead>
                 <tr>
                     <th>Nama</th>
