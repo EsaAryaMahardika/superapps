@@ -262,7 +262,8 @@ function skinChanger() {
             // CUSTOM SCRIPT //
             $('.search').DataTable({
                 paging: false,
-                info: false
+                info: false,
+                responsive: true
             });
             $('.tablenotime').DataTable({
                 info: false

@@ -9,6 +9,7 @@ use App\Models\AlasanBoyong;
 use App\Models\Rencana;
 use App\Models\Boyong;
 use Illuminate\Http\Request;
+use Stevebauman\Purify\Facades\Purify;
 
 class Kantor extends Controller
 {
@@ -27,13 +28,13 @@ class Kantor extends Controller
     }
     public function i_boyong(Request $request) {
         Boyong::create([
-            'nis' => $request->nis,
-            'nama' => $request->nama,
-            'kelas' => $request->kelas,
-            'kep_id' => $request->kepkam,
-            'asr_id' => $request->asrama,
-            'ala_id' => $request->alasan,
-            'ren_id' => $request->rencana
+            'nis' => Purify::clean($request->nis),
+            'nama' => Purify::clean($request->nama),
+            'kelas' => Purify::clean($request->kelas),
+            'kep_id' => Purify::clean($request->kepkam),
+            'asr_id' => Purify::clean($request->asrama),
+            'ala_id' => Purify::clean($request->alasan),
+            'ren_id' => Purify::clean($request->rencana)
         ]);
         session()->flash('success', 'Data berhasil disimpan');
         return redirect('/boyong');

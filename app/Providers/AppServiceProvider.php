@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -22,7 +23,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer(['sidebar', 'layout', 'kepkam.layout'], function ($view) {
-        $view->with('user', Auth::user());
-    });
+            $view->with('user', Auth::user());
+        });
+        if (env('APP_ENV') === 'production') {
+            URL::forceScheme('https');
+        }
     }
 }

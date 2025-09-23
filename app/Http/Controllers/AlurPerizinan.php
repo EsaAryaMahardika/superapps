@@ -7,11 +7,8 @@ use App\Models\Santri;
 use App\Models\AlasanIzin;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Session;
+use Stevebauman\Purify\Facades\Purify;
 
 class AlurPerizinan extends Controller
 {
