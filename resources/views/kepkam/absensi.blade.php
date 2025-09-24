@@ -321,28 +321,30 @@
                         <label for="">Tanggal</label>
                         <input type="date" class="form-control" name="tanggal">
                     </div>
-                    <table class="table table-custom search">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>Absensi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($santri as $item)
-                            <tr>
-                                <td>{{ $item->nama }}</td>
-                                <td>
-                                    <select name="santri[{{ $item->nis }}]" class="custom-select">
-                                        @foreach (['H' => 'Hadir', 'S' => 'Sakit', 'I' => 'Izin', 'A' => 'Alpa'] as $kode => $label)
-                                            <option value="{{ $kode }}" {{ $kode == 'H' ? 'selected' : '' }}>{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-custom search">
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Absensi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($santri as $item)
+                                <tr>
+                                    <td>{{ $item->nama }}</td>
+                                    <td>
+                                        <select name="santri[{{ $item->nis }}]" class="custom-select">
+                                            @foreach (['H' => 'Hadir', 'S' => 'Sakit', 'I' => 'Izin', 'A' => 'Alpa'] as $kode => $label)
+                                                <option value="{{ $kode }}" {{ $kode == 'H' ? 'selected' : '' }}>{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Simpan</button>
