@@ -21,11 +21,12 @@ class AlurPerizinan extends Controller
             return $next($request);
         });
     }
-    public function perizinan() {
+    public function perizinan()
+    {
         $santri = match ($this->user->role) {
             // 'kepkam' => Santri::select(['nis','nama'])->where('kamar_id', $this->user->kamar_id)->get(),
-            'kepkam' => Santri::select('nis','nama')->get(),
-            'keamanan' => Santri::select('nis','nama')->get(),
+            'kepkam' => Santri::select('nis', 'nama')->get(),
+            'keamanan' => Santri::select('nis', 'nama')->get(),
             default => redirect('/'),
         };
         $alasan = AlasanIzin::all();
@@ -42,16 +43,39 @@ class AlurPerizinan extends Controller
         };
         return view($view, compact('santri', 'alasan', 'perizinan'));
     }
-    public function createizin(Request $request) {
-        $nis = $request->nis;
+    public function createizin(Request $request)
+    {
+        try {
+            Perizinan::updateOrCreate(
+                ['nis' => $request->nis],
+                [
+                    'jenis' => $request->jenis,
+                    'alasan' => $request->alasan,
+                    'berangkat' => Carbon::now(),
+                    'es_kembali' => Carbon::parse($request->kembali),
+                    'status' => 0, // 0: Pending/Proses
+                ]
+            );
+            return redirect('/perizinan')->with('success', 'Perizinan berhasil dibuat');
+        } catch (\Throwable $e) {
+            return redirect('/perizinan')->with('error', 'Gagal membuat perizinan: ' . $e->getMessage());
+        }
     }
-    public function accizin(Request $request, $nis){
+    public function accizin(Request $request, $nis)
+    {
         try {
             switch ($this->user->role) {
-                case 'kepkam': $table = 'acckepkam'; break;
-                case 'keamanan': $table = 'acckeamanan'; break;
-                case 'pengasuh': $table = 'accpengasuh'; break;
-                default: redirect('/');
+                case 'kepkam':
+                    $table = 'acckepkam';
+                    break;
+                case 'keamanan':
+                    $table = 'acckeamanan';
+                    break;
+                case 'pengasuh':
+                    $table = 'accpengasuh';
+                    break;
+                default:
+                    redirect('/');
             }
             $santri = Perizinan::where('nis', $nis)->first();
             $santri->update([
@@ -66,7 +90,8 @@ class AlurPerizinan extends Controller
             ], 500);
         }
     }
-    public function lapor(Request $request, $nis){
+    public function lapor(Request $request, $nis)
+    {
         try {
             $table = match ($this->user->role) {
                 'kepkam' => 'laporkepkam',

@@ -15,41 +15,44 @@ use Illuminate\Support\Facades\DB;
 
 class Mahadiyah extends Controller
 {
-    public function dashboard(Request $request){
+    public function dashboard(Request $request)
+    {
         $waqiah = User::leftJoin('pengurus as p', 'user.username', '=', 'p.nis')
             ->leftJoin('santri as s', 's.kepkam', '=', 'p.nis')
-            ->leftJoin('absen_waqiah as w', function($join) {
+            ->leftJoin('absen_waqiah as w', function ($join) {
                 $join->on('w.nis', '=', 's.nis');
             })
             ->select(
                 'p.nama',
-                'w.tanggal',
+                'p.nis',
+                DB::raw("STR_TO_DATE(w.tanggal, '%d/%m/%Y') as tanggal"),
                 DB::raw("COALESCE(SUM(CASE WHEN w.status = 'H' THEN 1 ELSE 0 END), 0) AS hadir"),
                 DB::raw("COALESCE(SUM(CASE WHEN w.status = 'S' THEN 1 ELSE 0 END), 0) AS sakit"),
                 DB::raw("COALESCE(SUM(CASE WHEN w.status = 'I' THEN 1 ELSE 0 END), 0) AS izin"),
                 DB::raw("COALESCE(SUM(CASE WHEN w.status = 'A' THEN 1 ELSE 0 END), 0) AS alfa")
             )
             ->where('user.role', 's.kepkam')
-            ->groupBy('p.nama', 'w.tanggal')
+            ->groupBy('p.nis', 'p.nama', 'w.tanggal')
             ->get();
-        $absensi = function($tabel, $kegiatan, $value){
+        $absensi = function ($tabel, $kegiatan, $value) {
             $result = User::leftJoin('pengurus as p', 'user.username', '=', 'p.nis')
-            ->leftJoin('santri as s', 's.kepkam', '=', 'p.nis')
-            ->leftJoin($tabel.' as k', function($join) use($kegiatan, $value){
-                $join->on('k.nis', '=', 's.nis')
-                ->where("k.$kegiatan", $value);
-            })
-            ->select(
-                'p.nama',
-                "k.tanggal",
-                DB::raw("COALESCE(SUM(CASE WHEN k.status = 'H' THEN 1 ELSE 0 END), 0) AS hadir"),
-                DB::raw("COALESCE(SUM(CASE WHEN k.status = 'S' THEN 1 ELSE 0 END), 0) AS sakit"),
-                DB::raw("COALESCE(SUM(CASE WHEN k.status = 'I' THEN 1 ELSE 0 END), 0) AS izin"),
-                DB::raw("COALESCE(SUM(CASE WHEN k.status = 'A' THEN 1 ELSE 0 END), 0) AS alfa")
-            )
-            ->where('user.role', 'kepkam')
-            ->groupBy('p.nama', 'k.tanggal')
-            ->get();
+                ->leftJoin('santri as s', 's.kepkam', '=', 'p.nis')
+                ->leftJoin($tabel . ' as k', function ($join) use ($kegiatan, $value) {
+                    $join->on('k.nis', '=', 's.nis')
+                        ->where("k.$kegiatan", $value);
+                })
+                ->select(
+                    'p.nama',
+                    'p.nis',
+                    DB::raw("STR_TO_DATE(k.tanggal, '%d/%m/%Y') as tanggal"),
+                    DB::raw("COALESCE(SUM(CASE WHEN k.status = 'H' THEN 1 ELSE 0 END), 0) AS hadir"),
+                    DB::raw("COALESCE(SUM(CASE WHEN k.status = 'S' THEN 1 ELSE 0 END), 0) AS sakit"),
+                    DB::raw("COALESCE(SUM(CASE WHEN k.status = 'I' THEN 1 ELSE 0 END), 0) AS izin"),
+                    DB::raw("COALESCE(SUM(CASE WHEN k.status = 'A' THEN 1 ELSE 0 END), 0) AS alfa")
+                )
+                ->where('user.role', 'kepkam')
+                ->groupBy('p.nis', 'p.nama', 'k.tanggal')
+                ->get();
             return $result;
         };
         $subuh = $absensi('absen_jamaah', 'sholat', 2);
@@ -59,6 +62,14 @@ class Mahadiyah extends Controller
         $isya = $absensi('absen_jamaah', 'sholat', 6);
         $ngasore = $absensi('absen_ngaji', 'ngaji', 10);
         $ngamalam = $absensi('absen_ngaji', 'ngaji', 11);
+
+        $kepkams = User::leftJoin('pengurus as p', 'user.username', '=', 'p.nis')
+            ->leftJoin('santri as s', 's.kepkam', '=', 'p.nis')
+            ->where('user.role', 'kepkam')
+            ->select('p.nama', 'p.nis', DB::raw('COUNT(s.nis) as jml_santri'))
+            ->groupBy('p.nama', 'p.nis')
+            ->orderBy('p.nama')
+            ->get();
         return view('mahadiyah.dashboard', compact(
             'waqiah',
             'subuh',
@@ -68,6 +79,7 @@ class Mahadiyah extends Controller
             'isya',
             'ngasore',
             'ngamalam',
+            'kepkams'
         ));
     }
     public function absensi()
@@ -81,15 +93,17 @@ class Mahadiyah extends Controller
             'yasinan'
         ));
     }
-    public function create_absen() {
+    public function create_absen()
+    {
         $kegiatan = Kegiatan::where('ket', 'P')->get();
         $pengurus = Pengurus::select('nis', 'nama')->get();
         return view('mahadiyah.create-absensi', compact('kegiatan', 'pengurus'));
     }
-    public function store_absen(Request $request){
+    public function store_absen(Request $request)
+    {
         $kegiatan = $request->kegiatan;
         $tanggal = $request->tanggal;
-        match($kegiatan) {
+        match ($kegiatan) {
             '7' => $exists = Bandongan::where('tanggal', $tanggal)->exists(),
             '8' => $exists = Wirid::where('tanggal', $tanggal)->exists(),
             '9' => $exists = Yasinan::where('tanggal', $tanggal)->exists()
@@ -99,12 +113,12 @@ class Mahadiyah extends Controller
             return redirect('/mahadiyah/absensi-pengurus');
         }
         foreach ($request->pengurus as $nis => $status) {
-            $pengurus = Pengurus::where('nis', (string)$nis)->first();   
+            $pengurus = Pengurus::where('nis', (string) $nis)->first();
             if ($pengurus) {
-                match($kegiatan){
-                    '7' => Bandongan::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'status' => $status]),
-                    '8' => Wirid::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'status' => $status]),
-                    '9' => Yasinan::create(['nis' => (string)$nis, 'tanggal' => $tanggal, 'status' => $status])
+                match ($kegiatan) {
+                    '7' => Bandongan::create(['nis' => (string) $nis, 'tanggal' => $tanggal, 'status' => $status]),
+                    '8' => Wirid::create(['nis' => (string) $nis, 'tanggal' => $tanggal, 'status' => $status]),
+                    '9' => Yasinan::create(['nis' => (string) $nis, 'tanggal' => $tanggal, 'status' => $status])
                 };
             }
         }
@@ -117,6 +131,6 @@ class Mahadiyah extends Controller
     }
     public function kegiatan()
     {
-        
+
     }
 }

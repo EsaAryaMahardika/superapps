@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="" type="image/x-icon">
-    <title>{{ strtoupper($user->pengurus->nama) }} - An-Nur II</title>
+    <title>MAHADIYAH - An-Nur II</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,8 +17,6 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
-    <!-- <link rel="stylesheet" href="{{ asset('vendor/animate-css/vivify.min.css') }}"> -->
-    <!-- <link rel="stylesheet" href="{{ asset('css/site.min.css') }}"> -->
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
     <link rel="stylesheet"
@@ -116,7 +114,7 @@
         <!-- Navigation -->
         <nav class="flex-1 overflow-y-auto py-4 pl-4 custom-scrollbar">
             <ul class="sidebar-menu list-none p-0 m-0">
-                @include('kepkam.sidebar')
+                @include('mahadiyah.sidebar')
             </ul>
 
             <!-- Bottom Actions -->
@@ -136,7 +134,7 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
-        <!-- Top Navbar (Optional, for mobile toggle or quick actions) -->
+        <!-- Top Navbar -->
         <header
             class="h-20 bg-white/50 backdrop-blur-xl flex items-center justify-between px-8 sticky top-0 z-40 border-b border-gray-100/50">
             <div class="flex items-center">
@@ -146,13 +144,12 @@
                 <div>
                     <p class="text-xs md:text-sm text-[#A3AED0] font-medium">Selamat Datang</p>
                     <h1 class="text-sm md:text-xl font-bold text-[#1B2559]">
-                        {{ $user->pengurus->nama }}
-                        <span class="text-xs md:text-sm font-normal text-[#4318FF] ml-1 md:ml-2">• Kepala Kamar</span>
+                        {{ Auth::check() ? (Auth::user()->pengurus ? Auth::user()->pengurus->nama : Auth::user()->username) : 'Tamu' }}
+                        <span class="text-xs md:text-sm font-normal text-[#4318FF] ml-1 md:ml-2">• Mahadiyah</span>
                     </h1>
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <!-- Add any header widgets here -->
                 <div class="w-10 h-10 rounded-full bg-[#F4F7FE] flex items-center justify-center text-[#4318FF]">
                     <i class="fa fa-user"></i>
                 </div>
@@ -191,7 +188,6 @@
             sidebar.classList.toggle('-translate-x-full');
             overlay.classList.toggle('hidden');
 
-            // Wait for display:block to apply before changing opacity for transition
             if (!overlay.classList.contains('hidden')) {
                 setTimeout(() => {
                     overlay.classList.remove('opacity-0');
@@ -204,7 +200,6 @@
     <script src="{{ asset('js/libscripts.bundle.js') }}"></script>
     <script src="{{ asset('js/vendorscripts.bundle.js') }}"></script>
     <script src="{{ asset('vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
-    <!-- <script src="{{ asset('js/mainscripts.bundle.js') }}"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>

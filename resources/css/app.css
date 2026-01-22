@@ -1,3 +1,155 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-[#F4F7FE] font-['DM_Sans'] text-[#2B3674] antialiased;
+    }
+}
+
+@layer components {
+
+    /* Modern Card */
+    .card {
+        @apply bg-white rounded-[20px] border-none shadow-[0_20px_27px_0_rgba(0, 0, 0, 0.05)] p-6 !important;
+    }
+
+    /* Modern Inputs */
+    .form-control {
+        @apply bg-[#F4F7FE] border-none text-gray-600 text-sm rounded-xl h-12 px-5 w-full focus:ring-2 focus:ring-[#4318FF] focus:bg-white transition-all duration-200 !important;
+    }
+
+    .form-control::placeholder {
+        @apply text-gray-400;
+    }
+
+    /* Modern Buttons */
+    .btn {
+        @apply rounded-xl px-6 py-3 font-medium tracking-wide transition-all duration-200 shadow-none border-none hover:-translate-y-0.5 !important;
+    }
+
+    .btn-dark {
+        @apply bg-[#111C44] text-white hover:bg-[#1B254B] hover:shadow-lg !important;
+    }
+
+    .btn-primary {
+        @apply bg-[#4318FF] text-white hover:bg-[#3311CC] hover:shadow-lg !important;
+    }
+
+    .btn-danger {
+        @apply bg-[#EE5D50] text-white hover:bg-[#D43F33] hover:shadow-lg !important;
+    }
+
+    .btn-success {
+        @apply bg-[#05CD99] text-white hover:bg-[#04A67A] hover:shadow-lg !important;
+    }
+
+    /* Typography & Utilities */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply text-[#1B2559] font-bold tracking-tight;
+    }
+
+    .text-muted {
+        @apply text-[#A3AED0] !important;
+    }
+
+    .text-primary {
+        @apply text-[#4318FF] !important;
+    }
+
+    .alert {
+        @apply rounded-xl border-none shadow-sm !important;
+    }
+
+    /* Layout Styles */
+    #wrapper {
+        @apply flex h-screen overflow-hidden bg-[#F4F7FE];
+    }
+
+    .navbar.top-navbar {
+        @apply bg-white/50 backdrop-blur-xl border-none shadow-sm sticky top-0 z-50 py-2 !important;
+        margin-bottom: 0 !important;
+    }
+
+    #left-sidebar {
+        @apply bg-[#111C44] w-72 h-full shadow-2xl fixed left-0 top-0 bottom-0 z-40 transition-transform duration-300 md:translate-x-0 -translate-x-full text-white;
+        border-right: none !important;
+    }
+
+    #left-sidebar .navbar-brand {
+        @apply text-white text-2xl font-bold px-8 py-6 mb-4 !important;
+    }
+
+    #left-sidebar .user-account {
+        @apply px-8 mb-6 !important;
+    }
+
+    #left-sidebar .user-account .dropdown {
+        @apply flex flex-col;
+    }
+
+    #left-sidebar .user-account span {
+        @apply text-[#A3AED0] text-sm font-medium;
+    }
+
+    #left-sidebar .user-account .user-name {
+        @apply text-white text-lg font-bold mt-1 mb-1;
+    }
+
+    #main-content {
+        @apply flex-1 ml-0 md:ml-72 p-8 overflow-y-auto h-full relative transition-all duration-300;
+    }
+
+    /* Sidebar Navigation */
+    .metismenu li a {
+        @apply flex items-center px-8 py-4 text-[#A3AED0] hover:text-white font-medium transition-colors duration-200 decoration-0 relative;
+    }
+
+    .metismenu li a:hover {
+        @apply bg-white/5;
+    }
+
+    .metismenu li a i {
+        @apply mr-4 text-xl w-6 text-center;
+    }
+
+    .metismenu li.active>a {
+        @apply text-white font-bold bg-[#4318FF] rounded-r-none border-r-4 border-[#4318FF];
+        /* Add right rounded effect or indicators */
+        position: relative;
+    }
+
+    .metismenu li.active>a::after {
+        content: '';
+        @apply absolute right-0 top-0 bottom-0 w-1 bg-[#4318FF] rounded-l-md;
+    }
+
+    /* Tables */
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_processing,
+    .dataTables_wrapper .dataTables_paginate {
+        @apply text-[#2B3674] font-medium !important;
+    }
+
+    table.dataTable thead th,
+    table.dataTable thead td {
+        @apply border-b border-gray-200 py-4 !important;
+    }
+
+    table.dataTable.no-footer {
+        @apply border-b-0 !important;
+    }
+
+    /* Hide some potential legacy elements causing visual noise */
+    #left-sidebar .sidebar-nav {
+        padding-top: 1rem;
+    }
+}
