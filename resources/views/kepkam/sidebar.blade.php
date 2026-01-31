@@ -7,6 +7,9 @@
 <li class="{{ Request::is('kepkam/mingguan*') ? 'active' : '' }}">
     <a href="/kepkam/mingguan"><i class="fa fa-calendar-week"></i><span>Absensi Mingguan</span></a>
 </li>
+<li class="{{ Request::is('kepkam/rekap-harian*') ? 'active' : '' }}">
+    <a href="/kepkam/rekap-harian"><i class="fa fa-table"></i><span>Rekapan Harian</span></a>
+</li>
 <li class="{{ Request::is('perizinan*') ? 'active' : '' }}">
     <a href="/perizinan"><i class="fa fa-hand-paper"></i><span>Perizinan</span></a>
 </li>

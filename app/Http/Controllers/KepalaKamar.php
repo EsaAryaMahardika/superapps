@@ -13,6 +13,7 @@ use App\Models\AbsensiWaqiah;
 use App\Models\AbsensiMingguan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class KepalaKamar extends Controller
 {
@@ -312,6 +313,146 @@ class KepalaKamar extends Controller
         })->with('santri', 'larangan')->get();
         return view('kepkam.mingguan', compact('larangan', 'mingguan', 'santri'));
     }
+
+    // ------------------- //
+    // REKAPAN HARIAN      //
+    // ------------------- //
+    public function rekapHarian(Request $request)
+    {
+        // Get selected date or default to today
+        $tanggal = $request->input('tanggal')
+            ? Carbon::parse($request->tanggal)->format('d/m/Y')
+            : Carbon::now()->format('d/m/Y');
+
+        // Get all santri under this kepkam
+        $santriList = Santri::select('nis', 'nama')
+            ->where('kepkam', $this->user->username)
+            ->orderBy('nama')
+            ->get();
+
+        // Define activities
+        $activities = [
+            ['name' => 'Subuh', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 2],
+            ['name' => 'Dhuhur', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 3],
+            ['name' => 'Ashar', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 4],
+            ['name' => 'Maghrib', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5],
+            ['name' => 'Isya', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6],
+            ['name' => 'Waqiah', 'model' => 'AbsensiWaqiah', 'col' => null, 'val' => null],
+            ['name' => 'Ngaji Sore', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 10],
+            ['name' => 'Ngaji Malam', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 11],
+        ];
+
+        // Fetch attendance data for each activity
+        $attendanceData = [];
+        foreach ($activities as $activity) {
+            $modelClass = "\\App\\Models\\{$activity['model']}";
+            $query = $modelClass::where('tanggal', $tanggal)
+                ->whereHas('santri', function ($q) {
+                    $q->where('kepkam', $this->user->username);
+                });
+
+            if ($activity['col']) {
+                $query->where($activity['col'], $activity['val']);
+            }
+
+            $records = $query->get()->keyBy('nis');
+            $attendanceData[$activity['name']] = $records;
+        }
+
+        // Build recap data
+        $rekapData = [];
+        foreach ($santriList as $santri) {
+            $row = [
+                'nis' => $santri->nis,
+                'nama' => $santri->nama,
+                'attendance' => []
+            ];
+
+            foreach ($activities as $activity) {
+                $status = '-';
+                if (isset($attendanceData[$activity['name']][$santri->nis])) {
+                    $status = $attendanceData[$activity['name']][$santri->nis]->status;
+                }
+                $row['attendance'][$activity['name']] = $status;
+            }
+
+            $rekapData[] = $row;
+        }
+
+        // Get kepala kamar name from pengurus relation
+        $kepalaKamar = $this->user->pengurus->nama;
+
+        return view('kepkam.rekap-harian', compact('rekapData', 'activities', 'tanggal', 'kepalaKamar'));
+    }
+
+    public function downloadRekapHarian(Request $request)
+    {
+        // Get selected date or default to today
+        $tanggal = $request->input('tanggal')
+            ? Carbon::parse($request->tanggal)->format('d/m/Y')
+            : Carbon::now()->format('d/m/Y');
+
+        // Get all santri under this kepkam
+        $santriList = Santri::select('nis', 'nama')
+            ->where('kepkam', $this->user->username)
+            ->orderBy('nama')
+            ->get();
+
+        // Define activities (matching the rekapHarian method)
+        $activities = [
+            ['name' => 'Subuh', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 2],
+            ['name' => 'Dhuhur', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 3],
+            ['name' => 'Ashar', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 4],
+            ['name' => 'Maghrib', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5],
+            ['name' => 'Isya', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6],
+            ['name' => 'Waqiah', 'model' => 'AbsensiWaqiah', 'col' => null, 'val' => null],
+            ['name' => 'Ngaji Sore', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 10],
+            ['name' => 'Ngaji Malam', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 11],
+        ];
+
+        $rekapData = [];
+        foreach ($santriList as $index => $santri) {
+            $row = [
+                'no' => $index + 1,
+                'nis' => $santri->nis,
+                'nama' => $santri->nama,
+                'attendance' => []
+            ];
+
+            foreach ($activities as $activity) {
+                $modelClass = "App\\Models\\" . $activity['model'];
+                $query = $modelClass::where('nis', $santri->nis)
+                    ->where('tanggal', $tanggal);
+
+                if ($activity['col'] !== null) {
+                    $query->where($activity['col'], $activity['val']);
+                }
+
+                $record = $query->first();
+                $status = $record ? $record->status : '-';
+                $row['attendance'][$activity['name']] = $status;
+            }
+
+            $rekapData[] = $row;
+        }
+
+        // Get kepala kamar name
+        $kepalaKamar = $this->user->pengurus->nama;
+
+        // Debug: check data
+        // dd(compact('rekapData', 'activities', 'tanggal', 'kepalaKamar'));
+
+        // Load PDF view
+        $pdf = Pdf::loadView('kepkam.rekap-harian-pdf', compact('rekapData', 'activities', 'tanggal', 'kepalaKamar'));
+
+        // Set paper size to Legal (longer than A4) to fit all data in one page
+        $pdf->setPaper('legal', 'portrait');
+
+        // Download PDF
+        $filename = 'Rekap_Harian_' . str_replace('/', '-', $tanggal) . '.pdf';
+        return $pdf->download($filename);
+    }
+
     public function i_mingguan(Request $request)
     {
         $tanggal = Carbon::createFromFormat('d-m-Y', $request->tanggal)->format('d/m/Y');

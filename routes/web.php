@@ -68,6 +68,8 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/absensi/{id}', [KepalaKamar::class, 'hapusAbsen']);
         Route::get('/mingguan', [KepalaKamar::class, 'mingguan']);
         Route::post('/mingguan', [KepalaKamar::class, 'i_mingguan']);
+        Route::get('/rekap-harian', [KepalaKamar::class, 'rekapHarian']);
+        Route::get('/rekap-harian/download', [KepalaKamar::class, 'downloadRekapHarian']);
     });
 });
 Route::get('/ok', function () {
