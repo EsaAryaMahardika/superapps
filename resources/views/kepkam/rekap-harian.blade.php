@@ -46,31 +46,68 @@
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
             async function renderPdfToCanvas() {
-                // Fetch PDF
                 const date = document.querySelector('input[name="tanggal"]').value;
                 const url = `/kepkam/rekap-harian/download?tanggal=${date}`;
-                const loadingTask = pdfjsLib.getDocument(url);
-                const pdf = await loadingTask.promise;
+                
+                console.log('[PDF Render] Starting PDF fetch from:', url);
+                
+                try {
+                    // First, try to fetch the PDF to check if it exists and is accessible
+                    const response = await fetch(url);
+                    console.log('[PDF Render] Fetch response status:', response.status);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    // Check content type
+                    const contentType = response.headers.get('content-type');
+                    console.log('[PDF Render] Content-Type:', contentType);
+                    
+                    if (!contentType || !contentType.includes('pdf')) {
+                        const text = await response.text();
+                        console.error('[PDF Render] Invalid content type. Response:', text.substring(0, 200));
+                        throw new Error(`Server tidak mengembalikan PDF (Content-Type: ${contentType})`);
+                    }
+                    
+                    // Convert response to blob for pdf.js
+                    const blob = await response.blob();
+                    const arrayBuffer = await blob.arrayBuffer();
+                    console.log('[PDF Render] PDF size:', blob.size, 'bytes');
+                    
+                    // Load PDF with pdf.js
+                    const loadingTask = pdfjsLib.getDocument({data: arrayBuffer});
+                    const pdf = await loadingTask.promise;
+                    console.log('[PDF Render] PDF loaded successfully, pages:', pdf.numPages);
 
-                // Get first page
-                const page = await pdf.getPage(1);
+                    // Get first page
+                    const page = await pdf.getPage(1);
+                    console.log('[PDF Render] Page 1 loaded');
 
-                // Set scale for high quality (4x for clearer text)
-                const viewport = page.getViewport({ scale: 4 });
+                    // Set scale for high quality (4x for clearer text)
+                    const viewport = page.getViewport({ scale: 4 });
+                    console.log('[PDF Render] Viewport size:', viewport.width, 'x', viewport.height);
 
-                // Prepare canvas
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
+                    // Prepare canvas
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
 
-                // Render PDF page to canvas
-                await page.render({
-                    canvasContext: context,
-                    viewport: viewport
-                }).promise;
+                    // Render PDF page to canvas
+                    await page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    }).promise;
+                    
+                    console.log('[PDF Render] Rendering complete');
 
-                return { canvas, date };
+                    return { canvas, date };
+                } catch (error) {
+                    console.error('[PDF Render] Error:', error);
+                    console.error('[PDF Render] Error stack:', error.stack);
+                    throw error;
+                }
             }
 
             async function downloadAsJpg() {
@@ -90,8 +127,20 @@
                     link.click();
 
                 } catch (error) {
-                    console.error('Error:', error);
-                    alert('Gagal mendownload gambar. Silakan coba lagi.');
+                    console.error('[Download] Error:', error);
+                    let errorMsg = 'Gagal mendownload gambar. ';
+                    
+                    if (error.message.includes('Server returned')) {
+                        errorMsg += 'Server tidak dapat membuat PDF. Coba lagi atau hubungi admin.';
+                    } else if (error.message.includes('Content-Type')) {
+                        errorMsg += 'Server mengembalikan format yang salah (bukan PDF).';
+                    } else if (error.message.includes('fetch')) {
+                        errorMsg += 'Tidak dapat terhubung ke server.';
+                    } else {
+                        errorMsg += error.message || 'Error tidak diketahui. Cek console (F12) untuk detail.';
+                    }
+                    
+                    alert(errorMsg);
                 } finally {
                     btn.disabled = false;
                     btn.innerHTML = originalContent;
@@ -124,7 +173,7 @@
                             });
                         } catch (shareError) {
                             if (shareError.name !== 'AbortError') {
-                                console.error('Error sharing:', shareError);
+                                console.error('[Share] Error sharing:', shareError);
                             }
                         } finally {
                             btn.disabled = false;
@@ -133,8 +182,20 @@
                     }, 'image/png');
 
                 } catch (error) {
-                    console.error('Error:', error);
-                    alert('Gagal memproses gambar untuk dibagikan.');
+                    console.error('[Share] Error:', error);
+                    let errorMsg = 'Gagal memproses gambar untuk dibagikan. ';
+                    
+                    if (error.message.includes('Server returned')) {
+                        errorMsg += 'Server tidak dapat membuat PDF. Coba lagi atau hubungi admin.';
+                    } else if (error.message.includes('Content-Type')) {
+                        errorMsg += 'Server mengembalikan format yang salah (bukan PDF).';
+                    } else if (error.message.includes('fetch')) {
+                        errorMsg += 'Tidak dapat terhubung ke server.';
+                    } else {
+                        errorMsg += error.message || 'Error tidak diketahui. Cek console (F12) untuk detail.';
+                    }
+                    
+                    alert(errorMsg);
                     btn.disabled = false;
                     btn.innerHTML = originalContent;
                 }
