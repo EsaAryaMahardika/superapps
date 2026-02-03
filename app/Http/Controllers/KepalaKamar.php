@@ -387,70 +387,104 @@ class KepalaKamar extends Controller
 
     public function downloadRekapHarian(Request $request)
     {
-        // Get selected date or default to today
-        $tanggal = $request->input('tanggal')
-            ? Carbon::parse($request->tanggal)->format('d/m/Y')
-            : Carbon::now()->format('d/m/Y');
+        try {
+            \Log::info('[PDF Download] Starting PDF generation', ['tanggal' => $request->tanggal]);
 
-        // Get all santri under this kepkam
-        $santriList = Santri::select('nis', 'nama')
-            ->where('kepkam', $this->user->username)
-            ->orderBy('nama')
-            ->get();
+            // Get selected date or default to today
+            $tanggal = $request->input('tanggal')
+                ? Carbon::parse($request->tanggal)->format('d/m/Y')
+                : Carbon::now()->format('d/m/Y');
 
-        // Define activities (matching the rekapHarian method)
-        $activities = [
-            ['name' => 'Subuh', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 2],
-            ['name' => 'Dhuhur', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 3],
-            ['name' => 'Ashar', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 4],
-            ['name' => 'Maghrib', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5],
-            ['name' => 'Isya', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6],
-            ['name' => 'Waqiah', 'model' => 'AbsensiWaqiah', 'col' => null, 'val' => null],
-            ['name' => 'Ngaji Sore', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 10],
-            ['name' => 'Ngaji Malam', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 11],
-        ];
+            \Log::info('[PDF Download] Date:', ['tanggal' => $tanggal]);
 
-        $rekapData = [];
-        foreach ($santriList as $index => $santri) {
-            $row = [
-                'no' => $index + 1,
-                'nis' => $santri->nis,
-                'nama' => $santri->nama,
-                'attendance' => []
+            // Get all santri under this kepkam
+            $santriList = Santri::select('nis', 'nama')
+                ->where('kepkam', $this->user->username)
+                ->orderBy('nama')
+                ->get();
+
+            \Log::info('[PDF Download] Santri count:', ['count' => $santriList->count()]);
+
+            // Define activities (matching the rekapHarian method)
+            $activities = [
+                ['name' => 'Subuh', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 2],
+                ['name' => 'Dhuhur', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 3],
+                ['name' => 'Ashar', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 4],
+                ['name' => 'Maghrib', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5],
+                ['name' => 'Isya', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6],
+                ['name' => 'Waqiah', 'model' => 'AbsensiWaqiah', 'col' => null, 'val' => null],
+                ['name' => 'Ngaji Sore', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 10],
+                ['name' => 'Ngaji Malam', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 11],
             ];
 
-            foreach ($activities as $activity) {
-                $modelClass = "App\\Models\\" . $activity['model'];
-                $query = $modelClass::where('nis', $santri->nis)
-                    ->where('tanggal', $tanggal);
+            $rekapData = [];
+            foreach ($santriList as $index => $santri) {
+                $row = [
+                    'no' => $index + 1,
+                    'nis' => $santri->nis,
+                    'nama' => $santri->nama,
+                    'attendance' => []
+                ];
 
-                if ($activity['col'] !== null) {
-                    $query->where($activity['col'], $activity['val']);
+                foreach ($activities as $activity) {
+                    $modelClass = "App\\Models\\" . $activity['model'];
+                    $query = $modelClass::where('nis', $santri->nis)
+                        ->where('tanggal', $tanggal);
+
+                    if ($activity['col'] !== null) {
+                        $query->where($activity['col'], $activity['val']);
+                    }
+
+                    $record = $query->first();
+                    $status = $record ? $record->status : '-';
+                    $row['attendance'][$activity['name']] = $status;
                 }
 
-                $record = $query->first();
-                $status = $record ? $record->status : '-';
-                $row['attendance'][$activity['name']] = $status;
+                $rekapData[] = $row;
             }
 
-            $rekapData[] = $row;
+            // Get kepala kamar name with null check
+            $kepalaKamar = 'N/A';
+            if ($this->user && $this->user->pengurus) {
+                $kepalaKamar = $this->user->pengurus->nama;
+            } else {
+                \Log::warning('[PDF Download] Pengurus relation is null for user', ['username' => $this->user->username]);
+            }
+
+            \Log::info('[PDF Download] Kepala Kamar:', ['nama' => $kepalaKamar]);
+
+            // Validate data before PDF generation
+            if (empty($rekapData)) {
+                \Log::warning('[PDF Download] No data to generate PDF');
+                return response()->json([
+                    'error' => 'Tidak ada data santri untuk tanggal ini'
+                ], 400);
+            }
+
+            \Log::info('[PDF Download] Loading PDF view');
+
+            // Load PDF view
+            $pdf = Pdf::loadView('kepkam.rekap-harian-pdf', compact('rekapData', 'activities', 'tanggal', 'kepalaKamar'));
+
+            // Set paper size to Legal (longer than A4) to fit all data in one page
+            $pdf->setPaper('legal', 'portrait');
+
+            \Log::info('[PDF Download] PDF generated successfully');
+
+            // Download PDF
+            $filename = 'Rekap_Harian_' . str_replace('/', '-', $tanggal) . '.pdf';
+            return $pdf->download($filename);
+
+        } catch (\Exception $e) {
+            \Log::error('[PDF Download] Error generating PDF', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'error' => 'Gagal membuat PDF: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Get kepala kamar name
-        $kepalaKamar = $this->user->pengurus->nama;
-
-        // Debug: check data
-        // dd(compact('rekapData', 'activities', 'tanggal', 'kepalaKamar'));
-
-        // Load PDF view
-        $pdf = Pdf::loadView('kepkam.rekap-harian-pdf', compact('rekapData', 'activities', 'tanggal', 'kepalaKamar'));
-
-        // Set paper size to Legal (longer than A4) to fit all data in one page
-        $pdf->setPaper('legal', 'portrait');
-
-        // Download PDF
-        $filename = 'Rekap_Harian_' . str_replace('/', '-', $tanggal) . '.pdf';
-        return $pdf->download($filename);
     }
 
     public function i_mingguan(Request $request)
