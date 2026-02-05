@@ -466,8 +466,38 @@ class KepalaKamar extends Controller
             // Load PDF view
             $pdf = Pdf::loadView('kepkam.rekap-harian-pdf', compact('rekapData', 'activities', 'tanggal', 'kepalaKamar'));
 
-            // Set paper size to Legal (longer than A4) to fit all data in one page
-            $pdf->setPaper('legal', 'portrait');
+            // Calculate dynamic page height based on data rows
+            // DomPDF uses POINTS as unit (1 inch = 72 points)
+            // Standard portrait width = 8.5 inches = 612 points
+
+            // Base height estimation (header + footer + margins) ~5 inches = 360 points
+            $baseHeightPoints = 360;
+
+            // Each data row approximately 0.25 inches = 18 points
+            $rowHeightPoints = 18;
+
+            // Header table row ~0.4 inches = 29 points
+            $headerRowPoints = 29;
+
+            $rowCount = count($rekapData);
+            $contentHeightPoints = $headerRowPoints + ($rowCount * $rowHeightPoints);
+            $totalHeightPoints = $baseHeightPoints + $contentHeightPoints;
+
+            // Set minimum height (8 inches = 576 points)
+            $totalHeightPoints = max($totalHeightPoints, 576);
+
+            \Log::info('[PDF Download] Page dimensions', [
+                'width_points' => 612,
+                'height_points' => $totalHeightPoints,
+                'rows' => $rowCount,
+                'width_inches' => 8.5,
+                'height_inches' => round($totalHeightPoints / 72, 2)
+            ]);
+
+            // Set custom paper size in POINTS: [x1, y1, x2, y2]
+            // Width: 612 points (8.5 inches)
+            // Height: dynamic based on content
+            $pdf->setPaper([0, 0, 612, $totalHeightPoints]);
 
             \Log::info('[PDF Download] PDF generated successfully');
 

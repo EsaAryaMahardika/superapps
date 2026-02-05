@@ -59,17 +59,22 @@
         }
 
         thead {
-            background-color: #F9FAFB;
+            background-color: #F3F4F6;
         }
 
         th {
             padding: 8px 5px;
             text-align: center;
-            font-size: 7px;
-            font-weight: bold;
-            color: #A3AED0;
+            font-size: 8px;
+            font-weight: 800;
+            color: #2B3674;
             text-transform: uppercase;
-            border-bottom: 2px solid #E5E7EB;
+            border-bottom: 3px solid #D1D5DB;
+            border-right: 1px solid #E5E7EB;
+        }
+
+        th:last-child {
+            border-right: none;
         }
 
         th.th-no {
@@ -95,6 +100,11 @@
             padding: 6px 4px;
             text-align: center;
             font-size: 8px;
+            border-right: 1px solid #E5E7EB;
+        }
+
+        td:last-child {
+            border-right: none;
         }
 
         td.no {
