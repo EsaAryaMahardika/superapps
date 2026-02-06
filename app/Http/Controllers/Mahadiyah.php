@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Wirid;
 use App\Models\Yasinan;
 use App\Models\Kegiatan;
@@ -12,6 +13,7 @@ use App\Models\AbsensiJamaah;
 use App\Models\AbsensiWaqiah;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class Mahadiyah extends Controller
 {
@@ -132,5 +134,196 @@ class Mahadiyah extends Controller
     public function kegiatan()
     {
 
+    }
+
+    // ------------------- //
+    // REKAP KEGIATAN KEPALA KAMAR //
+    // ------------------- //
+    public function rekapKegiatan(Request $request)
+    {
+        // Get date range or default to last 7 days
+        $endDate = $request->input('end_date')
+            ? Carbon::parse($request->end_date)
+            : Carbon::now();
+
+        $startDate = $request->input('start_date')
+            ? Carbon::parse($request->start_date)
+            : Carbon::now()->subDays(6);
+
+        // Generate array of dates in range
+        $dates = [];
+        $currentDate = $startDate->copy();
+        while ($currentDate <= $endDate) {
+            $dates[] = $currentDate->format('d/m/Y');
+            $currentDate->addDay();
+        }
+
+        $totalDays = count($dates);
+
+        // Get all kepala kamar
+        $kepkams = User::leftJoin('pengurus as p', 'user.username', '=', 'p.nis')
+            ->where('user.role', 'kepkam')
+            ->select('p.nama', 'p.nis')
+            ->orderBy('p.nama')
+            ->get();
+
+        // Define all activities to check
+        $activities = [
+            ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 2],
+            ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 3],
+            ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 4],
+            ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5],
+            ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6],
+            ['model' => 'AbsensiWaqiah', 'col' => null, 'val' => null],
+            ['model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 10],
+            ['model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 11],
+        ];
+
+        // Build recap data for each kepala kamar
+        $rekapData = [];
+        foreach ($kepkams as $kepkam) {
+            $row = [
+                'nis' => $kepkam->nis,
+                'nama' => $kepkam->nama,
+                'daily_status' => [],
+                'total' => 0,
+                'percentage' => 0
+            ];
+
+            // Check each date
+            foreach ($dates as $date) {
+                $hasFilled = $this->checkKepkamActivity($kepkam->nis, $date, $activities);
+                $row['daily_status'][$date] = $hasFilled;
+                if ($hasFilled) {
+                    $row['total']++;
+                }
+            }
+
+            // Calculate current percentage
+            $row['percentage'] = $totalDays > 0 ? round(($row['total'] / $totalDays) * 100) : 0;
+
+            $rekapData[] = $row;
+        }
+
+        return view('mahadiyah.rekap-kegiatan', compact('rekapData', 'dates', 'startDate', 'endDate', 'totalDays'));
+    }
+
+    private function checkKepkamActivity($kepkamNis, $tanggal, $activities)
+    {
+        // Get santri under this kepkam
+        $santriNis = DB::table('santri')
+            ->where('kepkam', $kepkamNis)
+            ->pluck('nis')
+            ->toArray();
+
+        if (empty($santriNis)) {
+            return false;
+        }
+
+        // Check if any activity has attendance for this date
+        foreach ($activities as $activity) {
+            $modelClass = "\\App\\Models\\{$activity['model']}";
+            $query = $modelClass::where('tanggal', $tanggal)
+                ->whereIn('nis', $santriNis);
+
+            if ($activity['col']) {
+                $query->where($activity['col'], $activity['val']);
+            }
+
+            if ($query->exists()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function downloadRekapKegiatan(Request $request)
+    {
+        try {
+            // Get date range or default to last 7 days
+            $endDate = $request->input('end_date')
+                ? Carbon::parse($request->end_date)
+                : Carbon::now();
+
+            $startDate = $request->input('start_date')
+                ? Carbon::parse($request->start_date)
+                : Carbon::now()->subDays(6);
+
+            // Generate array of dates in range
+            $dates = [];
+            $currentDate = $startDate->copy();
+            while ($currentDate <= $endDate) {
+                $dates[] = $currentDate->format('d/m/Y');
+                $currentDate->addDay();
+            }
+
+            $totalDays = count($dates);
+
+            // Get all kepala kamar
+            $kepkams = User::leftJoin('pengurus as p', 'user.username', '=', 'p.nis')
+                ->where('user.role', 'kepkam')
+                ->select('p.nama', 'p.nis')
+                ->orderBy('p.nama')
+                ->get();
+
+            // Define all activities to check
+            $activities = [
+                ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 2],
+                ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 3],
+                ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 4],
+                ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5],
+                ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6],
+                ['model' => 'AbsensiWaqiah', 'col' => null, 'val' => null],
+                ['model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 10],
+                ['model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 11],
+            ];
+
+            // Build recap data for each kepala kamar
+            $rekapData = [];
+            foreach ($kepkams as $kepkam) {
+                $row = [
+                    'nis' => $kepkam->nis,
+                    'nama' => $kepkam->nama,
+                    'daily_status' => [],
+                    'total' => 0,
+                    'percentage' => 0
+                ];
+
+                // Check each date
+                foreach ($dates as $date) {
+                    $hasFilled = $this->checkKepkamActivity($kepkam->nis, $date, $activities);
+                    $row['daily_status'][$date] = $hasFilled;
+                    if ($hasFilled) {
+                        $row['total']++;
+                    }
+                }
+
+                // Calculate current percentage
+                $row['percentage'] = $totalDays > 0 ? round(($row['total'] / $totalDays) * 100) : 0;
+
+                $rekapData[] = $row;
+            }
+
+            // Load PDF view
+            $pdf = Pdf::loadView('mahadiyah.rekap-kegiatan-pdf', compact('rekapData', 'dates', 'startDate', 'endDate', 'totalDays'));
+
+            // Set landscape orientation for better table display
+            $pdf->setPaper('a4', 'landscape');
+
+            // Download PDF
+            $filename = 'Rekap_Kegiatan_KepKam_' . $startDate->format('d-m-Y') . '_to_' . $endDate->format('d-m-Y') . '.pdf';
+            return $pdf->download($filename);
+
+        } catch (\Exception $e) {
+            \Log::error('[PDF Download] Error generating PDF', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'error' => 'Gagal membuat PDF: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -7,3 +7,6 @@
 <li class="{{ Request::is('mahadiyah/absensi-mingguan*') ? 'active' : '' }}">
     <a href="/mahadiyah/absensi-mingguan"><i class="fa fa-calendar-week"></i><span>Absensi Mingguan</span></a>
 </li>
+<li class="{{ Request::is('mahadiyah/rekap-kegiatan*') ? 'active' : '' }}">
+    <a href="/mahadiyah/rekap-kegiatan"><i class="fa fa-chart-bar"></i><span>Rekap Absensi KepKam</span></a>
+</li>

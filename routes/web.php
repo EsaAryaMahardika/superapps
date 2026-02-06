@@ -43,6 +43,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/absensi-pengurus', [Mahadiyah::class, 'absensi']);
         Route::get('/absen-pengurus', [Mahadiyah::class, 'create_absen']);
         Route::post('/absen-pengurus', [Mahadiyah::class, 'store_absen']);
+        Route::get('/rekap-kegiatan', [Mahadiyah::class, 'rekapKegiatan']);
+        Route::get('/rekap-kegiatan/download', [Mahadiyah::class, 'downloadRekapKegiatan']);
     });
 
     // Madin
