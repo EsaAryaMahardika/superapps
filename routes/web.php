@@ -45,6 +45,26 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/absen-pengurus', [Mahadiyah::class, 'store_absen']);
         Route::get('/rekap-kegiatan', [Mahadiyah::class, 'rekapKegiatan']);
         Route::get('/rekap-kegiatan/download', [Mahadiyah::class, 'downloadRekapKegiatan']);
+
+        // CRUD Pengurus
+        Route::get('/pengurus', [Mahadiyah::class, 'pengurus_index']);
+        Route::post('/pengurus', [Mahadiyah::class, 'pengurus_store']);
+        Route::put('/pengurus/{nis}', [Mahadiyah::class, 'pengurus_update']);
+        Route::delete('/pengurus/{nis}', [Mahadiyah::class, 'pengurus_destroy']);
+
+        // CRUD Divisi
+        Route::post('/divisi', [Mahadiyah::class, 'divisi_store']);
+        Route::put('/divisi/{id}', [Mahadiyah::class, 'divisi_update']);
+        Route::delete('/divisi/{id}', [Mahadiyah::class, 'divisi_destroy']);
+
+        // CRUD Jabatan
+        Route::post('/jabatan', [Mahadiyah::class, 'jabatan_store']);
+        Route::put('/jabatan/{id}', [Mahadiyah::class, 'jabatan_update']);
+        Route::delete('/jabatan/{id}', [Mahadiyah::class, 'jabatan_destroy']);
+
+        // Edit Absensi Pengurus (halaman penuh)
+        Route::get('/edit-absen/{tipe}/{tanggal}', [Mahadiyah::class, 'edit_absen']);
+        Route::put('/edit-absen/{tipe}/{tanggal}', [Mahadiyah::class, 'update_absen']);
     });
 
     // Madin

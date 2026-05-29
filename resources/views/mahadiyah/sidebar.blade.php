@@ -10,3 +10,6 @@
 <li class="{{ Request::is('mahadiyah/rekap-kegiatan*') ? 'active' : '' }}">
     <a href="/mahadiyah/rekap-kegiatan"><i class="fa fa-chart-bar"></i><span>Rekap Absensi KepKam</span></a>
 </li>
+<li class="{{ Request::is('mahadiyah/pengurus*') ? 'active' : '' }}">
+    <a href="/mahadiyah/pengurus"><i class="fa fa-users"></i><span>Data Pengurus</span></a>
+</li>
