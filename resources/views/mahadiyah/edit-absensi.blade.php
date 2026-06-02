@@ -57,7 +57,7 @@
                     <thead>
                         <tr class="text-left text-xs text-[#A3AED0] border-b border-gray-100">
                             <th class="pb-3 font-semibold">Nama Pengurus</th>
-                            <th class="pb-3 font-semibold">Jabatan</th>
+                            <th class="pb-3 font-semibold hidden md:table-cell">Jabatan</th>
                             <th class="pb-3 font-semibold">Status Kehadiran</th>
                         </tr>
                     </thead>
@@ -75,11 +75,18 @@
                                     </div>
                                     <div>
                                         <p class="font-semibold text-[#1B2559] nama-col">{{ $p->nama }}</p>
-                                        <p class="text-xs text-gray-400 font-mono">{{ $p->nis }}</p>
+                                        <div class="flex flex-col gap-0.5">
+                                            <p class="text-xs text-gray-400 font-mono">NIS: {{ $p->nis }}</p>
+                                            @if($jabatan)
+                                                <p class="text-xs text-gray-500 md:hidden font-medium">
+                                                    {{ $jabatan }} @if($divisi) · {{ $divisi }} @endif
+                                                </p>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="py-3.5">
+                            <td class="py-3.5 hidden md:table-cell">
                                 @if($jabatan)
                                     <p class="text-sm text-[#1B2559]">{{ $jabatan }}</p>
                                     @if($divisi)
@@ -95,7 +102,7 @@
                                     $statusNow = $rec?->status ?? 'H';
                                 @endphp
                                 <select name="pengurus[{{ $p->nis }}]"
-                                    class="status-select px-3 py-2 rounded-lg border font-medium text-sm min-w-[130px] outline-none transition-all">
+                                    class="status-select px-3 py-2 rounded-lg border font-medium text-sm min-w-[120px] md:min-w-[130px] outline-none transition-all">
                                     @foreach(['H'=>'Hadir','S'=>'Sakit','I'=>'Izin','A'=>'Alpa'] as $k=>$l)
                                     <option value="{{ $k }}" {{ $k === $statusNow ? 'selected' : '' }}>{{ $l }}</option>
                                     @endforeach

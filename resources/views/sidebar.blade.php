@@ -7,6 +7,8 @@
     @case('mahadiyah')
         <li><a href="/mahadiyah"><i class="fa fa-home"></i><span>Dashboard</span></a></li>
         <li><a href="/mahadiyah/absensi-pengurus"><i class="fa fa-list"></i><span>Absensi Pengurus</span></a></li>
+        <li><a href="/mahadiyah/rekap-kegiatan"><i class="fa fa-chart-bar"></i><span>Rekap Absensi KepKam</span></a></li>
+        <li><a href="/mahadiyah/rekap-absensi-pengurus"><i class="fa fa-file-invoice"></i><span>Rekap Absensi Pengurus</span></a></li>
         <li><a href="/mahadiyah/absensi-mingguan"><i class="fa fa-list"></i><span>Absensi Mingguan</span></a></li>
         @break
     @case('madin')

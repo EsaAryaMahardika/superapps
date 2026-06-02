@@ -279,14 +279,28 @@
                 <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Jabatan</label>
                 <select name="jabatan_id" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4318FF] focus:ring-2 focus:ring-[#4318FF]/20 transition-all text-sm outline-none">
                     <option value="">-- Pilih Jabatan --</option>
-                    @foreach($allJabatan->groupBy(fn($j) => $j->divisi->nama ?? 'Lainnya') as $divNama => $jabList)
+                    @php
+                        $jabatanKepkam = $allJabatan->filter(fn($j) => $j->divisi?->tipe === 'kepkam');
+                        $jabatanNon    = $allJabatan->filter(fn($j) => $j->divisi?->tipe !== 'kepkam');
+                    @endphp
+                    @if($jabatanKepkam->count())
+                    <optgroup label="── Kepala Kamar ──">
+                        @foreach($jabatanKepkam as $jab)
+                        <option value="{{ $jab->id }}">{{ $jab->nama }}</option>
+                        @endforeach
+                    </optgroup>
+                    @endif
+                    @if($jabatanNon->count())
+                    @foreach($jabatanNon->groupBy(fn($j) => $j->divisi->nama ?? 'Lainnya') as $divNama => $jabList)
                     <optgroup label="{{ $divNama }}">
                         @foreach($jabList as $jab)
                         <option value="{{ $jab->id }}">{{ $jab->nama }}</option>
                         @endforeach
                     </optgroup>
                     @endforeach
+                    @endif
                 </select>
+                <p class="text-[10px] text-[#A3AED0] mt-1">Untuk Kepala Kamar: pilih opsi di grup "Kepala Kamar" — contoh: <em>Kepala Kamar 1 SMA</em>, <em>Kepala Kamar 2 SMP</em></p>
             </div>
             <div class="flex gap-3 pt-2">
                 <button type="button" onclick="closeModal('modal-tambah-pengurus')" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 text-sm">Batal</button>
@@ -318,14 +332,28 @@
                 <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Jabatan</label>
                 <select name="jabatan_id" id="ep-jabatan" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4318FF] focus:ring-2 focus:ring-[#4318FF]/20 transition-all text-sm outline-none">
                     <option value="">-- Tanpa Jabatan --</option>
-                    @foreach($allJabatan->groupBy(fn($j) => $j->divisi->nama ?? 'Lainnya') as $divNama => $jabList)
+                    @php
+                        $jabatanKepkam = $allJabatan->filter(fn($j) => $j->divisi?->tipe === 'kepkam');
+                        $jabatanNon    = $allJabatan->filter(fn($j) => $j->divisi?->tipe !== 'kepkam');
+                    @endphp
+                    @if($jabatanKepkam->count())
+                    <optgroup label="── Kepala Kamar ──">
+                        @foreach($jabatanKepkam as $jab)
+                        <option value="{{ $jab->id }}">{{ $jab->nama }}</option>
+                        @endforeach
+                    </optgroup>
+                    @endif
+                    @if($jabatanNon->count())
+                    @foreach($jabatanNon->groupBy(fn($j) => $j->divisi->nama ?? 'Lainnya') as $divNama => $jabList)
                     <optgroup label="{{ $divNama }}">
                         @foreach($jabList as $jab)
                         <option value="{{ $jab->id }}">{{ $jab->nama }}</option>
                         @endforeach
                     </optgroup>
                     @endforeach
+                    @endif
                 </select>
+                <p class="text-[10px] text-[#A3AED0] mt-1">Untuk Kepala Kamar: pilih opsi di grup "Kepala Kamar" — contoh: <em>Kepala Kamar 1 SMA</em>, <em>Kepala Kamar 2 SMP</em></p>
             </div>
             <div class="flex gap-3 pt-2">
                 <button type="button" onclick="closeModal('modal-edit-pengurus')" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 text-sm">Batal</button>

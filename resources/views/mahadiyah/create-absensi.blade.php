@@ -82,7 +82,7 @@
                         <thead>
                             <tr class="text-left text-sm text-[#A3AED0] border-b border-gray-100">
                                 <th class="pb-3 font-semibold">Nama Pengurus</th>
-                                <th class="pb-3 font-semibold">Jabatan</th>
+                                <th class="pb-3 font-semibold hidden md:table-cell">Jabatan</th>
                                 <th class="pb-3 font-semibold">Status Kehadiran</th>
                             </tr>
                         </thead>
@@ -122,30 +122,34 @@
             ? `<span class="inline-flex items-center gap-1 text-[#05CD99]"><i class="fa fa-info-circle"></i> Yasinan: hanya pengurus Non Kepala Kamar (${list.length} orang)</span>`
             : `<span class="inline-flex items-center gap-1"><i class="fa fa-users"></i> Semua pengurus (${list.length} orang)</span>`;
 
-        tbody.innerHTML = list.map(p => {
+         tbody.innerHTML = list.map(p => {
             const jabatan = p.jabatan?.nama ?? '-';
             const divisi  = p.jabatan?.divisi?.nama ?? '';
             const jabLabel = divisi ? `${jabatan} · <span class="text-[#4318FF]">${divisi}</span>` : jabatan;
+            const jabLabelPlain = divisi ? `${jabatan} · ${divisi}` : jabatan;
 
             return `
             <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors pengurus-row">
                 <td class="py-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-[#F4F7FE] flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-full bg-[#F4F7FE] flex items-center justify-center flex-shrink-0">
                             <i class="fa fa-user text-[#4318FF]"></i>
                         </div>
                         <div>
                             <p class="font-semibold text-[#1B2559] nama-col">${p.nama}</p>
-                            <p class="text-xs text-gray-400">NIS: ${p.nis}</p>
+                            <div class="flex flex-col gap-0.5">
+                                <p class="text-xs text-gray-400">NIS: ${p.nis}</p>
+                                <p class="text-xs text-gray-500 md:hidden font-medium">${jabLabel}</p>
+                            </div>
                         </div>
                     </div>
                 </td>
-                <td class="py-4">
+                <td class="py-4 hidden md:table-cell">
                     <p class="text-sm text-[#1B2559] jabatan-col">${jabLabel}</p>
                 </td>
                 <td class="py-4">
                     <select name="pengurus[${p.nis}]"
-                        class="status-select px-4 py-2.5 rounded-lg border border-gray-200 focus:border-[#4318FF] focus:ring-2 focus:ring-[#4318FF]/20 transition-all font-medium min-w-[150px] text-green-600 border-green-200 bg-green-50">
+                        class="status-select px-4 py-2.5 rounded-lg border border-gray-200 focus:border-[#4318FF] focus:ring-2 focus:ring-[#4318FF]/20 transition-all font-medium min-w-[120px] md:min-w-[150px] text-green-600 border-green-200 bg-green-50">
                         <option value="H" selected>Hadir</option>
                         <option value="S">Sakit</option>
                         <option value="I">Izin</option>

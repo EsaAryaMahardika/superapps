@@ -922,4 +922,360 @@ class Mahadiyah extends Controller
             'rankEndDate'
         ));
     }
+
+    public function rekapAbsensiPengurus(Request $request)
+    {
+        $startDate = $request->input('start_date')
+            ? Carbon::parse($request->start_date)
+            : Carbon::now()->startOfWeek();
+
+        $endDate = $request->input('end_date')
+            ? Carbon::parse($request->end_date)
+            : Carbon::now()->endOfWeek();
+
+        $dates = [];
+        $currentDate = $startDate->copy();
+        while ($currentDate <= $endDate) {
+            $dates[] = $currentDate->format('d-m-Y');
+            $currentDate->addDay();
+        }
+
+        $totalDays = count($dates);
+
+        $pengurusList = Pengurus::with(['jabatan.divisi'])
+            ->get()
+            ->sortBy(function($p) {
+                $tipe = $p->jabatan->divisi->tipe ?? 'z_none';
+                $divName = $p->jabatan->divisi->nama ?? 'z_none';
+                $jabName = $p->jabatan->nama ?? 'z_none';
+                $tipeOrder = $tipe === 'kepkam' ? 0 : 1;
+                return sprintf('%d_%s_%s_%s', $tipeOrder, $divName, $jabName, $p->nama);
+            });
+
+        $nisList = $pengurusList->pluck('nis')->toArray();
+
+        $bandonganData = DB::table('bandongan')
+            ->whereIn('tanggal', $dates)
+            ->whereIn('nis', $nisList)
+            ->get()
+            ->groupBy('nis');
+
+        $wiridData = DB::table('wirid')
+            ->whereIn('tanggal', $dates)
+            ->whereIn('nis', $nisList)
+            ->get()
+            ->groupBy('nis');
+
+        $yasinanData = DB::table('yasinan')
+            ->whereIn('tanggal', $dates)
+            ->whereIn('nis', $nisList)
+            ->get()
+            ->groupBy('nis');
+
+        $rekapData = [];
+        foreach ($pengurusList as $p) {
+            $nis = $p->nis;
+            $div = $p->jabatan->divisi ?? null;
+            $tipe = $div ? $div->tipe : 'non';
+
+            $row = [
+                'nis' => $p->nis,
+                'nama' => $p->nama,
+                'jabatan' => $p->jabatan->nama ?? 'Pengurus',
+                'divisi' => $div->nama ?? 'Tanpa Divisi',
+                'tipe' => $tipe,
+                'attendance' => [],
+                'summary' => [
+                    'bandongan' => ['H' => 0, 'S' => 0, 'I' => 0, 'A' => 0, 'total' => 0],
+                    'wirid' => ['H' => 0, 'S' => 0, 'I' => 0, 'A' => 0, 'total' => 0],
+                    'yasinan' => ['H' => 0, 'S' => 0, 'I' => 0, 'A' => 0, 'total' => 0],
+                ]
+            ];
+
+            $pBandongan = isset($bandonganData[$nis]) ? $bandonganData[$nis]->keyBy('tanggal') : collect();
+            $pWirid = isset($wiridData[$nis]) ? $wiridData[$nis]->keyBy('tanggal') : collect();
+            $pYasinan = isset($yasinanData[$nis]) ? $yasinanData[$nis]->keyBy('tanggal') : collect();
+
+            foreach ($dates as $date) {
+                $bStatus = $pBandongan->get($date)->status ?? null;
+                $wStatus = $pWirid->get($date)->status ?? null;
+                $yStatus = ($tipe === 'kepkam') ? null : ($pYasinan->get($date)->status ?? null);
+
+                $row['attendance'][$date] = [
+                    'bandongan' => $bStatus,
+                    'wirid' => $wStatus,
+                    'yasinan' => $yStatus,
+                ];
+
+                if ($bStatus) {
+                    $row['summary']['bandongan'][$bStatus]++;
+                    $row['summary']['bandongan']['total']++;
+                }
+                if ($wStatus) {
+                    $row['summary']['wirid'][$wStatus]++;
+                    $row['summary']['wirid']['total']++;
+                }
+                if ($yStatus) {
+                    $row['summary']['yasinan'][$yStatus]++;
+                    $row['summary']['yasinan']['total']++;
+                }
+            }
+
+            $rekapData[] = $row;
+        }
+
+        return view('mahadiyah.rekap-absensi-pengurus', compact('rekapData', 'dates', 'startDate', 'endDate', 'totalDays'));
+    }
+
+    public function downloadRekapAbsensiPengurus(Request $request)
+    {
+        try {
+            $startDate = $request->input('start_date')
+                ? Carbon::parse($request->start_date)
+                : Carbon::now()->startOfWeek();
+
+            $endDate = $request->input('end_date')
+                ? Carbon::parse($request->end_date)
+                : Carbon::now()->endOfWeek();
+
+            $dates = [];
+            $currentDate = $startDate->copy();
+            while ($currentDate <= $endDate) {
+                $dates[] = $currentDate->format('d-m-Y');
+                $currentDate->addDay();
+            }
+
+            $totalDays = count($dates);
+
+            $pengurusList = Pengurus::with(['jabatan.divisi'])
+                ->get()
+                ->sortBy(function($p) {
+                    $tipe = $p->jabatan->divisi->tipe ?? 'z_none';
+                    $divName = $p->jabatan->divisi->nama ?? 'z_none';
+                    $jabName = $p->jabatan->nama ?? 'z_none';
+                    $tipeOrder = $tipe === 'kepkam' ? 0 : 1;
+                    return sprintf('%d_%s_%s_%s', $tipeOrder, $divName, $jabName, $p->nama);
+                });
+
+            $nisList = $pengurusList->pluck('nis')->toArray();
+
+            $bandonganData = DB::table('bandongan')
+                ->whereIn('tanggal', $dates)
+                ->whereIn('nis', $nisList)
+                ->get()
+                ->groupBy('nis');
+
+            $wiridData = DB::table('wirid')
+                ->whereIn('tanggal', $dates)
+                ->whereIn('nis', $nisList)
+                ->get()
+                ->groupBy('nis');
+
+            $yasinanData = DB::table('yasinan')
+                ->whereIn('tanggal', $dates)
+                ->whereIn('nis', $nisList)
+                ->get()
+                ->groupBy('nis');
+
+            $rekapData = [];
+            foreach ($pengurusList as $p) {
+                $nis = $p->nis;
+                $div = $p->jabatan->divisi ?? null;
+                $tipe = $div ? $div->tipe : 'non';
+
+                $row = [
+                    'nis' => $p->nis,
+                    'nama' => $p->nama,
+                    'jabatan' => $p->jabatan->nama ?? 'Pengurus',
+                    'divisi' => $div->nama ?? 'Tanpa Divisi',
+                    'tipe' => $tipe,
+                    'attendance' => [],
+                    'summary' => [
+                        'bandongan' => ['H' => 0, 'S' => 0, 'I' => 0, 'A' => 0, 'total' => 0],
+                        'wirid' => ['H' => 0, 'S' => 0, 'I' => 0, 'A' => 0, 'total' => 0],
+                        'yasinan' => ['H' => 0, 'S' => 0, 'I' => 0, 'A' => 0, 'total' => 0],
+                    ]
+                ];
+
+                $pBandongan = isset($bandonganData[$nis]) ? $bandonganData[$nis]->keyBy('tanggal') : collect();
+                $pWirid = isset($wiridData[$nis]) ? $wiridData[$nis]->keyBy('tanggal') : collect();
+                $pYasinan = isset($yasinanData[$nis]) ? $yasinanData[$nis]->keyBy('tanggal') : collect();
+
+                foreach ($dates as $date) {
+                    $bStatus = $pBandongan->get($date)->status ?? null;
+                    $wStatus = $pWirid->get($date)->status ?? null;
+                    $yStatus = ($tipe === 'kepkam') ? null : ($pYasinan->get($date)->status ?? null);
+
+                    $row['attendance'][$date] = [
+                        'bandongan' => $bStatus,
+                        'wirid' => $wStatus,
+                        'yasinan' => $yStatus,
+                    ];
+
+                    if ($bStatus) {
+                        $row['summary']['bandongan'][$bStatus]++;
+                        $row['summary']['bandongan']['total']++;
+                    }
+                    if ($wStatus) {
+                        $row['summary']['wirid'][$wStatus]++;
+                        $row['summary']['wirid']['total']++;
+                    }
+                    if ($yStatus) {
+                        $row['summary']['yasinan'][$yStatus]++;
+                        $row['summary']['yasinan']['total']++;
+                    }
+                }
+
+                $rekapData[] = $row;
+            }
+
+            $pdf = Pdf::loadView('mahadiyah.rekap-absensi-pengurus-pdf', compact('rekapData', 'dates', 'startDate', 'endDate', 'totalDays'));
+            $pdf->setPaper('a4', 'landscape');
+
+            $filename = 'Rekap_Absensi_Pengurus_' . $startDate->format('d-m-Y') . '_to_' . $endDate->format('d-m-Y') . '.pdf';
+            return $pdf->download($filename);
+
+        } catch (\Exception $e) {
+            \Log::error('[PDF Download] Error generating PDF for Pengurus', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'error' => 'Gagal membuat PDF: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function csvRekapAbsensiPengurus(Request $request)
+    {
+        $startDate = $request->input('start_date')
+            ? Carbon::parse($request->start_date)
+            : Carbon::now()->startOfWeek();
+
+        $endDate = $request->input('end_date')
+            ? Carbon::parse($request->end_date)
+            : Carbon::now()->endOfWeek();
+
+        $dates = [];
+        $currentDate = $startDate->copy();
+        while ($currentDate <= $endDate) {
+            $dates[] = $currentDate->format('d-m-Y');
+            $currentDate->addDay();
+        }
+
+        $pengurusList = Pengurus::with(['jabatan.divisi'])
+            ->get()
+            ->sortBy(function($p) {
+                $tipe = $p->jabatan->divisi->tipe ?? 'z_none';
+                $divName = $p->jabatan->divisi->nama ?? 'z_none';
+                $jabName = $p->jabatan->nama ?? 'z_none';
+                $tipeOrder = $tipe === 'kepkam' ? 0 : 1;
+                return sprintf('%d_%s_%s_%s', $tipeOrder, $divName, $jabName, $p->nama);
+            });
+
+        $nisList = $pengurusList->pluck('nis')->toArray();
+
+        $bandonganData = DB::table('bandongan')
+            ->whereIn('tanggal', $dates)
+            ->whereIn('nis', $nisList)
+            ->get()
+            ->groupBy('nis');
+
+        $wiridData = DB::table('wirid')
+            ->whereIn('tanggal', $dates)
+            ->whereIn('nis', $nisList)
+            ->get()
+            ->groupBy('nis');
+
+        $yasinanData = DB::table('yasinan')
+            ->whereIn('tanggal', $dates)
+            ->whereIn('nis', $nisList)
+            ->get()
+            ->groupBy('nis');
+
+        $filename = 'Rekap_Absensi_Pengurus_' . $startDate->format('d-m-Y') . '_to_' . $endDate->format('d-m-Y') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0'
+        ];
+
+        $callback = function() use ($pengurusList, $dates, $bandonganData, $wiridData, $yasinanData) {
+            $file = fopen('php://output', 'w');
+            
+            // Add UTF-8 BOM for proper excel opening
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // Header row
+            $headerRow = ['Nama', 'Jabatan', 'Divisi', 'Tipe'];
+            foreach ($dates as $date) {
+                $headerRow[] = $date;
+            }
+            $headerRow[] = 'Total Hadir Bandongan';
+            $headerRow[] = 'Total Hadir Wirid';
+            $headerRow[] = 'Total Hadir Yasinan';
+
+            fputcsv($file, $headerRow, ';');
+
+            foreach ($pengurusList as $p) {
+                $nis = $p->nis;
+                $div = $p->jabatan->divisi ?? null;
+                $tipe = $div ? $div->tipe : 'non';
+
+                $pBandongan = isset($bandonganData[$nis]) ? $bandonganData[$nis]->keyBy('tanggal') : collect();
+                $pWirid = isset($wiridData[$nis]) ? $wiridData[$nis]->keyBy('tanggal') : collect();
+                $pYasinan = isset($yasinanData[$nis]) ? $yasinanData[$nis]->keyBy('tanggal') : collect();
+
+                $row = [
+                    $p->nama,
+                    $p->jabatan->nama ?? 'Pengurus',
+                    $div->nama ?? 'Tanpa Divisi',
+                    $tipe === 'kepkam' ? 'Kepala Kamar' : 'Non Kepala Kamar'
+                ];
+
+                $sumB = 0; $totalB = 0;
+                $sumW = 0; $totalW = 0;
+                $sumY = 0; $totalY = 0;
+
+                foreach ($dates as $date) {
+                    $bStatus = $pBandongan->get($date)->status ?? null;
+                    $wStatus = $pWirid->get($date)->status ?? null;
+                    $yStatus = ($tipe === 'kepkam') ? null : ($pYasinan->get($date)->status ?? null);
+
+                    $parts = [];
+                    if ($bStatus) {
+                        $parts[] = "B:" . $bStatus;
+                        if ($bStatus === 'H') $sumB++;
+                        $totalB++;
+                    }
+                    if ($wStatus) {
+                        $parts[] = "W:" . $wStatus;
+                        if ($wStatus === 'H') $sumW++;
+                        $totalW++;
+                    }
+                    if ($yStatus) {
+                        $parts[] = "Y:" . $yStatus;
+                        if ($yStatus === 'H') $sumY++;
+                        $totalY++;
+                    }
+
+                    $row[] = empty($parts) ? '-' : implode(' | ', $parts);
+                }
+
+                $row[] = "{$sumB}/{$totalB}";
+                $row[] = "{$sumW}/{$totalW}";
+                $row[] = ($tipe === 'kepkam') ? '-' : "{$sumY}/{$totalY}";
+
+                fputcsv($file, $row, ';');
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

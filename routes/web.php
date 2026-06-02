@@ -45,6 +45,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/absen-pengurus', [Mahadiyah::class, 'store_absen']);
         Route::get('/rekap-kegiatan', [Mahadiyah::class, 'rekapKegiatan']);
         Route::get('/rekap-kegiatan/download', [Mahadiyah::class, 'downloadRekapKegiatan']);
+        Route::get('/rekap-absensi-pengurus', [Mahadiyah::class, 'rekapAbsensiPengurus']);
+        Route::get('/rekap-absensi-pengurus/download', [Mahadiyah::class, 'downloadRekapAbsensiPengurus']);
+        Route::get('/rekap-absensi-pengurus/csv', [Mahadiyah::class, 'csvRekapAbsensiPengurus']);
 
         // CRUD Pengurus
         Route::get('/pengurus', [Mahadiyah::class, 'pengurus_index']);
