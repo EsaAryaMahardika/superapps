@@ -254,12 +254,15 @@ function salinAbsensi(tipe) {
     lines.push(`_${tglStr}_`);
     lines.push('');
     lines.push('*📊 Rekap Kehadiran*');
-    lines.push(`- Total Kehadiran: *${totalHadir} Pengurus Dari ${totalPeserta} Pengurus*`);
+    const presentase = totalPeserta > 0 ? Math.round((totalHadir / totalPeserta) * 100) : 0;
+    lines.push(`- Total Kehadiran: *${totalHadir} Pengurus Dari ${totalPeserta} Pengurus (${presentase}%)*`);
     lines.push('');
 
     if (tipe === 'yasinan') {
         // Hanya Non Kepkam, dikelompokkan per divisi
-        lines.push('*▶️ Non Kepala Kamar*');
+        const hadirNon = totalHadir;
+        const presentaseNon = totalNon > 0 ? Math.round((hadirNon / totalNon) * 100) : 0;
+        lines.push(`*▶️ Non Kepala Kamar: ${hadirNon} Pengurus Dari ${totalNon} Pengurus (${presentaseNon}%)*`);
         divisiNon.forEach(div => {
             // Kumpulkan semua NIS di divisi ini
             const nisDiv = [];
@@ -289,7 +292,8 @@ function salinAbsensi(tipe) {
         });
         const totalKepkam = totalSemua - totalNon;
 
-        lines.push(`*▶️ Kepala Kamar: ${hadirKepkam.length} Pengurus Dari ${totalKepkam} Pengurus*`);
+        const presentaseKepkam = totalKepkam > 0 ? Math.round((hadirKepkam.length / totalKepkam) * 100) : 0;
+        lines.push(`*▶️ Kepala Kamar: ${hadirKepkam.length} Pengurus Dari ${totalKepkam} Pengurus (${presentaseKepkam}%)*`);
         if (hadirKepkam.length === 0) {
             lines.push('1. -');
             lines.push('');
@@ -332,7 +336,9 @@ function salinAbsensi(tipe) {
         if (lines[lines.length - 1] !== '') {
             lines.push('');
         }
-        lines.push('*▶️ Non Kepala Kamar*');
+        const hadirNon = totalHadir - hadirKepkam.length;
+        const presentaseNon = totalNon > 0 ? Math.round((hadirNon / totalNon) * 100) : 0;
+        lines.push(`*▶️ Non Kepala Kamar: ${hadirNon} Pengurus Dari ${totalNon} Pengurus (${presentaseNon}%)*`);
         divisiNon.forEach(div => {
             const nisDiv = [];
             div.jabatan.forEach(jab => jab.pengurus.forEach(p => nisDiv.push(p.nis)));
