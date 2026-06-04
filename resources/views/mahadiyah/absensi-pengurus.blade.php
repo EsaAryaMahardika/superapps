@@ -107,6 +107,7 @@ const activitiesData = {
 };
 
 const divisiNon   = @json($divisiNon);   // [{id, nama, jabatan:[{pengurus:[]}]}]
+const divisiKepkam = @json($divisiKepkam);
 const totalSemua  = {{ $totalSemua }};
 const totalNon    = {{ $totalNon }};
 const csrfToken   = document.querySelector('meta[name="csrf-token"]').content;
@@ -239,6 +240,9 @@ function salinAbsensi(tipe) {
     const judulMap = { yasinan: 'YASINAN', bandongan: 'BANDONGAN', wirid: 'WIRID' };
     const judul = judulMap[tipe] || tipe.toUpperCase();
 
+    const emojiMap = { yasinan: '📖', bandongan: '📕', wirid: '📿' };
+    const emoji = emojiMap[tipe] || '📕';
+
     // Hitung total hadir
     const hadirList = Object.values(byNis).filter(i => i.status === 'H');
     const izinList  = Object.values(byNis).filter(i => i.status === 'I' || i.status === 'S');
@@ -246,16 +250,16 @@ function salinAbsensi(tipe) {
     const totalPeserta = tipe === 'yasinan' ? totalNon : totalSemua;
 
     let lines = [];
-    lines.push(`PRESENSI ${judul}`);
-    lines.push(tglStr);
+    lines.push(`*${emoji} PRESENSI ${judul}*`);
+    lines.push(`_${tglStr}_`);
     lines.push('');
-    lines.push('📊 Rekap Kehadiran');
-    lines.push(`- Total Kehadiran: ${totalHadir} Pengurus Dari ${totalPeserta} Pengurus`);
+    lines.push('*📊 Rekap Kehadiran*');
+    lines.push(`- Total Kehadiran: *${totalHadir} Pengurus Dari ${totalPeserta} Pengurus*`);
     lines.push('');
 
     if (tipe === 'yasinan') {
         // Hanya Non Kepkam, dikelompokkan per divisi
-        lines.push('▶️ Non Kepala Kamar');
+        lines.push('*▶️ Non Kepala Kamar*');
         divisiNon.forEach(div => {
             // Kumpulkan semua NIS di divisi ini
             const nisDiv = [];
@@ -264,7 +268,7 @@ function salinAbsensi(tipe) {
             const hadirDiv = hadirList.filter(i => nisDiv.includes(i.pengurus?.nis));
             const totalDiv = nisDiv.length;
 
-            lines.push(`${div.nama}: *${hadirDiv.length} Pengurus Dari ${totalDiv} Pengurus`);
+            lines.push(`*${div.nama}: ${hadirDiv.length} Pengurus Dari ${totalDiv} Pengurus*`);
             if (hadirDiv.length === 0) {
                 lines.push('1. -');
             } else {
@@ -273,11 +277,62 @@ function salinAbsensi(tipe) {
                     const suffix  = jabatan ? ` (${jabatan})` : '';
                     lines.push(`${idx+1}. ${item.pengurus?.nama || '-'}${suffix}`);
                 });
+                lines.push('');
             }
         });
     } else {
-        // Bandongan & Wirid: semua pengurus, kelompokkan Non Kepkam per divisi dulu
-        lines.push('▶️ Non Kepala Kamar');
+        // Bandongan & Wirid: semua pengurus, kelompokkan Kepkam dulu baru Non Kepkam
+        // Kepkam
+        const hadirKepkam = hadirList.filter(i => {
+            const tipeDiv = i.pengurus?.jabatan?.divisi?.tipe;
+            return tipeDiv === 'kepkam' || !tipeDiv; // kepkam atau tanpa divisi
+        });
+        const totalKepkam = totalSemua - totalNon;
+
+        lines.push(`*▶️ Kepala Kamar: ${hadirKepkam.length} Pengurus Dari ${totalKepkam} Pengurus*`);
+        if (hadirKepkam.length === 0) {
+            lines.push('1. -');
+            lines.push('');
+        } else {
+            const printedNis = new Set();
+            divisiKepkam.forEach(div => {
+                const nisDiv = [];
+                div.jabatan.forEach(jab => jab.pengurus.forEach(p => nisDiv.push(p.nis)));
+
+                const hadirDiv = hadirKepkam.filter(i => nisDiv.includes(i.pengurus?.nis));
+                const totalDiv = nisDiv.length;
+
+                if (hadirDiv.length > 0) {
+                    lines.push(`*${div.nama}: ${hadirDiv.length} Pengurus Dari ${totalDiv} Pengurus*`);
+                    hadirDiv.forEach((item, idx) => {
+                        printedNis.add(item.pengurus?.nis);
+                        const jabatan = item.pengurus?.jabatan?.nama ?? '';
+                        const suffix  = jabatan ? ` (${jabatan})` : '';
+                        lines.push(`${idx+1}. ${item.pengurus?.nama || '-'}${suffix}`);
+                    });
+                    lines.push('');
+                }
+            });
+
+            // Fallback for any present Kepala Kamar not in the divisions
+            const remainingHadir = hadirKepkam.filter(i => !printedNis.has(i.pengurus?.nis));
+            if (remainingHadir.length > 0) {
+                lines.push(`*Tanpa Divisi: ${remainingHadir.length} Pengurus*`);
+                remainingHadir.forEach((item, idx) => {
+                    const jabatan = item.pengurus?.jabatan?.nama ?? '';
+                    const suffix  = jabatan ? ` (${jabatan})` : '';
+                    lines.push(`${idx+1}. ${item.pengurus?.nama || '-'}${suffix}`);
+                });
+                lines.push('');
+            }
+        }
+
+        // Non Kepkam
+        // Ensure there is exactly one empty line before Non Kepala Kamar
+        if (lines[lines.length - 1] !== '') {
+            lines.push('');
+        }
+        lines.push('*▶️ Non Kepala Kamar*');
         divisiNon.forEach(div => {
             const nisDiv = [];
             div.jabatan.forEach(jab => jab.pengurus.forEach(p => nisDiv.push(p.nis)));
@@ -285,7 +340,7 @@ function salinAbsensi(tipe) {
             const hadirDiv = hadirList.filter(i => nisDiv.includes(i.pengurus?.nis));
             const totalDiv = nisDiv.length;
 
-            lines.push(`${div.nama}: *${hadirDiv.length} Pengurus Dari ${totalDiv} Pengurus`);
+            lines.push(`*${div.nama}: ${hadirDiv.length} Pengurus Dari ${totalDiv} Pengurus*`);
             if (hadirDiv.length === 0) {
                 lines.push('1. -');
             } else {
@@ -294,30 +349,16 @@ function salinAbsensi(tipe) {
                     const suffix  = jabatan ? ` (${jabatan})` : '';
                     lines.push(`${idx+1}. ${item.pengurus?.nama || '-'}${suffix}`);
                 });
+                lines.push('');
             }
         });
-
-        // Kepkam
-        const hadirKepkam = hadirList.filter(i => {
-            const tipeDiv = i.pengurus?.jabatan?.divisi?.tipe;
-            return tipeDiv === 'kepkam' || !tipeDiv; // kepkam atau tanpa divisi
-        });
-        const totalKepkam = totalSemua - totalNon;
-        lines.push('');
-        lines.push(`▶️ Kepala Kamar: *${hadirKepkam.length} Pengurus Dari ${totalKepkam} Pengurus`);
-        if (hadirKepkam.length === 0) {
-            lines.push('1. -');
-        } else {
-            hadirKepkam.forEach((item, idx) => {
-                const jabatan = item.pengurus?.jabatan?.nama ?? '';
-                const suffix  = jabatan ? ` (${jabatan})` : '';
-                lines.push(`${idx+1}. ${item.pengurus?.nama || '-'}${suffix}`);
-            });
-        }
     }
 
     // Pengurus Izin/Sakit
-    lines.push('');
+    // Ensure there is exactly one empty line before Pengurus Izin
+    if (lines[lines.length - 1] !== '') {
+        lines.push('');
+    }
     lines.push('▶️ Pengurus Izin');
     if (izinList.length === 0) {
         lines.push('1. -');

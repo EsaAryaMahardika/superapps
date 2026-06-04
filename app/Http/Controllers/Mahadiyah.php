@@ -31,14 +31,18 @@ class Mahadiyah extends Controller
         // Data semua pengurus dikelompokkan per divisi (untuk format salin)
         $divisiNon  = Divisi::where('tipe', 'non')
             ->with(['jabatan.pengurus'])
-            ->orderBy('nama')->get();
+            ->orderBy('id')->get();
+
+        $divisiKepkam = Divisi::where('tipe', 'kepkam')
+            ->with(['jabatan.pengurus'])
+            ->orderBy('id')->get();
 
         $totalSemua = Pengurus::count();
         $totalNon   = Pengurus::whereHas('jabatan.divisi', fn($q) => $q->where('tipe','non'))->count();
 
         return view('mahadiyah.absensi-pengurus', compact(
             'bandongan', 'wirid', 'yasinan',
-            'divisiNon', 'totalSemua', 'totalNon'
+            'divisiNon', 'divisiKepkam', 'totalSemua', 'totalNon'
         ));
     }
 
