@@ -208,15 +208,15 @@
                 const sub = [jabatan, divisi].filter(Boolean).join(' · ');
 
                 filteredNamesDiv.insertAdjacentHTML('beforeend', `
-                    <div class="flex items-center gap-2 p-2 bg-white rounded border border-gray-100">
-                        <div class="w-8 h-8 rounded-full bg-[#F4F7FE] flex items-center justify-center flex-shrink-0">
-                            <i class="fa fa-user text-[#4318FF] text-xs"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <p class="text-sm font-medium text-[#1B2559] truncate">${item.pengurus?.nama || '-'}</p>
-                            ${sub ? `<p class="text-xs text-gray-400 truncate">${sub}</p>` : ''}
-                        </div>
-                    </div>`);
+                        <div class="flex items-center gap-2 p-2 bg-white rounded border border-gray-100">
+                            <div class="w-8 h-8 rounded-full bg-[#F4F7FE] flex items-center justify-center flex-shrink-0">
+                                <i class="fa fa-user text-[#4318FF] text-xs"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-medium text-[#1B2559] truncate">${item.pengurus?.nama || '-'}</p>
+                                ${sub ? `<p class="text-xs text-gray-400 truncate">${sub}</p>` : ''}
+                            </div>
+                        </div>`);
             });
 
             if (count === 0)
@@ -253,7 +253,7 @@
             const tglStr = `${hariList[dateObj.getDay()]}, ${dd} ${bulanList[parseInt(mm) - 1]} ${yyyy}`;
 
             // Judul kegiatan
-            const judulMap = { yasinan: 'YASINAN', bandongan: 'BANDONGAN', wirid: 'WIRID' };
+            const judulMap = { yasinan: 'JAMAAH SUBUH DAN YASIN', bandongan: 'BANDONGAN', wirid: 'WIRID' };
             const judul = judulMap[tipe] || tipe.toUpperCase();
 
             const emojiMap = { yasinan: '📖', bandongan: '📕', wirid: '📿' };
