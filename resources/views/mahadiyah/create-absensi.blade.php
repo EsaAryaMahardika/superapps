@@ -78,7 +78,7 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="table w-full">
+                    <table class="w-full border-collapse">
                         <thead>
                             <tr class="text-left text-sm text-[#A3AED0] border-b border-gray-100">
                                 <th class="pb-3 font-semibold">Nama Pengurus</th>

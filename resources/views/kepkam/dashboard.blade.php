@@ -12,7 +12,7 @@
                     <i class="fa fa-chevron-down text-[#A3AED0] transition-transform duration-300"></i>
                 </div>
                 <div class="overflow-x-auto hidden agenda-content">
-                    <table class="table w-full">
+                    <table class="w-full border-collapse">
                         <thead>
                             <tr class="text-left text-sm text-[#A3AED0]">
                                 <th class="pb-2">Tanggal</th>
@@ -56,7 +56,7 @@
                     <i class="fa fa-chevron-down text-[#A3AED0] transition-transform duration-300"></i>
                 </div>
                 <div class="overflow-x-auto hidden agenda-content">
-                    <table class="table w-full">
+                    <table class="w-full border-collapse">
                         <thead>
                             <tr class="text-left text-sm text-[#A3AED0]">
                                 <th class="pb-2">Tanggal</th>
@@ -100,7 +100,7 @@
                     <i class="fa fa-chevron-down text-[#A3AED0] transition-transform duration-300"></i>
                 </div>
                 <div class="overflow-x-auto hidden agenda-content">
-                    <table class="table w-full">
+                    <table class="w-full border-collapse">
                         <thead>
                             <tr class="text-left text-sm text-[#A3AED0]">
                                 <th class="pb-2">Tanggal</th>
@@ -144,7 +144,7 @@
                     <i class="fa fa-chevron-down text-[#A3AED0] transition-transform duration-300"></i>
                 </div>
                 <div class="overflow-x-auto hidden agenda-content">
-                    <table class="table w-full">
+                    <table class="w-full border-collapse">
                         <thead>
                             <tr class="text-left text-sm text-[#A3AED0]">
                                 <th class="pb-2">Tanggal</th>
@@ -188,7 +188,7 @@
                     <i class="fa fa-chevron-down text-[#A3AED0] transition-transform duration-300"></i>
                 </div>
                 <div class="overflow-x-auto hidden agenda-content">
-                    <table class="table w-full">
+                    <table class="w-full border-collapse">
                         <thead>
                             <tr class="text-left text-sm text-[#A3AED0]">
                                 <th class="pb-2">Tanggal</th>
@@ -232,7 +232,7 @@
                     <i class="fa fa-chevron-down text-[#A3AED0] transition-transform duration-300"></i>
                 </div>
                 <div class="overflow-x-auto hidden agenda-content">
-                    <table class="table w-full">
+                    <table class="w-full border-collapse">
                         <thead>
                             <tr class="text-left text-sm text-[#A3AED0]">
                                 <th class="pb-2">Tanggal</th>
@@ -274,7 +274,7 @@
                     <i class="fa fa-chevron-down text-[#A3AED0] transition-transform duration-300"></i>
                 </div>
                 <div class="overflow-x-auto hidden agenda-content">
-                    <table class="table w-full">
+                    <table class="w-full border-collapse">
                         <thead>
                             <tr class="text-left text-sm text-[#A3AED0]">
                                 <th class="pb-2">Tanggal</th>
@@ -319,7 +319,7 @@
                     <i class="fa fa-chevron-down text-[#A3AED0] transition-transform duration-300"></i>
                 </div>
                 <div class="overflow-x-auto hidden agenda-content">
-                    <table class="table w-full">
+                    <table class="w-full border-collapse">
                         <thead>
                             <tr class="text-left text-sm text-[#A3AED0]">
                                 <th class="pb-2">Tanggal</th>

@@ -174,7 +174,7 @@
                 <p class="text-xs mt-1.5" style="color:#A3AED0;">Maks. 2MB. Kolom <span class="font-mono">kepkam</span> boleh kosong.</p>
             </div>
             <div class="flex gap-3">
-                <button type="submit" class="btn btn-primary flex-1 rounded-xl">Import</button>
+                <button type="submit" class="flex-1 bg-[#4318FF] hover:bg-[#3311CC] text-white py-2.5 rounded-xl font-semibold text-sm transition-all">Import</button>
                 <button type="button" onclick="closeModalImport()" class="flex-1 btn bg-white border border-gray-200 rounded-xl text-sm" style="color:#2B3674;">Batal</button>
             </div>
         </form>
@@ -195,15 +195,15 @@
             @csrf
             <div class="mb-4">
                 <label class="block text-xs font-semibold mb-1.5" style="color:#1B2559;">NIS</label>
-                <input type="text" name="nis" required placeholder="Nomor Induk Santri" class="form-control">
+                <input type="text" name="nis" required placeholder="Nomor Induk Santri" class="w-full bg-[#F4F7FE] border-0 text-gray-600 text-sm rounded-xl h-11 px-4 focus:ring-2 focus:ring-[#4318FF] focus:bg-white outline-none transition-all">
             </div>
             <div class="mb-4">
                 <label class="block text-xs font-semibold mb-1.5" style="color:#1B2559;">Nama</label>
-                <input type="text" name="nama" required placeholder="Nama lengkap santri" class="form-control">
+                <input type="text" name="nama" required placeholder="Nama lengkap santri" class="w-full bg-[#F4F7FE] border-0 text-gray-600 text-sm rounded-xl h-11 px-4 focus:ring-2 focus:ring-[#4318FF] focus:bg-white outline-none transition-all">
             </div>
             <div class="mb-5">
                 <label class="block text-xs font-semibold mb-1.5" style="color:#1B2559;">Kepala Kamar</label>
-                <select name="kepkam" class="form-control">
+                <select name="kepkam" class="w-full bg-[#F4F7FE] border-0 text-gray-600 text-sm rounded-xl h-11 px-4 focus:ring-2 focus:ring-[#4318FF] focus:bg-white outline-none transition-all">
                     <option value="">— Belum ada —</option>
                     @foreach($kepkams as $k)
                     <option value="{{ $k->nis }}">{{ $k->nama }}</option>
@@ -211,8 +211,8 @@
                 </select>
             </div>
             <div class="flex gap-3">
-                <button type="submit" class="btn btn-primary flex-1 rounded-xl">Simpan</button>
-                <button type="button" onclick="closeModalTambah()" class="flex-1 btn bg-white border border-gray-200 rounded-xl text-sm" style="color:#2B3674;">Batal</button>
+                <button type="submit" class="flex-1 bg-[#4318FF] hover:bg-[#3311CC] text-white py-2.5 rounded-xl font-semibold text-sm transition-all">Simpan</button>
+                <button type="button" onclick="closeModalTambah()" class="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-[#2B3674] py-2.5 rounded-xl font-semibold text-sm transition-all">Batal</button>
             </div>
         </form>
     </div>
@@ -227,15 +227,15 @@
             @csrf @method('PUT')
             <div class="mb-4">
                 <label class="block text-xs font-semibold mb-1.5" style="color:#1B2559;">Nama</label>
-                <input type="text" name="nama" id="edit-nama" required class="form-control">
+                <input type="text" name="nama" id="edit-nama" required class="w-full bg-[#F4F7FE] border-0 text-gray-600 text-sm rounded-xl h-11 px-4 focus:ring-2 focus:ring-[#4318FF] focus:bg-white outline-none transition-all">
             </div>
             <div class="mb-4">
                 <label class="block text-xs font-semibold mb-1.5" style="color:#1B2559;">NIS</label>
-                <input type="text" id="edit-nis-display" class="form-control" style="background:#F4F7FE; color:#A3AED0;" disabled>
+                <input type="text" id="edit-nis-display" class="w-full bg-[#F4F7FE] border-0 text-[#A3AED0] text-sm rounded-xl h-11 px-4 outline-none" disabled>
             </div>
             <div class="mb-5">
                 <label class="block text-xs font-semibold mb-1.5" style="color:#1B2559;">Kepala Kamar</label>
-                <select name="kepkam" id="edit-kepkam" class="form-control">
+                <select name="kepkam" id="edit-kepkam" class="w-full bg-[#F4F7FE] border-0 text-gray-600 text-sm rounded-xl h-11 px-4 focus:ring-2 focus:ring-[#4318FF] focus:bg-white outline-none transition-all">
                     <option value="">— Belum ada —</option>
                     @foreach($kepkams as $k)
                     <option value="{{ $k->nis }}">{{ $k->nama }}</option>
@@ -243,8 +243,8 @@
                 </select>
             </div>
             <div class="flex gap-3">
-                <button type="submit" class="btn btn-primary flex-1 rounded-xl">Simpan</button>
-                <button type="button" onclick="closeModalEdit()" class="flex-1 btn bg-white border border-gray-200 rounded-xl text-sm" style="color:#2B3674;">Batal</button>
+                <button type="submit" class="flex-1 bg-[#4318FF] hover:bg-[#3311CC] text-white py-2.5 rounded-xl font-semibold text-sm transition-all">Simpan</button>
+                <button type="button" onclick="closeModalEdit()" class="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-[#2B3674] py-2.5 rounded-xl font-semibold text-sm transition-all">Batal</button>
             </div>
         </form>
     </div>
@@ -289,7 +289,7 @@
             <a href="/mahadiyah/santri/template" class="text-xs hover:underline flex items-center gap-1" style="color:#4318FF;">
                 <i class="fa fa-download"></i> Download template CSV
             </a>
-            <button onclick="closeModalTutorial()" class="btn btn-dark py-2 px-5 text-sm rounded-xl">Tutup</button>
+            <button onclick="closeModalTutorial()" class="bg-[#111C44] hover:bg-[#1B254B] text-white py-2 px-5 text-sm rounded-xl font-semibold transition-all">Tutup</button>
         </div>
     </div>
 </div>

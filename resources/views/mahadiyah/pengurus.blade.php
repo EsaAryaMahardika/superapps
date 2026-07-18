@@ -869,8 +869,8 @@
                 <p class="text-[11px] text-[#A3AED0] mt-1.5">Maks. 2MB. Daftar jabatan_id ada di file template.</p>
             </div>
             <div class="flex gap-3">
-                <button type="submit" class="btn btn-primary flex-1">Import</button>
-                <button type="button" onclick="closeModalImportPengurus()" class="btn btn-light flex-1">Batal</button>
+                <button type="submit" class="flex-1 bg-[#4318FF] hover:bg-[#3311CC] text-white py-2.5 rounded-xl font-semibold text-sm transition-all">Import</button>
+                <button type="button" onclick="closeModalImportPengurus()" class="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-[#2B3674] py-2.5 rounded-xl font-semibold text-sm transition-all">Batal</button>
             </div>
         </form>
         <div class="mt-3 pt-3 border-t border-gray-100 text-center">
@@ -940,7 +940,7 @@
             <a href="/mahadiyah/pengurus/template" class="text-xs text-[#4318FF] hover:underline flex items-center gap-1">
                 <i class="fa fa-download"></i> Download template CSV
             </a>
-            <button onclick="closeModalTutorialPengurus()" class="btn btn-dark py-2 px-5 text-sm">Tutup</button>
+            <button onclick="closeModalTutorialPengurus()" class="bg-[#111C44] hover:bg-[#1B254B] text-white py-2 px-5 text-sm rounded-xl font-semibold transition-all">Tutup</button>
         </div>
     </div>
 </div>

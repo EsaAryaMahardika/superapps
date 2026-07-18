@@ -15,7 +15,7 @@
                 <div class="w-full md:flex-1">
                     <label class="block text-sm font-bold text-[#1B2559] mb-2">Pilih Tanggal</label>
                     <input type="date" name="tanggal" id="tanggal" value="{{ request('tanggal') ?? date('Y-m-d') }}"
-                        class="form-control w-full">
+                        class="w-full bg-[#F4F7FE] border-0 text-gray-600 text-sm rounded-xl h-11 px-4 focus:ring-2 focus:ring-[#4318FF] focus:bg-white outline-none transition-all">
                 </div>
                 <button type="submit"
                     class="btn bg-[#4318FF] text-white hover:bg-[#3311CC] px-6 w-full md:w-auto flex justify-center items-center">

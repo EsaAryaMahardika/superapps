@@ -132,24 +132,24 @@
     </div>
 
     <!-- Modal Buat Absensi -->
-    <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content !rounded-[20px] !border-none !shadow-2xl">
-                <div class="modal-header border-b border-gray-100 p-6">
-                    <h5 class="modal-title text-xl font-bold text-[#1B2559]">Buat Absensi Baru</h5>
-                    <button type="button" class="close opacity-50 hover:opacity-100 transition-opacity" data-dismiss="modal"
-                        aria-label="Close">
+    <div class="fixed inset-0 z-50 hidden items-center justify-center p-4" id="add">
+        <div class="absolute inset-0 bg-black/40" onclick="$('#add').addClass('hidden').removeClass('flex')"></div>
+        <div class="relative bg-white rounded-[20px] shadow-2xl w-full max-w-2xl z-10 max-h-[90vh] overflow-y-auto">
+            <div class="border-b border-gray-100 p-6 flex items-center justify-between">
+                    <h5 class="text-xl font-bold text-[#1B2559]">Buat Absensi Baru</h5>
+                    <button type="button" class="text-gray-400 hover:text-gray-600 w-7 h-7 flex items-center justify-center"
+                        onclick="$('#add').addClass('hidden').removeClass('flex')">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                </div>
-                <div class="modal-body p-6">
+            </div>
+            <div class="p-6">
                     <form action="/kepkam/absen" method="post" id="formAbsensi">
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div class="form-group">
                                 <label class="block text-sm font-bold text-[#1B2559] mb-2">Jenis Kegiatan</label>
                                 <div class="relative">
-                                    <select class="form-control appearance-none" name="kegiatan" id="kegiatan" required>
+                                    <select class="w-full bg-[#F4F7FE] border-0 text-gray-600 text-sm rounded-xl h-11 px-4 pr-8 appearance-none focus:ring-2 focus:ring-[#4318FF] focus:bg-white outline-none transition-all" name="kegiatan" id="kegiatan" required>
                                         <option value="" disabled selected>Pilih kegiatan...</option>
                                         @foreach ($kegiatan as $item)
                                             <option value="{{ $item->id }}">{{ $item->nama }}</option>
@@ -164,7 +164,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="block text-sm font-bold text-[#1B2559] mb-2">Tanggal</label>
-                                <input type="date" class="form-control" id="tanggal-absen" name="tanggal" value="{{ date('Y-m-d') }}" required>
+                                <input type="date" class="w-full bg-[#F4F7FE] border-0 text-gray-600 text-sm rounded-xl h-11 px-4 focus:ring-2 focus:ring-[#4318FF] focus:bg-white outline-none transition-all" id="tanggal-absen" name="tanggal" value="{{ date('Y-m-d') }}" required>
                             </div>
                         </div>
 
@@ -293,10 +293,10 @@
                             </div>
                         </div>
 
-                        <div class="modal-footer border-t border-gray-100 pt-4 px-0 pb-0 flex justify-end">
+                        <div class="border-t border-gray-100 pt-4 flex justify-end gap-2">
                             <div>
                                 <button type="button" class="btn bg-gray-100 text-[#2B3674] hover:bg-gray-200"
-                                    data-dismiss="modal">Batal</button>
+                                    onclick="document.getElementById('add').classList.add('hidden'); document.getElementById('add').classList.remove('flex');">Batal</button>
                                 <button type="submit" class="btn btn-primary ml-2">Simpan Absensi</button>
                             </div>
                         </div>

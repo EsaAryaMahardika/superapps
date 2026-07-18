@@ -17,12 +17,12 @@
                 <div class="w-full md:flex-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-[#1B2559] mb-2">Tanggal Mulai</label>
                     <input type="date" name="start_date" id="start_date"
-                        value="{{ request('start_date') ?? $startDate->format('Y-m-d') }}" class="form-control w-full rounded-xl border-gray-200 text-sm focus:border-blue-500 focus:ring-0">
+                        value="{{ request('start_date') ?? $startDate->format('Y-m-d') }}" class="w-full bg-[#F4F7FE] border-0 text-gray-600 text-sm rounded-xl h-11 px-4 focus:ring-2 focus:ring-[#4318FF] focus:bg-white outline-none transition-all">
                 </div>
                 <div class="w-full md:flex-1">
                     <label class="block text-xs font-bold uppercase tracking-wider text-[#1B2559] mb-2">Tanggal Akhir</label>
                     <input type="date" name="end_date" id="end_date"
-                        value="{{ request('end_date') ?? $endDate->format('Y-m-d') }}" class="form-control w-full rounded-xl border-gray-200 text-sm focus:border-blue-500 focus:ring-0">
+                        value="{{ request('end_date') ?? $endDate->format('Y-m-d') }}" class="w-full bg-[#F4F7FE] border-0 text-gray-600 text-sm rounded-xl h-11 px-4 focus:ring-2 focus:ring-[#4318FF] focus:bg-white outline-none transition-all">
                 </div>
                 <div class="flex gap-2 w-full md:w-auto">
                     <button type="submit"

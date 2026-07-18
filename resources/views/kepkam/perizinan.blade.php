@@ -91,27 +91,27 @@
     </div>
 
     <!-- Modal Buat Izin -->
-    <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content !rounded-[20px] !border-none !shadow-2xl">
-                <div class="modal-header border-b border-gray-100 p-6">
-                    <h5 class="modal-title text-xl font-bold text-[#1B2559]">Buat Izin Baru</h5>
-                    <button type="button" class="close opacity-50 hover:opacity-100 transition-opacity" data-dismiss="modal"
-                        aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body p-6">
+    <div class="fixed inset-0 z-50 hidden items-center justify-center p-4" id="add">
+        <div class="absolute inset-0 bg-black/40" onclick="document.getElementById('add').classList.add('hidden'); document.getElementById('add').classList.remove('flex');"></div>
+        <div class="relative bg-white rounded-[20px] shadow-2xl w-full max-w-2xl z-10 max-h-[90vh] overflow-y-auto">
+            <div class="border-b border-gray-100 p-6 flex items-center justify-between">
+                <h5 class="text-xl font-bold text-[#1B2559]">Buat Izin Baru</h5>
+                <button type="button" class="text-gray-400 hover:text-gray-600 w-7 h-7 flex items-center justify-center"
+                    onclick="document.getElementById('add').classList.add('hidden'); document.getElementById('add').classList.remove('flex');">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="p-6">
                     <form action="/perizinan" method="post" id="formPerizinan">
                         @csrf
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <!-- Jenis Izin -->
-                            <div class="form-group">
+                            <div>
                                 <label class="block text-sm font-bold text-[#1B2559] mb-2">Jenis Izin</label>
                                 <div class="relative">
                                     <select
-                                        class="form-control appearance-none w-full bg-gray-50 border border-gray-200 text-[#2B3674] text-sm rounded-lg focus:ring-[#4318FF] focus:border-[#4318FF] block p-2.5 pr-8"
+                                        class="appearance-none w-full bg-gray-50 border border-gray-200 text-[#2B3674] text-sm rounded-lg focus:ring-[#4318FF] focus:border-[#4318FF] block p-2.5 pr-8 outline-none"
                                         name="jenis" required>
                                         <option value="" disabled selected>Pilih Jenis Izin...</option>
                                         <option value="P">Pulang</option>
@@ -125,11 +125,11 @@
                             </div>
 
                             <!-- Alasan -->
-                            <div class="form-group">
+                            <div>
                                 <label class="block text-sm font-bold text-[#1B2559] mb-2">Alasan</label>
                                 <div class="relative">
                                     <select
-                                        class="form-control appearance-none w-full bg-gray-50 border border-gray-200 text-[#2B3674] text-sm rounded-lg focus:ring-[#4318FF] focus:border-[#4318FF] block p-2.5 pr-8"
+                                        class="appearance-none w-full bg-gray-50 border border-gray-200 text-[#2B3674] text-sm rounded-lg focus:ring-[#4318FF] focus:border-[#4318FF] block p-2.5 pr-8 outline-none"
                                         name="alasan" required>
                                         <option value="" disabled selected>Pilih Alasan...</option>
                                         @foreach ($alasan as $item)
@@ -144,7 +144,7 @@
                             </div>
 
                             <!-- Tanggal Kembali -->
-                            <div class="form-group">
+                            <div>
                                 <label class="block text-sm font-bold text-[#1B2559] mb-2">Estimasi Kembali</label>
                                 <input type="date"
                                     class="bg-gray-50 border border-gray-200 text-[#2B3674] text-sm rounded-lg focus:ring-[#4318FF] focus:border-[#4318FF] block w-full p-2.5"
@@ -181,13 +181,12 @@
                             </div>
                         </div>
 
-                        <div class="modal-footer border-t border-gray-100 mt-6 pt-6 px-0 pb-0 flex justify-end">
+                        <div class="border-t border-gray-100 mt-6 pt-6 flex justify-end gap-2">
                             <button type="button" class="btn bg-gray-100 text-[#2B3674] hover:bg-gray-200"
-                                data-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary ml-2">Simpan Izin</button>
+                                onclick="document.getElementById('add').classList.add('hidden'); document.getElementById('add').classList.remove('flex');">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan Izin</button>
                         </div>
                     </form>
-                </div>
             </div>
         </div>
     </div>
