@@ -64,13 +64,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/rekap-absensi-pengurus/download', [MahadiyahRekap::class, 'downloadRekapAbsensiPengurus']);
         Route::get('/rekap-absensi-pengurus/excel', [MahadiyahRekap::class, 'excelRekapAbsensiPengurus']);
 
-        // Search
-        Route::get('/search-santri', [General::class, 'santri']);
-        Route::get('/search-pengurus', [General::class, 'pengurus']);
-        Route::get('/search-kepkam', [General::class, 'kepkam']);
+        Route::get('/santri', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'index']);
+        Route::post('/santri', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'store']);
+        Route::get('/santri/template', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'template']);
+        Route::post('/santri/import', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'import']);
+        Route::put('/santri/{nis}', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'update']);
+        Route::delete('/santri/{nis}', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'destroy']);
 
         // CRUD Pengurus
         Route::get('/generate-nis', [MahadiyahPengurus::class, 'generateNis']);
+        Route::get('/pengurus/template', [MahadiyahPengurus::class, 'templatePengurus']);
+        Route::post('/pengurus/import', [MahadiyahPengurus::class, 'importPengurus']);
         Route::get('/pengurus', [MahadiyahPengurus::class, 'index']);
         Route::post('/pengurus', [MahadiyahPengurus::class, 'store']);
         Route::put('/pengurus/{nis}', [MahadiyahPengurus::class, 'update']);
@@ -117,9 +121,14 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/asrama/{asrama_id}/kamar/{kamar_id}/santri/{nis}', [Admin::class, 'kamarUnassignSantri']);
 
         Route::get('/santri', [Admin::class, 'santri']);
+        Route::post('/santri', [Admin::class, 'santriStore']);
+        Route::get('/santri/template', [Admin::class, 'santriTemplate']);
+        Route::post('/santri/import', [Admin::class, 'santriImport']);
         Route::put('/santri/{nis}', [Admin::class, 'santriUpdate']);
         Route::delete('/santri/{nis}', [Admin::class, 'santriDestroy']);
         Route::get('/pengurus', [Admin::class, 'pengurus']);
+        Route::get('/pengurus/template', [Admin::class, 'pengurusTemplate']);
+        Route::post('/pengurus/import', [Admin::class, 'pengurusImport']);
         Route::get('/pengurus/{nis}/edit', [Admin::class, 'pengurusEdit']);
         Route::put('/pengurus/{nis}', [Admin::class, 'pengurusUpdate']);
         Route::get('/logs', [Admin::class, 'logs']);

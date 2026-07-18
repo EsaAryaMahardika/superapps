@@ -16,3 +16,6 @@
 <li class="{{ Request::is('mahadiyah/pengurus*') ? 'active' : '' }}">
     <a href="/mahadiyah/pengurus"><i class="fa fa-users"></i><span>Data Pengurus</span></a>
 </li>
+<li class="{{ Request::is('mahadiyah/santri*') ? 'active' : '' }}">
+    <a href="/mahadiyah/santri"><i class="fa fa-user-graduate"></i><span>Data Santri</span></a>
+</li>

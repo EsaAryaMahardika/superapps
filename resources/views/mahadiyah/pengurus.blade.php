@@ -41,8 +41,20 @@
                 </button>
             </div>
             {{-- Info hasil + Tombol Tambah --}}
-            <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 <span id="info-cari" class="hidden text-xs text-[#A3AED0] whitespace-nowrap"></span>
+                <a href="/mahadiyah/pengurus/template"
+                    class="bg-white border border-gray-200 hover:bg-gray-50 text-[#2B3674] px-3 py-2 rounded-xl font-semibold transition-all text-sm flex items-center gap-1.5">
+                    <i class="fa fa-download text-green-600 text-xs"></i><span>Template</span>
+                </a>
+                <button onclick="openModalTutorialPengurus()"
+                    class="bg-white border border-gray-200 hover:bg-gray-50 text-[#2B3674] px-3 py-2 rounded-xl font-semibold transition-all text-sm flex items-center gap-1.5">
+                    <i class="fa fa-circle-info text-blue-500 text-xs"></i><span>Tutorial</span>
+                </button>
+                <button onclick="openModalImportPengurus()"
+                    class="bg-white border border-gray-200 hover:bg-gray-50 text-[#2B3674] px-3 py-2 rounded-xl font-semibold transition-all text-sm flex items-center gap-1.5">
+                    <i class="fa fa-file-import text-blue-600 text-xs"></i><span>Import CSV</span>
+                </button>
                 <button onclick="openModal('modal-tambah-pengurus')"
                     class="ml-auto sm:ml-0 bg-[#4318FF] hover:bg-[#3311CC] text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/30 text-sm whitespace-nowrap">
                     <i class="fa fa-plus mr-2"></i>Tambah Pengurus
@@ -823,5 +835,114 @@
             }
         }
     });
+
+    function openModalImportPengurus() {
+        document.getElementById('modal-import-pengurus').classList.remove('hidden');
+        document.getElementById('modal-import-pengurus').classList.add('flex');
+    }
+    function closeModalImportPengurus() {
+        document.getElementById('modal-import-pengurus').classList.add('hidden');
+        document.getElementById('modal-import-pengurus').classList.remove('flex');
+    }
+    function openModalTutorialPengurus() {
+        document.getElementById('modal-tutorial-pengurus').classList.remove('hidden');
+        document.getElementById('modal-tutorial-pengurus').classList.add('flex');
+    }
+    function closeModalTutorialPengurus() {
+        document.getElementById('modal-tutorial-pengurus').classList.add('hidden');
+        document.getElementById('modal-tutorial-pengurus').classList.remove('flex');
+    }
 </script>
+
+{{-- Modal Import Pengurus --}}
+<div id="modal-import-pengurus" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40" onclick="closeModalImportPengurus()"></div>
+    <div class="relative bg-white rounded-[20px] shadow-[0_20px_27px_0_rgba(0,0,0,0.1)] w-full max-w-sm z-10 p-6">
+        <h3 class="text-lg font-bold text-[#1B2559] mb-1">Import Pengurus dari CSV</h3>
+        <p class="text-xs text-[#A3AED0] mb-4">Format: <span class="font-mono">nis, nama, jabatan_id</span> — baris pertama header. Kolom <span class="font-mono">jabatan_id</span> boleh kosong.</p>
+        <form method="POST" action="/mahadiyah/pengurus/import" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-5">
+                <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Pilih File CSV</label>
+                <input type="file" name="file" accept=".csv,.txt" required
+                    class="w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-[#4318FF]/10 file:text-[#4318FF] hover:file:bg-[#4318FF]/20 transition-all">
+                <p class="text-[11px] text-[#A3AED0] mt-1.5">Maks. 2MB. Daftar jabatan_id ada di file template.</p>
+            </div>
+            <div class="flex gap-3">
+                <button type="submit" class="btn btn-primary flex-1">Import</button>
+                <button type="button" onclick="closeModalImportPengurus()" class="btn btn-light flex-1">Batal</button>
+            </div>
+        </form>
+        <div class="mt-3 pt-3 border-t border-gray-100 text-center">
+            <a href="/mahadiyah/pengurus/template" class="text-xs text-[#4318FF] hover:underline">
+                <i class="fa fa-download mr-1"></i> Download template CSV
+            </a>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Tutorial Pengurus --}}
+<div id="modal-tutorial-pengurus" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40" onclick="closeModalTutorialPengurus()"></div>
+    <div class="relative bg-white rounded-[20px] shadow-[0_20px_27px_0_rgba(0,0,0,0.1)] w-full max-w-lg z-10 p-6">
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                    <i class="fa fa-circle-info text-blue-500"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-[#1B2559]">Tutorial Import CSV Pengurus</h3>
+                    <p class="text-xs text-[#A3AED0]">Cara edit file CSV dengan Excel lalu import ke sistem</p>
+                </div>
+            </div>
+            <button onclick="closeModalTutorialPengurus()" class="text-gray-400 hover:text-gray-600 w-7 h-7 flex items-center justify-center">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="space-y-3">
+            <div class="flex gap-3">
+                <span class="w-6 h-6 rounded-full bg-[#4318FF] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
+                <div>
+                    <p class="text-sm font-semibold text-[#1B2559]">Download Template</p>
+                    <p class="text-xs text-[#A3AED0] mt-0.5">Klik tombol <strong class="text-[#2B3674]">Template</strong> untuk download file template.</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <span class="w-6 h-6 rounded-full bg-[#4318FF] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+                <div>
+                    <p class="text-sm font-semibold text-[#1B2559]">Buka di Excel</p>
+                    <p class="text-xs text-[#A3AED0] mt-0.5">Buka Excel → <strong class="text-[#2B3674]">File → Open</strong> → <strong class="text-[#2B3674]">Blok Kolom A</strong> → pilih Menu <strong class="text-[#2B3674]">Data → Text to Columns</strong>, pilih <strong class="text-[#2B3674]">Delimited → Comma → Next sampai Finish</strong>.</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <span class="w-6 h-6 rounded-full bg-[#4318FF] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
+                <div>
+                    <p class="text-sm font-semibold text-[#1B2559]">Isi Data Pengurus</p>
+                    <p class="text-xs text-[#A3AED0] mt-0.5">Kolom <code class="bg-gray-100 px-1 rounded text-[#4318FF]">nis</code> = NIS pengurus, <code class="bg-gray-100 px-1 rounded text-[#4318FF]">nama</code> = nama lengkap, <code class="bg-gray-100 px-1 rounded text-[#4318FF]">jabatan_id</code> = ID jabatan (lihat referensi di bagian bawah template).</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <span class="w-6 h-6 rounded-full bg-[#4318FF] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</span>
+                <div>
+                    <p class="text-sm font-semibold text-[#1B2559]">Save as CSV</p>
+                    <p class="text-xs text-[#A3AED0] mt-0.5"><strong class="text-[#2B3674]">File → Save As</strong> → pilih format <strong class="text-[#2B3674]">CSV (Comma delimited)</strong> → Save → Yes.</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <span class="w-6 h-6 rounded-full bg-[#4318FF] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">5</span>
+                <div>
+                    <p class="text-sm font-semibold text-[#1B2559]">Import ke Sistem</p>
+                    <p class="text-xs text-[#A3AED0] mt-0.5">Klik <strong class="text-[#2B3674]">Import CSV</strong>, pilih file CSV yang sudah diisi, lalu klik Import.</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-5 pt-4 border-t border-gray-100 flex justify-between items-center">
+            <a href="/mahadiyah/pengurus/template" class="text-xs text-[#4318FF] hover:underline flex items-center gap-1">
+                <i class="fa fa-download"></i> Download template CSV
+            </a>
+            <button onclick="closeModalTutorialPengurus()" class="btn btn-dark py-2 px-5 text-sm">Tutup</button>
+        </div>
+    </div>
+</div>
+
 @endsection

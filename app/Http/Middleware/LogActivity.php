@@ -27,10 +27,17 @@ class LogActivity
         'Admin@kamarAssignSantri'  => ['admin.kamar.assign',    'Assign santri ke kamar', 'admin'],
         'Admin@kamarUnassignSantri'=> ['admin.kamar.unassign',  'Melepas santri dari kamar', 'admin'],
         'Admin@asramaStore'        => ['admin.asrama.store',    'Menambah asrama baru', 'admin'],
+        'Admin@asramaUpdate'       => ['admin.asrama.update',   'Mengubah data asrama', 'admin'],
+        'Admin@asramaDestroy'      => ['admin.asrama.destroy',  'Menghapus asrama', 'admin'],
         'Admin@kamarStore'         => ['admin.kamar.store',     'Menambah kamar baru', 'admin'],
         'Admin@kamarUpdate'        => ['admin.kamar.update',    'Mengubah data kamar', 'admin'],
         'Admin@kamarDestroy'       => ['admin.kamar.destroy',   'Menghapus kamar', 'admin'],
         'Admin@pengurusUpdate'     => ['admin.pengurus.update', 'Mengubah data pengurus (admin)', 'admin'],
+        'Admin@santriStore'        => ['admin.santri.store',    'Menambah santri baru', 'admin'],
+        'Admin@santriUpdate'       => ['admin.santri.update',   'Mengubah data santri', 'admin'],
+        'Admin@santriDestroy'      => ['admin.santri.destroy',  'Menghapus santri', 'admin'],
+        'Admin@santriImport'       => ['admin.santri.import',   'Import santri dari CSV', 'admin'],
+        'Admin@pengurusImport'     => ['admin.pengurus.import', 'Import pengurus dari CSV', 'admin'],
 
         // KepalaKamar - Absensi
         'KepalaKamar\AbsensiController@store'   => ['kepkam.absensi.store',   'Membuat absensi santri', 'kepkam'],
@@ -302,7 +309,56 @@ class LogActivity
             return $parts ? $base . ' — ' . implode(', ', $parts) : $base;
         }
 
-        // ── ABSENSI (store/update/libur) ────────────────────────────
+        // ── DELETE SANTRI ───────────────────────────────────────────
+        if (str_contains($action, 'santri.destroy')) {
+            $nis = $request->route('nis');
+            if ($nis) {
+                $santri = Santri::where('nis', $nis)->value('nama');
+                $parts[] = $santri ? "Santri: {$santri} (NIS: {$nis})" : "NIS: {$nis}";
+            }
+            return $parts ? $base . ' — ' . implode(', ', $parts) : $base;
+        }
+
+        // ── CREATE SANTRI ───────────────────────────────────────────
+        if (str_contains($action, 'santri.store')) {
+            $nis    = $request->input('nis');
+            $nama   = $request->input('nama');
+            $kepkam = $request->input('kepkam');
+            if ($nama) $parts[] = "Nama: {$nama}";
+            if ($nis)  $parts[] = "NIS: {$nis}";
+            if ($kepkam) {
+                $namaKepkam = Pengurus::where('nis', $kepkam)->value('nama');
+                if ($namaKepkam) $parts[] = "Kepkam: {$namaKepkam}";
+            }
+            return $parts ? $base . ' — ' . implode(', ', $parts) : $base;
+        }
+
+        // ── UPDATE SANTRI ───────────────────────────────────────────
+        if (str_contains($action, 'santri.update')) {
+            $nis     = $request->route('nis');
+            $newNama = $request->input('nama');
+            $kepkam  = $request->input('kepkam');
+            if ($nis) {
+                $oldNama = Santri::where('nis', $nis)->value('nama');
+                if ($oldNama && $newNama && $newNama !== $oldNama) {
+                    $parts[] = "Santri: {$oldNama} → {$newNama}";
+                } elseif ($oldNama) {
+                    $parts[] = "Santri: {$oldNama}";
+                }
+            }
+            if ($kepkam) {
+                $namaKepkam = Pengurus::where('nis', $kepkam)->value('nama');
+                if ($namaKepkam) $parts[] = "Kepkam: {$namaKepkam}";
+            }
+            return $parts ? $base . ' — ' . implode(', ', $parts) : $base;
+        }
+
+        // ── IMPORT SANTRI ───────────────────────────────────────────
+        if (str_contains($action, 'santri.import')) {
+            $file = $request->file('file');
+            if ($file) $parts[] = "File: {$file->getClientOriginalName()}";
+            return $parts ? $base . ' — ' . implode(', ', $parts) : $base;
+        }
         if (str_contains($action, 'absensi') || str_contains($action, 'libur')) {
             $kegiatanMap = ['7' => 'Bandongan', '8' => 'Wirid', '9' => 'Yasinan'];
             $kegiatan    = $request->input('kegiatan');
