@@ -106,6 +106,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [Admin::class, 'dashboard']);
         Route::get('/asrama', [Admin::class, 'asrama']);
         Route::post('/asrama', [Admin::class, 'asramaStore']);
+        Route::put('/asrama/{id}', [Admin::class, 'asramaUpdate']);
+        Route::delete('/asrama/{id}', [Admin::class, 'asramaDestroy']);
         Route::get('/asrama/{asrama_id}/kamar', [Admin::class, 'kamarIndex']);
         Route::post('/asrama/{asrama_id}/kamar', [Admin::class, 'kamarStore']);
         Route::put('/asrama/{asrama_id}/kamar/{kamar_id}', [Admin::class, 'kamarUpdate']);
@@ -115,6 +117,8 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/asrama/{asrama_id}/kamar/{kamar_id}/santri/{nis}', [Admin::class, 'kamarUnassignSantri']);
 
         Route::get('/santri', [Admin::class, 'santri']);
+        Route::put('/santri/{nis}', [Admin::class, 'santriUpdate']);
+        Route::delete('/santri/{nis}', [Admin::class, 'santriDestroy']);
         Route::get('/pengurus', [Admin::class, 'pengurus']);
         Route::get('/pengurus/{nis}/edit', [Admin::class, 'pengurusEdit']);
         Route::put('/pengurus/{nis}', [Admin::class, 'pengurusUpdate']);

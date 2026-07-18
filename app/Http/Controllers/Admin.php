@@ -138,9 +138,31 @@ class Admin extends Controller
         }
         $santri  = $query->orderBy('nama')->paginate(30)->withQueryString();
         $kepkams = Pengurus::with('jabatan.divisi')
-            ->whereIn('nis', Santri::select('kepkam')->distinct()->pluck('kepkam'))
+            ->whereHas('jabatan.divisi', fn($q) => $q->where('tipe', 'kepkam'))
             ->orderBy('nama')->get();
         return view('admin.santri', compact('santri', 'kepkams'));
+    }
+
+    public function santriUpdate(Request $request, $nis)
+    {
+        $santri = Santri::where('nis', $nis)->firstOrFail();
+        $request->validate([
+            'nama'   => 'required|string|max:100',
+            'kepkam' => 'nullable|exists:pengurus,nis',
+        ]);
+        $santri->update([
+            'nama'   => $request->nama,
+            'kepkam' => $request->kepkam ?: null,
+        ]);
+        return redirect('/admin/santri' . '?' . http_build_query(request()->except('_token', '_method')))
+            ->with('success', 'Data santri berhasil diperbarui.');
+    }
+
+    public function santriDestroy($nis)
+    {
+        Santri::where('nis', $nis)->firstOrFail()->delete();
+        return redirect('/admin/santri' . '?' . http_build_query(request()->except('_token', '_method')))
+            ->with('success', 'Santri berhasil dihapus.');
     }
 
     public function pengurus(Request $request)
@@ -200,6 +222,24 @@ class Admin extends Controller
         $request->validate(['nama' => 'required|string|max:50']);
         Asrama::create(['nama' => $request->nama]);
         return redirect('/admin/asrama')->with('success', 'Asrama berhasil ditambahkan.');
+    }
+
+    public function asramaUpdate(Request $request, $id)
+    {
+        $asrama = Asrama::findOrFail($id);
+        $request->validate(['nama' => 'required|string|max:50']);
+        $asrama->update(['nama' => $request->nama]);
+        return redirect('/admin/asrama')->with('success', 'Asrama berhasil diperbarui.');
+    }
+
+    public function asramaDestroy($id)
+    {
+        $asrama = Asrama::findOrFail($id);
+        if ($asrama->kamar()->count() > 0) {
+            return redirect('/admin/asrama')->with('error', 'Asrama tidak bisa dihapus karena masih memiliki kamar.');
+        }
+        $asrama->delete();
+        return redirect('/admin/asrama')->with('success', 'Asrama berhasil dihapus.');
     }
 
     public function kamarIndex($asrama_id)
