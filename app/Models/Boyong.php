@@ -18,7 +18,7 @@ class Boyong extends Model
         'nis' => 'string'
     ];
     public function kepkam() {
-        return $this->belongsTo(Pengurus::class, 'kep_id', 'NIS');
+        return $this->belongsTo(Pengurus::class, 'kep_id', 'nis');
     }
     public function asrama() {
         return $this->belongsTo(Asrama::class, 'asr_id', 'id');

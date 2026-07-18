@@ -59,15 +59,10 @@
 
             <!-- Download Buttons -->
             <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-start lg:justify-end">
-                <button onclick="downloadCsv()"
+                <button onclick="downloadExcel()"
                     class="btn bg-white border border-gray-200 hover:bg-gray-50 text-[#2B3674] shadow-sm rounded-xl font-semibold py-2.5 px-4 flex items-center justify-center gap-2 text-xs flex-1 lg:flex-none">
-                    <i class="fa fa-file-csv text-green-500"></i>
-                    <span>Download CSV</span>
-                </button>
-                <button id="download-png-btn" onclick="downloadAsPng()"
-                    class="btn bg-white border border-gray-200 hover:bg-gray-50 text-[#2B3674] shadow-sm rounded-xl font-semibold py-2.5 px-4 flex items-center justify-center gap-2 text-xs flex-1 lg:flex-none">
-                    <i class="fa fa-image text-blue-500"></i>
-                    <span>Download PNG</span>
+                    <i class="fa fa-file-excel text-green-600"></i>
+                    <span>Download Excel</span>
                 </button>
                 <button onclick="downloadPdf()"
                     class="btn bg-white border border-gray-200 hover:bg-gray-50 text-[#2B3674] shadow-sm rounded-xl font-semibold py-2.5 px-4 flex items-center justify-center gap-2 text-xs flex-1 lg:flex-none">
@@ -116,6 +111,60 @@
                                 Yasinan
                             </th>
                         </tr>
+                        <!-- Baris Total Hadir per Tanggal — 3 versi per tipe -->
+                        @if(count($rekapData) > 0)
+                        @foreach(['all','kepkam','non'] as $tipeRow)
+                        <tr class="bg-[#1B2559] text-white text-[10px] total-hadir-row total-hadir-{{ $tipeRow }}"
+                            style="{{ $tipeRow !== 'all' ? 'display:none' : '' }}">
+                            <td class="p-2.5 text-left sticky left-0 bg-[#1B2559] z-20 border-r border-[#2d3a6b] min-w-[130px] md:min-w-[200px]">
+                                <div class="text-[9px] uppercase tracking-wider font-black text-blue-200">Total Hadir</div>
+                            </td>
+                            @foreach($dates as $date)
+                                @php $s = $dailySummary[$tipeRow][$date] ?? ['bandongan'=>0,'bandongan_total'=>0,'wirid'=>0,'wirid_total'=>0,'yasinan'=>0,'yasinan_total'=>0]; @endphp
+                                <td class="p-1.5 border-r border-[#2d3a6b] align-middle">
+                                    <div class="flex flex-col items-center gap-0.5">
+                                        <div class="flex items-center gap-0.5">
+                                            <span class="text-[8px] text-blue-300 font-bold">B</span>
+                                            <span class="text-green-300 font-extrabold text-[10px]">{{ $s['bandongan'] }}/{{ $s['bandongan_total'] }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-0.5">
+                                            <span class="text-[8px] text-blue-300 font-bold">W</span>
+                                            <span class="text-green-300 font-extrabold text-[10px]">{{ $s['wirid'] }}/{{ $s['wirid_total'] }}</span>
+                                        </div>
+                                        @if($tipeRow !== 'kepkam')
+                                        <div class="flex items-center gap-0.5">
+                                            <span class="text-[8px] text-blue-300 font-bold">Y</span>
+                                            <span class="text-green-300 font-extrabold text-[10px]">{{ $s['yasinan'] }}/{{ $s['yasinan_total'] }}</span>
+                                        </div>
+                                        @endif
+                                    </div>
+                                </td>
+                            @endforeach
+                            {{-- Summary totals --}}
+                            @php
+                                $sumBH = array_sum(array_column($dailySummary[$tipeRow], 'bandongan'));
+                                $sumBT = array_sum(array_column($dailySummary[$tipeRow], 'bandongan_total'));
+                                $sumWH = array_sum(array_column($dailySummary[$tipeRow], 'wirid'));
+                                $sumWT = array_sum(array_column($dailySummary[$tipeRow], 'wirid_total'));
+                                $sumYH = array_sum(array_column($dailySummary[$tipeRow], 'yasinan'));
+                                $sumYT = array_sum(array_column($dailySummary[$tipeRow], 'yasinan_total'));
+                            @endphp
+                            <td class="p-2 text-center border-r border-[#2d3a6b] bg-[#151d47]">
+                                <span class="text-green-300 font-extrabold text-xs">{{ $sumBH }}/{{ $sumBT }}</span>
+                            </td>
+                            <td class="p-2 text-center border-r border-[#2d3a6b] bg-[#151d47]">
+                                <span class="text-green-300 font-extrabold text-xs">{{ $sumWH }}/{{ $sumWT }}</span>
+                            </td>
+                            <td class="p-2 text-center bg-[#151d47]">
+                                @if($tipeRow !== 'kepkam')
+                                    <span class="text-green-300 font-extrabold text-xs">{{ $sumYH }}/{{ $sumYT }}</span>
+                                @else
+                                    <span class="text-gray-500 select-none">-</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                        @endif
                     </thead>
                     <tbody class="text-xs">
                         @php
@@ -143,45 +192,33 @@
                                 @foreach($dates as $date)
                                     @php
                                         $att = $row['attendance'][$date];
+                                        $statusBg = fn($s) => match($s) {
+                                            'H' => 'bg-green-100 text-green-700 hover:bg-green-200',
+                                            'S' => 'bg-amber-100 text-amber-700 hover:bg-amber-200',
+                                            'I' => 'bg-blue-100 text-blue-700 hover:bg-blue-200',
+                                            'A' => 'bg-red-100 text-red-700 hover:bg-red-200',
+                                            'L' => 'bg-purple-100 text-purple-700',
+                                            default => 'bg-gray-100 text-gray-500'
+                                        };
+                                        $statusLabel = fn($s) => match($s) {
+                                            'H' => 'Hadir', 'S' => 'Sakit', 'I' => 'Izin',
+                                            'A' => 'Alpa', 'L' => 'Libur', default => 'N/A'
+                                        };
                                     @endphp
-                                    <td class="p-2 border-r border-gray-100 align-middle">
+                                    <td class="p-2 border-r border-gray-100 align-middle {{ ($att['bandongan'] === 'L' || $att['wirid'] === 'L' || $att['yasinan'] === 'L') ? 'bg-purple-50/50' : '' }}">
                                         <div class="flex items-center justify-center gap-1">
                                             <!-- Bandongan Badge (B) -->
                                             @if($att['bandongan'])
-                                                @php
-                                                    $bg = match($att['bandongan']) {
-                                                        'H' => 'bg-green-100 text-green-700 hover:bg-green-200',
-                                                        'S' => 'bg-amber-100 text-amber-700 hover:bg-amber-200',
-                                                        'I' => 'bg-blue-100 text-blue-700 hover:bg-blue-200',
-                                                        'A' => 'bg-red-100 text-red-700 hover:bg-red-200',
-                                                        default => 'bg-gray-100 text-gray-500'
-                                                    };
-                                                    $statusFull = match($att['bandongan']) {
-                                                        'H' => 'Hadir', 'S' => 'Sakit', 'I' => 'Izin', 'A' => 'Alpa', default => 'N/A'
-                                                    };
-                                                @endphp
-                                                <span class="w-4 h-4 rounded flex items-center justify-center text-[9px] font-black cursor-help transition-all {{ $bg }}"
-                                                    title="Bandongan ({{ $date }}): {{ $statusFull }}">B</span>
+                                                <span class="w-4 h-4 rounded flex items-center justify-center text-[9px] font-black cursor-help transition-all {{ $statusBg($att['bandongan']) }}"
+                                                    title="Bandongan ({{ $date }}): {{ $statusLabel($att['bandongan']) }}">B</span>
                                             @else
                                                 <span class="w-4 h-4 rounded flex items-center justify-center text-[9px] text-gray-300 border border-dashed border-gray-200 select-none">-</span>
                                             @endif
 
                                             <!-- Wirid Badge (W) -->
                                             @if($att['wirid'])
-                                                @php
-                                                    $bg = match($att['wirid']) {
-                                                        'H' => 'bg-green-100 text-green-700 hover:bg-green-200',
-                                                        'S' => 'bg-amber-100 text-amber-700 hover:bg-amber-200',
-                                                        'I' => 'bg-blue-100 text-blue-700 hover:bg-blue-200',
-                                                        'A' => 'bg-red-100 text-red-700 hover:bg-red-200',
-                                                        default => 'bg-gray-100 text-gray-500'
-                                                    };
-                                                    $statusFull = match($att['wirid']) {
-                                                        'H' => 'Hadir', 'S' => 'Sakit', 'I' => 'Izin', 'A' => 'Alpa', default => 'N/A'
-                                                    };
-                                                @endphp
-                                                <span class="w-4 h-4 rounded flex items-center justify-center text-[9px] font-black cursor-help transition-all {{ $bg }}"
-                                                    title="Wirid ({{ $date }}): {{ $statusFull }}">W</span>
+                                                <span class="w-4 h-4 rounded flex items-center justify-center text-[9px] font-black cursor-help transition-all {{ $statusBg($att['wirid']) }}"
+                                                    title="Wirid ({{ $date }}): {{ $statusLabel($att['wirid']) }}">W</span>
                                             @else
                                                 <span class="w-4 h-4 rounded flex items-center justify-center text-[9px] text-gray-300 border border-dashed border-gray-200 select-none">-</span>
                                             @endif
@@ -189,20 +226,8 @@
                                             <!-- Yasinan Badge (Y) -->
                                             @if($row['tipe'] !== 'kepkam')
                                                 @if($att['yasinan'])
-                                                    @php
-                                                        $bg = match($att['yasinan']) {
-                                                            'H' => 'bg-green-100 text-green-700 hover:bg-green-200',
-                                                            'S' => 'bg-amber-100 text-amber-700 hover:bg-amber-200',
-                                                            'I' => 'bg-blue-100 text-blue-700 hover:bg-blue-200',
-                                                            'A' => 'bg-red-100 text-red-700 hover:bg-red-200',
-                                                            default => 'bg-gray-100 text-gray-500'
-                                                        };
-                                                        $statusFull = match($att['yasinan']) {
-                                                            'H' => 'Hadir', 'S' => 'Sakit', 'I' => 'Izin', 'A' => 'Alpa', default => 'N/A'
-                                                        };
-                                                    @endphp
-                                                    <span class="w-4 h-4 rounded flex items-center justify-center text-[9px] font-black cursor-help transition-all {{ $bg }}"
-                                                        title="Yasinan ({{ $date }}): {{ $statusFull }}">Y</span>
+                                                    <span class="w-4 h-4 rounded flex items-center justify-center text-[9px] font-black cursor-help transition-all {{ $statusBg($att['yasinan']) }}"
+                                                        title="Yasinan ({{ $date }}): {{ $statusLabel($att['yasinan']) }}">Y</span>
                                                 @else
                                                     <span class="w-4 h-4 rounded flex items-center justify-center text-[9px] text-gray-300 border border-dashed border-gray-200 select-none">-</span>
                                                 @endif
@@ -262,6 +287,9 @@
                     <div class="flex items-center gap-1.5 bg-red-50 text-red-700 px-2.5 py-1 rounded-full font-medium">
                         <span class="w-3.5 h-3.5 rounded bg-red-200 text-red-800 text-[8px] font-black flex items-center justify-center">A</span> Alpa
                     </div>
+                    <div class="flex items-center gap-1.5 bg-purple-50 text-purple-700 px-2.5 py-1 rounded-full font-medium">
+                        <span class="w-3.5 h-3.5 rounded bg-purple-200 text-purple-800 text-[8px] font-black flex items-center justify-center">L</span> Libur
+                    </div>
                 </div>
                 <div class="flex items-center gap-3 text-gray-400">
                     <span class="font-bold"><span class="bg-gray-100 text-gray-700 px-1 py-0.5 rounded text-[9px] font-black">B</span> Bandongan</span>
@@ -272,93 +300,28 @@
         </div>
     </div>
 
-    <!-- PDF.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-        async function renderPdfToCanvas() {
-            const startDate = document.getElementById('start_date').value;
-            const endDate = document.getElementById('end_date').value;
-            const url = `/mahadiyah/rekap-absensi-pengurus/download?start_date=${startDate}&end_date=${endDate}`;
-            
-            console.log('[PDF Render] Starting PDF fetch from:', url);
-            
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-                }
-                
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('pdf')) {
-                    throw new Error(`Server tidak mengembalikan PDF (Content-Type: ${contentType})`);
-                }
-                
-                const blob = await response.blob();
-                const arrayBuffer = await blob.arrayBuffer();
-                
-                const loadingTask = pdfjsLib.getDocument({data: arrayBuffer});
-                const pdf = await loadingTask.promise;
-
-                const page = await pdf.getPage(1);
-                const viewport = page.getViewport({ scale: 4 });
-
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-
-                await page.render({
-                    canvasContext: context,
-                    viewport: viewport
-                }).promise;
-                
-                return { canvas, startDate, endDate };
-            } catch (error) {
-                console.error('[PDF Render] Error:', error);
-                throw error;
-            }
-        }
-
-        async function downloadAsPng() {
-            const btn = document.getElementById('download-png-btn');
-            const originalContent = btn.innerHTML;
-
-            try {
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i><span>Processing...</span>';
-
-                const { canvas, startDate, endDate } = await renderPdfToCanvas();
-
-                const link = document.createElement('a');
-                link.download = `Rekap_Absensi_Pengurus_${startDate}_to_${endDate}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-
-            } catch (error) {
-                alert('Gagal mendownload gambar: ' + (error.message || error));
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalContent;
-            }
-        }
-
         function downloadPdf() {
             const startDate = document.getElementById('start_date').value;
             const endDate = document.getElementById('end_date').value;
-            const url = `/mahadiyah/rekap-absensi-pengurus/download?start_date=${startDate}&end_date=${endDate}`;
+            const tipe = window.activeTipe || 'all';
+            const url = `/mahadiyah/rekap-absensi-pengurus/download?start_date=${startDate}&end_date=${endDate}&tipe=${tipe}`;
             window.location.href = url;
         }
 
-        function downloadCsv() {
+        function downloadExcel() {
             const startDate = document.getElementById('start_date').value;
             const endDate = document.getElementById('end_date').value;
-            const url = `/mahadiyah/rekap-absensi-pengurus/csv?start_date=${startDate}&end_date=${endDate}`;
+            const tipe = window.activeTipe || 'all';
+            const url = `/mahadiyah/rekap-absensi-pengurus/excel?start_date=${startDate}&end_date=${endDate}&tipe=${tipe}`;
             window.location.href = url;
         }
 
+        // Track tipe aktif untuk download
+        window.activeTipe = 'all';
+
         function filterTipe(tipe) {
+            window.activeTipe = tipe;
             // Update active tab styling
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('bg-[#4318FF]', 'text-white');
@@ -368,32 +331,28 @@
             activeBtn.classList.remove('bg-white', 'text-[#2B3674]', 'border', 'border-gray-200');
             activeBtn.classList.add('bg-[#4318FF]', 'text-white');
 
-            // Show/hide rows
+            // Show/hide data rows
             const rows = document.querySelectorAll('.data-row');
             rows.forEach(row => {
-                if (tipe === 'all' || row.getAttribute('data-tipe') === tipe) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                row.style.display = (tipe === 'all' || row.getAttribute('data-tipe') === tipe) ? '' : 'none';
             });
 
-            // Handle division divider rows if all rows under them are hidden
-            const dividers = document.querySelectorAll('.table-divider-row');
-            dividers.forEach(div => {
+            // Handle division divider rows
+            document.querySelectorAll('.table-divider-row').forEach(div => {
                 const divName = div.getAttribute('data-divisi');
                 let hasVisible = false;
-                
-                // Find all siblings that have the same division attribute and are visible
-                const sibs = document.querySelectorAll(`.data-row[data-divisi="${divName}"]`);
-                sibs.forEach(sib => {
-                    if (sib.style.display !== 'none') {
-                        hasVisible = true;
-                    }
+                document.querySelectorAll(`.data-row[data-divisi="${divName}"]`).forEach(sib => {
+                    if (sib.style.display !== 'none') hasVisible = true;
                 });
-                
                 div.style.display = hasVisible ? '' : 'none';
             });
+
+            // Show/hide total hadir rows sesuai tipe aktif
+            document.querySelectorAll('.total-hadir-row').forEach(row => {
+                row.style.display = 'none';
+            });
+            const targetRow = document.querySelector('.total-hadir-' + tipe);
+            if (targetRow) targetRow.style.display = '';
         }
     </script>
 @endsection

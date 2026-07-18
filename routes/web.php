@@ -1,13 +1,21 @@
 <?php
 
 use App\Http\Controllers\Madin;
+use App\Http\Controllers\Admin;
 use App\Http\Controllers\Kantor;
 use App\Http\Controllers\General;
 use App\Http\Controllers\Keamanan;
-use App\Http\Controllers\Mahadiyah;
-use App\Http\Controllers\KepalaKamar;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AlurPerizinan;
+use Illuminate\Support\Facades\Route;
+// Mahadiyah sub-controllers
+use App\Http\Controllers\Mahadiyah\DashboardController as MahadiyahDashboard;
+use App\Http\Controllers\Mahadiyah\AbsensiController as MahadiyahAbsensi;
+use App\Http\Controllers\Mahadiyah\PengurusController as MahadiyahPengurus;
+use App\Http\Controllers\Mahadiyah\RekapController as MahadiyahRekap;
+// KepalaKamar sub-controllers
+use App\Http\Controllers\KepalaKamar\DashboardController as KepkamDashboard;
+use App\Http\Controllers\KepalaKamar\AbsensiController as KepkamAbsensi;
+use App\Http\Controllers\KepalaKamar\RekapController as KepkamRekap;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [General::class, 'login'])->name('login');
@@ -16,87 +24,129 @@ Route::middleware(['guest'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [General::class, 'dashboard']);
+    Route::post('/logout', [General::class, 'logout'])->name('logout');
 
-    Route::get('/search-santri', [General::class, 'santri']);
-    Route::get('/search-pengurus', [General::class, 'pengurus']);
-    Route::get('/search-kepkam', [General::class, 'kepkam']);
-
-    Route::get('/perizinan', [AlurPerizinan::class, 'perizinan']);
-    Route::post('/perizinan', [AlurPerizinan::class, 'createizin']);
-    Route::put('/perizinan/{nis}', [AlurPerizinan::class, 'accizin']);
-    Route::put('/lapor/{nis}', [AlurPerizinan::class, 'lapor']);
-
-    Route::get('/logout', [General::class, 'logout']);
+    // Perizinan — diakses oleh kepkam & keamanan
+    Route::middleware(['role:kepkam,keamanan'])->group(function () {
+        Route::get('/perizinan', [AlurPerizinan::class, 'perizinan']);
+        Route::post('/perizinan', [AlurPerizinan::class, 'createizin']);
+        Route::put('/perizinan/{nis}', [AlurPerizinan::class, 'accizin']);
+        Route::put('/lapor/{nis}', [AlurPerizinan::class, 'lapor']);
+    });
 
     // Keamanan
-    Route::prefix('keamanan')->group(function () {
+    Route::prefix('keamanan')->middleware(['role:keamanan'])->group(function () {
         Route::get('/', [Keamanan::class, 'dashboard']);
         Route::get('/pelanggaran', [Keamanan::class, 'pelanggaran']);
         Route::post('/pelanggaran', [Keamanan::class, 'i_pelanggaran']);
     });
 
     // Mahadiyah
-    Route::prefix('mahadiyah')->group(function () {
-        Route::get('/', [Mahadiyah::class, 'dashboard']);
-        Route::get('/absensi-mingguan', [Mahadiyah::class, 'mingguan']);
-        Route::get('/absensi-kegiatan', [Mahadiyah::class, 'kegiatan']);
-        Route::get('/absensi-pengurus', [Mahadiyah::class, 'absensi']);
-        Route::get('/absen-pengurus', [Mahadiyah::class, 'create_absen']);
-        Route::post('/absen-pengurus', [Mahadiyah::class, 'store_absen']);
-        Route::get('/rekap-kegiatan', [Mahadiyah::class, 'rekapKegiatan']);
-        Route::get('/rekap-kegiatan/download', [Mahadiyah::class, 'downloadRekapKegiatan']);
-        Route::get('/rekap-absensi-pengurus', [Mahadiyah::class, 'rekapAbsensiPengurus']);
-        Route::get('/rekap-absensi-pengurus/download', [Mahadiyah::class, 'downloadRekapAbsensiPengurus']);
-        Route::get('/rekap-absensi-pengurus/csv', [Mahadiyah::class, 'csvRekapAbsensiPengurus']);
+    Route::prefix('mahadiyah')->middleware(['role:mahadiyah'])->group(function () {
+        // Dashboard
+        Route::get('/', [MahadiyahDashboard::class, 'index']);
+
+        // Absensi Pengurus
+        Route::get('/absensi-mingguan', [MahadiyahAbsensi::class, 'mingguan']);
+        Route::get('/absensi-kegiatan', [MahadiyahAbsensi::class, 'kegiatan']);
+        Route::get('/absensi-pengurus', [MahadiyahAbsensi::class, 'index']);
+        Route::get('/absen-pengurus', [MahadiyahAbsensi::class, 'create']);
+        Route::post('/absen-pengurus', [MahadiyahAbsensi::class, 'store']);
+        Route::get('/edit-absen/{tipe}/{tanggal}', [MahadiyahAbsensi::class, 'edit']);
+        Route::put('/edit-absen/{tipe}/{tanggal}', [MahadiyahAbsensi::class, 'update']);
+        Route::post('/libur-pengurus', [MahadiyahAbsensi::class, 'liburStore']);
+        Route::delete('/libur-pengurus', [MahadiyahAbsensi::class, 'liburDestroy']);
+
+        // Rekap
+        Route::get('/rekap-kegiatan', [MahadiyahRekap::class, 'rekapKegiatan']);
+        Route::get('/rekap-kegiatan/download', [MahadiyahRekap::class, 'downloadRekapKegiatan']);
+        Route::get('/rekap-absensi-pengurus', [MahadiyahRekap::class, 'rekapAbsensiPengurus']);
+        Route::get('/rekap-absensi-pengurus/download', [MahadiyahRekap::class, 'downloadRekapAbsensiPengurus']);
+        Route::get('/rekap-absensi-pengurus/excel', [MahadiyahRekap::class, 'excelRekapAbsensiPengurus']);
+
+        // Search
+        Route::get('/search-santri', [General::class, 'santri']);
+        Route::get('/search-pengurus', [General::class, 'pengurus']);
+        Route::get('/search-kepkam', [General::class, 'kepkam']);
 
         // CRUD Pengurus
-        Route::get('/pengurus', [Mahadiyah::class, 'pengurus_index']);
-        Route::post('/pengurus', [Mahadiyah::class, 'pengurus_store']);
-        Route::put('/pengurus/{nis}', [Mahadiyah::class, 'pengurus_update']);
-        Route::delete('/pengurus/{nis}', [Mahadiyah::class, 'pengurus_destroy']);
+        Route::get('/generate-nis', [MahadiyahPengurus::class, 'generateNis']);
+        Route::get('/pengurus', [MahadiyahPengurus::class, 'index']);
+        Route::post('/pengurus', [MahadiyahPengurus::class, 'store']);
+        Route::put('/pengurus/{nis}', [MahadiyahPengurus::class, 'update']);
+        Route::delete('/pengurus/{nis}', [MahadiyahPengurus::class, 'destroy']);
 
         // CRUD Divisi
-        Route::post('/divisi', [Mahadiyah::class, 'divisi_store']);
-        Route::put('/divisi/{id}', [Mahadiyah::class, 'divisi_update']);
-        Route::delete('/divisi/{id}', [Mahadiyah::class, 'divisi_destroy']);
+        Route::post('/divisi', [MahadiyahPengurus::class, 'divisiStore']);
+        Route::put('/divisi/{id}', [MahadiyahPengurus::class, 'divisiUpdate']);
+        Route::delete('/divisi/{id}', [MahadiyahPengurus::class, 'divisiDestroy']);
 
         // CRUD Jabatan
-        Route::post('/jabatan', [Mahadiyah::class, 'jabatan_store']);
-        Route::put('/jabatan/{id}', [Mahadiyah::class, 'jabatan_update']);
-        Route::delete('/jabatan/{id}', [Mahadiyah::class, 'jabatan_destroy']);
-
-        // Edit Absensi Pengurus (halaman penuh)
-        Route::get('/edit-absen/{tipe}/{tanggal}', [Mahadiyah::class, 'edit_absen']);
-        Route::put('/edit-absen/{tipe}/{tanggal}', [Mahadiyah::class, 'update_absen']);
+        Route::post('/jabatan', [MahadiyahPengurus::class, 'jabatanStore']);
+        Route::put('/jabatan/{id}', [MahadiyahPengurus::class, 'jabatanUpdate']);
+        Route::delete('/jabatan/{id}', [MahadiyahPengurus::class, 'jabatanDestroy']);
     });
 
     // Madin
-    Route::prefix('madin')->group(function () {
+    Route::prefix('madin')->middleware(['role:madin'])->group(function () {
         Route::get('/', [Madin::class, 'dashboard']);
         Route::get('/absensi-diniyah', [Madin::class, 'absensi']);
         Route::get('/absensi-pengajar', [Madin::class, 'pengajar']);
     });
 
     // Kantor
-    Route::prefix('kantor')->group(function () {
+    Route::prefix('kantor')->middleware(['role:kantor'])->group(function () {
         Route::get('/', [Kantor::class, 'kantor']);
         Route::get('/boyong', [Kantor::class, 'boyong']);
         Route::post('/boyong', [Kantor::class, 'i_boyong']);
     });
 
-    // Kepala Kamar
-    Route::prefix('kepkam')->group(function () {
-        Route::get('/', [KepalaKamar::class, 'dashboard']);
-        Route::get('/absensi', [KepalaKamar::class, 'absensi']);
-        Route::get('/absensi/check-completed', [KepalaKamar::class, 'checkCompleted']);
-        Route::post('/absen', [KepalaKamar::class, 'absen']);
-        Route::delete('/absensi/{id}', [KepalaKamar::class, 'hapusAbsen']);
-        Route::get('/mingguan', [KepalaKamar::class, 'mingguan']);
-        Route::post('/mingguan', [KepalaKamar::class, 'i_mingguan']);
-        Route::get('/rekap-harian', [KepalaKamar::class, 'rekapHarian']);
-        Route::get('/rekap-harian/download', [KepalaKamar::class, 'downloadRekapHarian']);
+    // Admin
+    Route::prefix('admin')->middleware(['role:admin'])->group(function () {
+        Route::get('/', [Admin::class, 'dashboard']);
+        Route::get('/asrama', [Admin::class, 'asrama']);
+        Route::post('/asrama', [Admin::class, 'asramaStore']);
+        Route::get('/asrama/{asrama_id}/kamar', [Admin::class, 'kamarIndex']);
+        Route::post('/asrama/{asrama_id}/kamar', [Admin::class, 'kamarStore']);
+        Route::put('/asrama/{asrama_id}/kamar/{kamar_id}', [Admin::class, 'kamarUpdate']);
+        Route::delete('/asrama/{asrama_id}/kamar/{kamar_id}', [Admin::class, 'kamarDestroy']);
+        Route::get('/asrama/{asrama_id}/kamar/{kamar_id}/santri', [Admin::class, 'kamarSantri']);
+        Route::post('/asrama/{asrama_id}/kamar/{kamar_id}/santri', [Admin::class, 'kamarAssignSantri']);
+        Route::delete('/asrama/{asrama_id}/kamar/{kamar_id}/santri/{nis}', [Admin::class, 'kamarUnassignSantri']);
+
+        Route::get('/santri', [Admin::class, 'santri']);
+        Route::get('/pengurus', [Admin::class, 'pengurus']);
+        Route::get('/pengurus/{nis}/edit', [Admin::class, 'pengurusEdit']);
+        Route::put('/pengurus/{nis}', [Admin::class, 'pengurusUpdate']);
+        Route::get('/generate-nis', [Admin::class, 'generateNis']);
+        Route::get('/users', [Admin::class, 'index']);
+        Route::get('/users/create', [Admin::class, 'create']);
+        Route::post('/users', [Admin::class, 'store']);
+        Route::get('/users/{id}/edit', [Admin::class, 'edit']);
+        Route::put('/users/{id}', [Admin::class, 'update']);
+        Route::delete('/users/{id}', [Admin::class, 'destroy']);
+        Route::post('/users/{id}/reset-password', [Admin::class, 'resetPassword']);
     });
-});
-Route::get('/ok', function () {
-    return "OK";
+
+    // Kepala Kamar
+    Route::prefix('kepkam')->middleware(['role:kepkam'])->group(function () {
+        // Dashboard
+        Route::get('/', [KepkamDashboard::class, 'index']);
+
+        // Absensi
+        Route::get('/absensi', [KepkamAbsensi::class, 'index']);
+        Route::get('/absensi/check-completed', [KepkamAbsensi::class, 'checkCompleted']);
+        Route::post('/absen', [KepkamAbsensi::class, 'store']);
+        Route::delete('/absensi/{id}', [KepkamAbsensi::class, 'destroy']);
+
+        // Rekap & Mingguan
+        Route::get('/mingguan', [KepkamRekap::class, 'mingguan']);
+        Route::post('/mingguan', [KepkamRekap::class, 'storeMingguan']);
+        Route::get('/rekap-harian', [KepkamRekap::class, 'rekapHarian']);
+        Route::get('/rekap-harian/download', [KepkamRekap::class, 'downloadRekapHarian']);
+
+        // Search
+        Route::get('/search-santri', [General::class, 'santri']);
+        Route::get('/search-kepkam', [General::class, 'kepkam']);
+    });
 });

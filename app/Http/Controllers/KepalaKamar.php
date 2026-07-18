@@ -190,24 +190,26 @@ class KepalaKamar extends Controller
     }
     public function absen(Request $request)
     {
+        $validIds = ['1', '2', '3', '4', '5', '6', '10', '11'];
+
+        $request->validate([
+            'tanggal'                => 'required|date',
+            'kegiatan'               => 'required|in:' . implode(',', $validIds),
+            'santri'                 => 'required|array|min:1',
+            'santri.*'               => 'required|in:H,S,I,A',
+            'additional_activities'  => 'nullable|array',
+            'additional_activities.*'=> 'in:' . implode(',', $validIds),
+        ]);
+
         $tanggal = Carbon::parse($request->tanggal)->format('d/m/Y');
 
-        // Target activities: Defaults to just the selected one
-        $targetActivities = [$request->kegiatan];
-
-        // Merge with any selected additional activities
-        if ($request->has('additional_activities') && is_array($request->additional_activities)) {
-            $targetActivities = array_merge($targetActivities, $request->additional_activities);
-            // Remove duplicates just in case User selected the current activity in the list too
-            $targetActivities = array_unique($targetActivities);
-        }
+        $targetActivities = array_unique(array_merge(
+            [$request->kegiatan],
+            $request->input('additional_activities', [])
+        ));
 
         foreach ($targetActivities as $actId) {
             foreach ($request->santri as $nis => $status) {
-                // Optimization: Don't check Santri::where every loop if possible, 
-                // but for safety in this existing codebase structure, we keep it simple.
-                // Or better: we assume NIS is valid since it comes from the form of valid santris.
-
                 match ($actId) {
                     '1' => AbsensiWaqiah::updateOrCreate(
                         ['nis' => (string) $nis, 'tanggal' => $tanggal],
@@ -221,12 +223,13 @@ class KepalaKamar extends Controller
                         ['nis' => (string) $nis, 'tanggal' => $tanggal, 'ngaji' => $actId],
                         ['status' => $status]
                     ),
-                    default => null
                 };
             }
         }
 
-        $msg = count($targetActivities) > 1 ? 'Absensi berhasil disimpan untuk ' . count($targetActivities) . ' kegiatan' : 'Absensi berhasil disimpan';
+        $msg = count($targetActivities) > 1
+            ? 'Absensi berhasil disimpan untuk ' . count($targetActivities) . ' kegiatan'
+            : 'Absensi berhasil disimpan';
         session()->flash('success', $msg);
         return redirect('/kepkam/absensi');
     }
@@ -270,28 +273,24 @@ class KepalaKamar extends Controller
 
     public function hapusAbsen($id)
     {
+        $validIds = ['1', '2', '3', '4', '5', '6', '10', '11'];
+        if (!in_array($id, $validIds)) abort(422);
+
         $today = Carbon::now()->format('d/m/Y');
 
         try {
             match ($id) {
                 '1' => AbsensiWaqiah::where('tanggal', $today)
-                    ->whereHas('santri', function ($q) {
-                            $q->where('kepkam', $this->user->username);
-                        })
+                    ->whereHas('santri', fn($q) => $q->where('kepkam', $this->user->username))
                     ->delete(),
                 '2', '3', '4', '5', '6' => AbsensiJamaah::where('tanggal', $today)
                     ->where('sholat', $id)
-                    ->whereHas('santri', function ($q) {
-                            $q->where('kepkam', $this->user->username);
-                        })
+                    ->whereHas('santri', fn($q) => $q->where('kepkam', $this->user->username))
                     ->delete(),
                 '10', '11' => AbsensiNgaji::where('tanggal', $today)
                     ->where('ngaji', $id)
-                    ->whereHas('santri', function ($q) {
-                            $q->where('kepkam', $this->user->username);
-                        })
+                    ->whereHas('santri', fn($q) => $q->where('kepkam', $this->user->username))
                     ->delete(),
-                default => null
             };
 
             session()->flash('success', 'Absensi berhasil dihapus');
@@ -301,9 +300,34 @@ class KepalaKamar extends Controller
 
         return redirect('/kepkam/absensi');
     }
-    // ---------------- //
-    // ABSENSI MINGGUAN //
-    // ---------------- //
+    private function activities(): array
+    {
+        return [
+            ['id' => '2',  'name' => 'Subuh',       'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 2],
+            ['id' => '3',  'name' => 'Dhuhur',      'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 3],
+            ['id' => '4',  'name' => 'Ashar',        'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 4],
+            ['id' => '5',  'name' => 'Maghrib',      'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5],
+            ['id' => '6',  'name' => 'Isya',         'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6],
+            ['id' => '1',  'name' => 'Waqiah',       'model' => 'AbsensiWaqiah', 'col' => null,      'val' => null],
+            ['id' => '10', 'name' => 'Ngaji Sore',   'model' => 'AbsensiNgaji',  'col' => 'ngaji',   'val' => 10],
+            ['id' => '11', 'name' => 'Ngaji Malam',  'model' => 'AbsensiNgaji',  'col' => 'ngaji',   'val' => 11],
+        ];
+    }
+
+    private function fetchAttendance(string $tanggal): array
+    {
+        $data = [];
+        foreach ($this->activities() as $act) {
+            $modelClass = "\\App\\Models\\{$act['model']}";
+            $query = $modelClass::where('tanggal', $tanggal)
+                ->whereHas('santri', fn($q) => $q->where('kepkam', $this->user->username));
+            if ($act['col']) {
+                $query->where($act['col'], $act['val']);
+            }
+            $data[$act['name']] = $query->get()->keyBy('nis');
+        }
+        return $data;
+    }
     public function mingguan()
     {
         $santri = Santri::select('nis', 'nama')->where('kepkam', $this->user->username)->get();
@@ -319,69 +343,23 @@ class KepalaKamar extends Controller
     // ------------------- //
     public function rekapHarian(Request $request)
     {
-        // Get selected date or default to today
         $tanggal = $request->input('tanggal')
             ? Carbon::parse($request->tanggal)->format('d/m/Y')
             : Carbon::now()->format('d/m/Y');
 
-        // Get all santri under this kepkam
-        $santriList = Santri::select('nis', 'nama')
-            ->where('kepkam', $this->user->username)
-            ->orderBy('nama')
-            ->get();
+        $santriList     = Santri::select('nis', 'nama')->where('kepkam', $this->user->username)->orderBy('nama')->get();
+        $activities     = $this->activities();
+        $attendanceData = $this->fetchAttendance($tanggal);
 
-        // Define activities
-        $activities = [
-            ['name' => 'Subuh', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 2],
-            ['name' => 'Dhuhur', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 3],
-            ['name' => 'Ashar', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 4],
-            ['name' => 'Maghrib', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5],
-            ['name' => 'Isya', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6],
-            ['name' => 'Waqiah', 'model' => 'AbsensiWaqiah', 'col' => null, 'val' => null],
-            ['name' => 'Ngaji Sore', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 10],
-            ['name' => 'Ngaji Malam', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 11],
-        ];
+        $rekapData = $santriList->map(fn($santri) => [
+            'nis'        => $santri->nis,
+            'nama'       => $santri->nama,
+            'attendance' => collect($activities)->mapWithKeys(fn($act) => [
+                $act['name'] => $attendanceData[$act['name']][$santri->nis]->status ?? '-'
+            ])->all(),
+        ])->all();
 
-        // Fetch attendance data for each activity
-        $attendanceData = [];
-        foreach ($activities as $activity) {
-            $modelClass = "\\App\\Models\\{$activity['model']}";
-            $query = $modelClass::where('tanggal', $tanggal)
-                ->whereHas('santri', function ($q) {
-                    $q->where('kepkam', $this->user->username);
-                });
-
-            if ($activity['col']) {
-                $query->where($activity['col'], $activity['val']);
-            }
-
-            $records = $query->get()->keyBy('nis');
-            $attendanceData[$activity['name']] = $records;
-        }
-
-        // Build recap data
-        $rekapData = [];
-        foreach ($santriList as $santri) {
-            $row = [
-                'nis' => $santri->nis,
-                'nama' => $santri->nama,
-                'attendance' => []
-            ];
-
-            foreach ($activities as $activity) {
-                $status = '-';
-                if (isset($attendanceData[$activity['name']][$santri->nis])) {
-                    $status = $attendanceData[$activity['name']][$santri->nis]->status;
-                }
-                $row['attendance'][$activity['name']] = $status;
-            }
-
-            $rekapData[] = $row;
-        }
-
-        // Get kepala kamar name from pengurus relation
         $kepalaKamar = $this->user->pengurus->nama;
-
         return view('kepkam.rekap-harian', compact('rekapData', 'activities', 'tanggal', 'kepalaKamar'));
     }
 
@@ -397,51 +375,20 @@ class KepalaKamar extends Controller
 
             \Log::info('[PDF Download] Date:', ['tanggal' => $tanggal]);
 
-            // Get all santri under this kepkam
-            $santriList = Santri::select('nis', 'nama')
-                ->where('kepkam', $this->user->username)
-                ->orderBy('nama')
-                ->get();
+            $santriList     = Santri::select('nis', 'nama')->where('kepkam', $this->user->username)->orderBy('nama')->get();
+            $activities     = $this->activities();
+            $attendanceData = $this->fetchAttendance($tanggal);
 
             \Log::info('[PDF Download] Santri count:', ['count' => $santriList->count()]);
 
-            // Define activities (matching the rekapHarian method)
-            $activities = [
-                ['name' => 'Subuh', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 2],
-                ['name' => 'Dhuhur', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 3],
-                ['name' => 'Ashar', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 4],
-                ['name' => 'Maghrib', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5],
-                ['name' => 'Isya', 'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6],
-                ['name' => 'Waqiah', 'model' => 'AbsensiWaqiah', 'col' => null, 'val' => null],
-                ['name' => 'Ngaji Sore', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 10],
-                ['name' => 'Ngaji Malam', 'model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 11],
-            ];
-
-            $rekapData = [];
-            foreach ($santriList as $index => $santri) {
-                $row = [
-                    'no' => $index + 1,
-                    'nis' => $santri->nis,
-                    'nama' => $santri->nama,
-                    'attendance' => []
-                ];
-
-                foreach ($activities as $activity) {
-                    $modelClass = "App\\Models\\" . $activity['model'];
-                    $query = $modelClass::where('nis', $santri->nis)
-                        ->where('tanggal', $tanggal);
-
-                    if ($activity['col'] !== null) {
-                        $query->where($activity['col'], $activity['val']);
-                    }
-
-                    $record = $query->first();
-                    $status = $record ? $record->status : '-';
-                    $row['attendance'][$activity['name']] = $status;
-                }
-
-                $rekapData[] = $row;
-            }
+            $rekapData = $santriList->values()->map(fn($santri, $index) => [
+                'no'         => $index + 1,
+                'nis'        => $santri->nis,
+                'nama'       => $santri->nama,
+                'attendance' => collect($activities)->mapWithKeys(fn($act) => [
+                    $act['name'] => $attendanceData[$act['name']][$santri->nis]->status ?? '-'
+                ])->all(),
+            ])->all();
 
             // Get kepala kamar name with null check
             $kepalaKamar = 'N/A';
@@ -519,13 +466,20 @@ class KepalaKamar extends Controller
 
     public function i_mingguan(Request $request)
     {
+        $request->validate([
+            'tanggal'    => 'required|date_format:d-m-Y',
+            'larangan'   => 'required|string|max:255',
+            'santri'     => 'required|array|min:1',
+            'santri.*'   => 'required|string|exists:santri,nis',
+        ]);
+
         $tanggal = Carbon::createFromFormat('d-m-Y', $request->tanggal)->format('d/m/Y');
-        $larangan = $request->larangan;
         foreach ($request->santri as $nis) {
-            $santri = Santri::where('nis', (string) $nis)->first();
-            if ($santri) {
-                AbsensiMingguan::create(['nis' => (string) $nis, 'pelanggaran' => $larangan, 'tanggal' => $tanggal]);
-            }
+            AbsensiMingguan::create([
+                'nis'         => (string) $nis,
+                'larangan_id' => $request->larangan,
+                'tanggal'     => $tanggal,
+            ]);
         }
         session()->flash('success', 'Absensi berhasil disimpan');
         return redirect('/kepkam/mingguan');

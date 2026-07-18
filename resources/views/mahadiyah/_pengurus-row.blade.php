@@ -1,4 +1,5 @@
-<div class="flex items-center justify-between p-3 rounded-xl bg-[#F4F7FE] hover:bg-[#EEF2FF] transition-colors">
+<div class="pengurus-item flex items-center justify-between p-3 rounded-xl bg-[#F4F7FE] hover:bg-[#EEF2FF] transition-colors"
+    data-search="{{ strtolower($p->nama . ' ' . $p->nis . ' ' . ($jabNama ?? '') . ' ' . ($divNama ?? '')) }}">
     <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
             <i class="fa fa-user text-[#4318FF] text-xs"></i>

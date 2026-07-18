@@ -8,11 +8,8 @@ class Pelanggaran extends Model
 {
     use HasFactory;
     protected $table = 'pelanggaran';
-    protected $guarded = ['tanggal'];
-    protected $primaryKey = 'nis';
-    public $incrementing = false;
+    protected $fillable = ['nis', 'langgar_id', 'hukuman'];
     public $timestamps = false;
-    protected $keyType = 'string';
     protected $casts = [
         'nis' => 'string'
     ];

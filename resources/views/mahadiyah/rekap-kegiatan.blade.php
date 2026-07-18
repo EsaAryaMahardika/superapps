@@ -31,11 +31,6 @@
 
         <!-- Download Buttons -->
         <div class="flex flex-col sm:flex-row gap-2 w-full mb-6">
-            <button id="download-png-btn" onclick="downloadAsPng()"
-                class="btn btn-primary shadow-brand flex items-center justify-center gap-2 w-full sm:w-auto">
-                <i class="fa fa-image"></i>
-                <span>Download PNG</span>
-            </button>
             <button onclick="downloadPdf()"
                 class="btn bg-white border border-[#E0E5F2] text-[#2B3674] shadow-sm hover:bg-gray-50 flex items-center justify-center gap-2 w-full sm:w-auto">
                 <i class="fa fa-file-pdf"></i>
@@ -117,114 +112,7 @@
         </div>
     </div>
 
-    <!-- PDF.js Library -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-        <script>
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-            async function renderPdfToCanvas() {
-                const startDate = document.getElementById('start_date').value;
-                const endDate = document.getElementById('end_date').value;
-                const url = `/mahadiyah/rekap-kegiatan/download?start_date=${startDate}&end_date=${endDate}`;
-                
-                console.log('[PDF Render] Starting PDF fetch from:', url);
-                
-                try {
-                    // Fetch the PDF
-                    const response = await fetch(url);
-                    console.log('[PDF Render] Fetch response status:', response.status);
-                    
-                    if (!response.ok) {
-                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-                    }
-                    
-                    // Check content type
-                    const contentType = response.headers.get('content-type');
-                    console.log('[PDF Render] Content-Type:', contentType);
-                    
-                    if (!contentType || !contentType.includes('pdf')) {
-                        const text = await response.text();
-                        console.error('[PDF Render] Invalid content type. Response:', text.substring(0, 200));
-                        throw new Error(`Server tidak mengembalikan PDF (Content-Type: ${contentType})`);
-                    }
-                    
-                    // Convert response to blob for pdf.js
-                    const blob = await response.blob();
-                    const arrayBuffer = await blob.arrayBuffer();
-                    console.log('[PDF Render] PDF size:', blob.size, 'bytes');
-                    
-                    // Load PDF with pdf.js
-                    const loadingTask = pdfjsLib.getDocument({data: arrayBuffer});
-                    const pdf = await loadingTask.promise;
-                    console.log('[PDF Render] PDF loaded successfully, pages:', pdf.numPages);
-
-                    // Get first page
-                    const page = await pdf.getPage(1);
-                    console.log('[PDF Render] Page 1 loaded');
-
-                    // Set scale for high quality (4x for clearer text)
-                    const viewport = page.getViewport({ scale: 4 });
-                    console.log('[PDF Render] Viewport size:', viewport.width, 'x', viewport.height);
-
-                    // Prepare canvas
-                    const canvas = document.createElement('canvas');
-                    const context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-
-                    // Render PDF page to canvas
-                    await page.render({
-                        canvasContext: context,
-                        viewport: viewport
-                    }).promise;
-                    
-                    console.log('[PDF Render] Rendering complete');
-
-                    return { canvas, startDate, endDate };
-                } catch (error) {
-                    console.error('[PDF Render] Error:', error);
-                    console.error('[PDF Render] Error stack:', error.stack);
-                    throw error;
-                }
-            }
-
-            async function downloadAsPng() {
-                const btn = document.getElementById('download-png-btn');
-                const originalContent = btn.innerHTML;
-
-                try {
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i><span>Processing...</span>';
-
-                    const { canvas, startDate, endDate } = await renderPdfToCanvas();
-
-                    // Convert to PNG
-                    const link = document.createElement('a');
-                    link.download = `Rekap_Absensi_KepKam_${startDate}_to_${endDate}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-
-                } catch (error) {
-                    console.error('[Download PNG] Error:', error);
-                    let errorMsg = 'Gagal mendownload gambar. ';
-                    
-                    if (error.message.includes('Server returned')) {
-                        errorMsg += 'Server tidak dapat membuat PDF. Coba lagi atau hubungi admin.';
-                    } else if (error.message.includes('Content-Type')) {
-                        errorMsg += 'Server mengembalikan format yang salah (bukan PDF).';
-                    } else if (error.message.includes('fetch')) {
-                        errorMsg += 'Tidak dapat terhubung ke server.';
-                    } else {
-                        errorMsg += error.message || 'Error tidak diketahui. Cek console (F12) untuk detail.';
-                    }
-                    
-                    alert(errorMsg);
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = originalContent;
-                }
-            }
-
+    <script>
             function downloadPdf() {
                 const startDate = document.getElementById('start_date').value;
                 const endDate = document.getElementById('end_date').value;

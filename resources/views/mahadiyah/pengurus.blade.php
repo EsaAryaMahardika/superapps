@@ -29,15 +29,29 @@
 
     {{-- ===================== TAB PENGURUS ===================== --}}
     <div id="tab-pengurus">
-        <div class="flex justify-end mb-4">
-            <button onclick="openModal('modal-tambah-pengurus')"
-                class="bg-[#4318FF] hover:bg-[#3311CC] text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/30 text-sm">
-                <i class="fa fa-plus mr-2"></i>Tambah Pengurus
-            </button>
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
+            {{-- Search Bar --}}
+            <div class="relative w-full sm:w-80">
+                <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#A3AED0] text-xs pointer-events-none"></i>
+                <input type="text" id="cari-pengurus" placeholder="Cari nama, jabatan, atau divisi..."
+                    oninput="cariPengurus(this.value)"
+                    class="w-full pl-9 pr-9 py-2.5 rounded-xl border border-gray-200 focus:border-[#4318FF] focus:ring-2 focus:ring-[#4318FF]/20 transition-all text-sm outline-none bg-white">
+                <button id="btn-clear-cari" onclick="clearCari()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-[#A3AED0] hover:text-[#1B2559] text-xs">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            {{-- Info hasil + Tombol Tambah --}}
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <span id="info-cari" class="hidden text-xs text-[#A3AED0] whitespace-nowrap"></span>
+                <button onclick="openModal('modal-tambah-pengurus')"
+                    class="ml-auto sm:ml-0 bg-[#4318FF] hover:bg-[#3311CC] text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/30 text-sm whitespace-nowrap">
+                    <i class="fa fa-plus mr-2"></i>Tambah Pengurus
+                </button>
+            </div>
         </div>
 
         {{-- Kepala Kamar --}}
-        <div class="mb-6">
+        <div class="mb-6" id="section-kepkam">
             <h3 class="text-base font-bold text-[#1B2559] mb-3 flex items-center gap-2">
                 <span class="w-2 h-5 bg-[#4318FF] rounded-full inline-block"></span>
                 Kepala Kamar
@@ -52,7 +66,8 @@
             <div class="card">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     @foreach($pengurusKepkam as $p)
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#F4F7FE] hover:bg-[#EEF2FF] transition-colors">
+                    <div class="pengurus-item flex items-center justify-between p-3 rounded-xl bg-[#F4F7FE] hover:bg-[#EEF2FF] transition-colors"
+                        data-search="{{ strtolower($p->nama . ' ' . ($p->jabatan->nama ?? '') . ' kepala kamar kepkam') }}">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
                                 <i class="fa fa-user text-[#4318FF] text-xs"></i>
@@ -267,8 +282,14 @@
             @csrf
             <div>
                 <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">NIS <span class="text-red-400">*</span></label>
-                <input type="text" name="nis" required placeholder="Contoh: 112441223"
-                    class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4318FF] focus:ring-2 focus:ring-[#4318FF]/20 transition-all text-sm outline-none">
+                <div class="flex gap-2">
+                    <input type="text" name="nis" id="tp-nis" required placeholder="Contoh: 112441223"
+                        class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4318FF] focus:ring-2 focus:ring-[#4318FF]/20 transition-all text-sm outline-none">
+                    <button type="button" onclick="generateNis('tp-nis', this)"
+                        class="px-3 py-2 rounded-xl border border-gray-200 text-xs text-[#4318FF] hover:bg-[#F4F7FE] font-medium whitespace-nowrap">
+                        <i class="fa fa-wand-magic-sparkles mr-1"></i>Generate
+                    </button>
+                </div>
             </div>
             <div>
                 <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Nama Lengkap <span class="text-red-400">*</span></label>
@@ -321,8 +342,15 @@
         <form id="form-edit-pengurus" action="" method="POST" class="p-6 space-y-4">
             @csrf @method('PUT')
             <div>
-                <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">NIS</label>
-                <input type="text" id="ep-nis" disabled class="w-full px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-gray-400 text-sm cursor-not-allowed">
+                <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">NIS <span class="text-red-400">*</span></label>
+                <div class="flex gap-2">
+                    <input type="text" name="nis" id="ep-nis" required
+                        class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4318FF] focus:ring-2 focus:ring-[#4318FF]/20 transition-all text-sm outline-none">
+                    <button type="button" onclick="generateNis('ep-nis', this)"
+                        class="px-3 py-2 rounded-xl border border-gray-200 text-xs text-[#4318FF] hover:bg-[#F4F7FE] font-medium whitespace-nowrap">
+                        <i class="fa fa-wand-magic-sparkles mr-1"></i>Generate
+                    </button>
+                </div>
             </div>
             <div>
                 <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Nama Lengkap <span class="text-red-400">*</span></label>
@@ -584,6 +612,21 @@
     .tab-btn.active { background: #4318FF; color: white; box-shadow: 0 4px 15px rgba(67,24,255,0.3); }
 </style>
 <script>
+    // ---- Generate NIS ----
+    function generateNis(targetId, btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin mr-1"></i>...';
+        fetch('/mahadiyah/generate-nis')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById(targetId).value = data.nis;
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa fa-wand-magic-sparkles mr-1"></i>Generate';
+            });
+    }
+
     // ---- Tab Switching ----
     function switchTab(tabId) {
         ['tab-pengurus','tab-jabatan','tab-divisi'].forEach(id => {
@@ -710,11 +753,74 @@
         updateHapusButtons();
     }
 
-    // Enter key untuk tambah baris baru
-    document.getElementById('jabatan-list').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            tambahBaris();
+    // ── Pencarian Pengurus ────────────────────────────────────────────
+    function cariPengurus(q) {
+        const keyword = q.toLowerCase().trim();
+        const items   = document.querySelectorAll('#tab-pengurus .pengurus-item');
+        const clearBtn = document.getElementById('btn-clear-cari');
+        const infoCari = document.getElementById('info-cari');
+
+        clearBtn.classList.toggle('hidden', keyword === '');
+
+        let totalTampil = 0;
+
+        items.forEach(item => {
+            const search = item.getAttribute('data-search') || '';
+            const match  = keyword === '' || search.includes(keyword);
+            item.style.display = match ? '' : 'none';
+            if (match) totalTampil++;
+        });
+
+        // Sembunyikan section header jika semua item di dalamnya tersembunyi
+        ['section-kepkam'].forEach(secId => {
+            const sec = document.getElementById(secId);
+            if (!sec) return;
+            const visible = sec.querySelectorAll('.pengurus-item:not([style*="display: none"])').length;
+            sec.style.display = visible === 0 && keyword !== '' ? 'none' : '';
+        });
+
+        // Sembunyikan card divisi jika semua item di dalamnya tersembunyi
+        document.querySelectorAll('#tab-pengurus .card').forEach(card => {
+            const visibleItems = card.querySelectorAll('.pengurus-item:not([style*="display: none"])');
+            if (visibleItems.length === 0 && keyword !== '') {
+                card.closest('.mb-4, .mt-4, div')?.style && (card.style.display = 'none');
+            } else {
+                card.style.display = '';
+            }
+        });
+
+        // Info hasil pencarian
+        if (keyword !== '') {
+            infoCari.textContent = `${totalTampil} hasil`;
+            infoCari.classList.remove('hidden');
+        } else {
+            infoCari.classList.add('hidden');
+        }
+    }
+
+    function clearCari() {
+        const input = document.getElementById('cari-pengurus');
+        input.value = '';
+        cariPengurus('');
+        input.focus();
+    }
+
+    // Focus shortcut: Ctrl+F / Cmd+F di dalam halaman
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f' && document.getElementById('tab-pengurus').style.display !== 'none') {
+            const input = document.getElementById('cari-pengurus');
+            if (input && document.activeElement !== input) {
+                e.preventDefault();
+                input.focus();
+                input.select();
+            }
+        }
+        if (e.key === 'Escape') {
+            const input = document.getElementById('cari-pengurus');
+            if (document.activeElement === input) {
+                clearCari();
+                input.blur();
+            }
         }
     });
 </script>

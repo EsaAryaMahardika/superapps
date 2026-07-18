@@ -1,35 +1,33 @@
 @extends('mahadiyah.layout')
 
 @section('content')
-    <div class="mt-4">
+    <div class="mt-2 sm:mt-4">
 
         {{-- Header --}}
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <h2 class="text-2xl font-bold text-[#1B2559]">Absensi Pengurus</h2>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
+            <h2 class="text-xl sm:text-2xl font-bold text-[#1B2559]">Absensi Pengurus</h2>
             <a href="/mahadiyah/absen-pengurus"
-                class="bg-[#4318FF] hover:bg-[#3311CC] text-white px-6 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/30">
+                class="w-full sm:w-auto text-center bg-[#4318FF] hover:bg-[#3311CC] text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/30 text-sm">
                 <i class="fa fa-plus mr-2"></i>Buat Absensi
             </a>
         </div>
 
         {{-- Date Picker --}}
         <div id="date-container"
-            class="bg-white px-4 py-3 sm:py-2 rounded-xl shadow-sm mb-6 w-full sm:w-fit flex items-center justify-between sm:justify-start gap-4 sm:gap-3 border border-gray-100 cursor-pointer hover:border-blue-200 hover:shadow-md transition-all group relative">
+            class="bg-white px-4 py-3 sm:py-2 rounded-xl shadow-sm mb-4 sm:mb-6 w-full sm:w-fit flex items-center justify-between sm:justify-start gap-3 border border-gray-100 cursor-pointer hover:border-blue-200 hover:shadow-md transition-all group relative">
             <div class="flex items-center gap-3 w-full sm:w-auto">
-                <div class="text-[#4318FF] flex-shrink-0"><i class="fa fa-calendar-alt"></i></div>
-                <div class="h-6 w-px bg-gray-200 hidden sm:block"></div>
+                <div class="text-[#4318FF] flex-shrink-0 text-sm"><i class="fa fa-calendar-alt"></i></div>
+                <div class="h-5 w-px bg-gray-200 hidden sm:block"></div>
                 <input type="text" id="tanggal-display"
-                    class="bg-transparent border-none text-[#1B2559] font-bold text-sm sm:text-base p-0 flex-1 sm:w-56 pointer-events-none focus:ring-0 text-left"
+                    class="bg-transparent border-none text-[#1B2559] font-bold text-sm p-0 flex-1 sm:w-56 pointer-events-none focus:ring-0 text-left"
                     placeholder="Pilih Tanggal" readonly>
             </div>
-            <i
-                class="fa fa-chevron-down text-[#A3AED0] text-xs transition-transform group-hover:translate-y-0.5 pointer-events-none flex-shrink-0"></i>
-            <input type="text" id="tanggal" class="absolute bottom-0 left-0 w-full h-px opacity-0 p-0 border-0 -z-10"
-                readonly>
+            <i class="fa fa-chevron-down text-[#A3AED0] text-xs pointer-events-none flex-shrink-0"></i>
+            <input type="text" id="tanggal" class="absolute bottom-0 left-0 w-full h-px opacity-0 p-0 border-0 -z-10" readonly>
         </div>
 
         {{-- Activity Cards --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             @php
                 $activityList = [
                     ['id' => 'yasinan', 'tipe' => 'yasinan', 'title' => 'Absensi Yasinan', 'data' => $yasinan],
@@ -39,33 +37,47 @@
             @endphp
 
             @foreach($activityList as $activity)
-                <div
-                    class="card h-fit transition-all duration-300 hover:shadow-lg hover:border-blue-100 border border-transparent">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-[#1B2559]">{{ $activity['title'] }}</h3>
-                        <div class="flex items-center gap-2">
+                <div class="card h-fit transition-all duration-300 hover:shadow-lg hover:border-blue-100 border border-transparent !p-4 sm:!p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+                        <h3 class="text-base sm:text-lg font-bold text-[#1B2559]">{{ $activity['title'] }}</h3>
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            {{-- Badge Libur (tampil via JS) --}}
+                            <span id="libur-badge-{{ $activity['id'] }}"
+                                class="hidden items-center gap-1 px-2 py-1 rounded-lg bg-purple-100 text-purple-700 text-xs font-bold">
+                                <i class="fa fa-moon"></i> LIBUR
+                            </span>
+                            {{-- Tombol Set/Hapus Libur --}}
+                            <button id="libur-btn-{{ $activity['id'] }}"
+                                onclick="toggleLibur('{{ $activity['tipe'] }}')"
+                                class="hidden items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#F4F7FE] hover:bg-purple-500 text-purple-500 hover:text-white text-xs font-semibold transition-all"
+                                title="Tandai libur">
+                                <i class="fa fa-moon text-[10px]"></i>
+                                <span class="hidden sm:inline">Libur</span>
+                            </button>
                             {{-- Tombol Edit --}}
                             <a id="edit-btn-{{ $activity['id'] }}" href="#"
-                                class="hidden items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F4F7FE] hover:bg-[#FFB547] text-[#FFB547] hover:text-white text-xs font-semibold transition-all"
+                                class="hidden items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#F4F7FE] hover:bg-[#FFB547] text-[#FFB547] hover:text-white text-xs font-semibold transition-all"
                                 title="Edit absensi">
-                                <i class="fa fa-pen"></i><span>Edit</span>
+                                <i class="fa fa-pen text-[10px]"></i>
+                                <span class="hidden sm:inline">Edit</span>
                             </a>
                             {{-- Tombol Salin --}}
                             <button onclick="salinAbsensi('{{ $activity['tipe'] }}')"
-                                class="salin-btn-{{ $activity['id'] }} hidden items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F4F7FE] hover:bg-[#4318FF] text-[#4318FF] hover:text-white text-xs font-semibold transition-all"
+                                class="salin-btn-{{ $activity['id'] }} hidden items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#F4F7FE] hover:bg-[#4318FF] text-[#4318FF] hover:text-white text-xs font-semibold transition-all"
                                 title="Salin format teks">
-                                <i class="fa fa-copy"></i><span>Salin</span>
+                                <i class="fa fa-copy text-[10px]"></i>
+                                <span class="hidden sm:inline">Salin</span>
                             </button>
                         </div>
                     </div>
 
                     {{-- Stats --}}
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                    <div class="grid grid-cols-4 gap-1.5 sm:gap-2 mb-4">
                         @foreach(['H' => ['Hadir', 'green'], 'S' => ['Sakit', 'yellow'], 'I' => ['Izin', 'blue'], 'A' => ['Alpa', 'red']] as $kode => [$label, $color])
-                            <div class="bg-{{ $color }}-50 border border-{{ $color }}-100 rounded-lg p-2.5 cursor-pointer hover:bg-{{ $color }}-100 transition-colors"
+                            <div class="bg-{{ $color }}-50 border border-{{ $color }}-100 rounded-lg p-2 sm:p-2.5 cursor-pointer hover:bg-{{ $color }}-100 transition-colors text-center"
                                 onclick="showStatusList('{{ $activity['id'] }}','{{ $kode }}')">
-                                <p class="text-[10px] text-{{ $color }}-600 font-medium mb-0.5">{{ $label }}</p>
-                                <p class="text-xl font-bold text-{{ $color }}-700 leading-none"
+                                <p class="text-[9px] sm:text-[10px] text-{{ $color }}-600 font-medium mb-0.5">{{ $label }}</p>
+                                <p class="text-lg sm:text-xl font-bold text-{{ $color }}-700 leading-none"
                                     id="count-{{ strtolower($kode === 'A' ? 'alfa' : $label) }}-{{ $activity['id'] }}">0</p>
                             </div>
                         @endforeach
@@ -73,16 +85,15 @@
 
                     {{-- Name List (hidden by default) --}}
                     <div id="name-list-{{ $activity['id'] }}" class="hidden mb-4">
-                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <h4 class="text-sm font-semibold text-[#1B2559]" id="list-title-{{ $activity['id'] }}">Daftar
-                                    Nama</h4>
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4">
+                            <div class="flex justify-between items-center mb-2 sm:mb-3">
+                                <h4 class="text-xs sm:text-sm font-semibold text-[#1B2559]" id="list-title-{{ $activity['id'] }}">Daftar Nama</h4>
                                 <button onclick="hideStatusList('{{ $activity['id'] }}')"
-                                    class="text-gray-400 hover:text-gray-600">
-                                    <i class="fa fa-times"></i>
+                                    class="text-gray-400 hover:text-gray-600 w-6 h-6 flex items-center justify-center">
+                                    <i class="fa fa-times text-xs"></i>
                                 </button>
                             </div>
-                            <div id="filtered-names-{{ $activity['id'] }}" class="space-y-2 max-h-64 overflow-y-auto"></div>
+                            <div id="filtered-names-{{ $activity['id'] }}" class="space-y-1.5 max-h-48 sm:max-h-64 overflow-y-auto"></div>
                         </div>
                     </div>
                 </div>
@@ -97,6 +108,51 @@
             <span id="toast-msg">Berhasil</span>
         </div>
     </div>
+
+    {{-- Modal Input Keterangan Libur --}}
+    <div id="modal-libur" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4" style="animation: modalIn .2s ease">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                    <i class="fa fa-moon text-purple-600"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-[#1B2559] text-sm" id="modal-libur-title">Tandai Libur</h3>
+                    <p class="text-[11px] text-gray-400" id="modal-libur-sub"></p>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Keterangan (opsional)</label>
+                <input type="text" id="libur-keterangan" maxlength="255"
+                    class="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all"
+                    placeholder="Contoh: Hari Raya, Libur Nasional...">
+            </div>
+            <div class="flex gap-2">
+                <button onclick="submitLibur()"
+                    class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl font-semibold text-sm transition-all">
+                    <i class="fa fa-moon mr-1"></i> Simpan
+                </button>
+                <button onclick="closeLiburModal()"
+                    class="px-4 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold text-sm transition-all">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Form tersembunyi untuk POST/DELETE libur --}}
+    <form id="form-libur-store" method="POST" action="/mahadiyah/libur-pengurus" class="hidden">
+        @csrf
+        <input type="hidden" name="tanggal" id="libur-form-tanggal">
+        <input type="hidden" name="tipe" id="libur-form-tipe">
+        <input type="hidden" name="keterangan" id="libur-form-keterangan">
+    </form>
+    <form id="form-libur-destroy" method="POST" action="/mahadiyah/libur-pengurus" class="hidden">
+        @csrf
+        @method('DELETE')
+        <input type="hidden" name="tanggal" id="libur-destroy-tanggal">
+        <input type="hidden" name="tipe" id="libur-destroy-tipe">
+    </form>
 
 @endsection
 
@@ -122,11 +178,14 @@
             wirid: @json($wirid->load('pengurus.jabatan.divisi')),
         };
 
-        const divisiNon = @json($divisiNon);   // [{id, nama, jabatan:[{pengurus:[]}]}]
+        const divisiNon = @json($divisiNon);
         const divisiKepkam = @json($divisiKepkam);
         const totalSemua = {{ $totalSemua }};
         const totalNon = {{ $totalNon }};
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+        // Data libur dari server: { "dd-mm-yyyy": { "bandongan": "keterangan", ... }, ... }
+        const semuaLibur = @json($semuaLibur);
 
         // ── State ─────────────────────────────────────────────────────
         let currentDate = null;
@@ -152,19 +211,51 @@
             if (!selectedDate) return;
             currentDate = selectedDate;
 
+            // Ambil data libur untuk tanggal ini
+            const liburHari = semuaLibur[selectedDate] || {};
+
             Object.keys(activitiesData).forEach(key => {
-                const data = activitiesData[key];
-                const stats = { H: 0, S: 0, I: 0, A: 0 };
+                const data     = activitiesData[key];
+                const isLibur  = liburHari.hasOwnProperty(key);
+                const stats    = { H: 0, S: 0, I: 0, A: 0 };
 
                 data.forEach(item => {
                     if (normDate(item.tanggal) === selectedDate && item.status)
                         stats[item.status] = (stats[item.status] || 0) + 1;
                 });
 
-                document.getElementById(`count-hadir-${key}`).textContent = stats.H;
-                document.getElementById(`count-sakit-${key}`).textContent = stats.S;
-                document.getElementById(`count-izin-${key}`).textContent = stats.I;
-                document.getElementById(`count-alfa-${key}`).textContent = stats.A;
+                document.getElementById(`count-hadir-${key}`).textContent = isLibur ? '-' : stats.H;
+                document.getElementById(`count-sakit-${key}`).textContent = isLibur ? '-' : stats.S;
+                document.getElementById(`count-izin-${key}`).textContent  = isLibur ? '-' : stats.I;
+                document.getElementById(`count-alfa-${key}`).textContent  = isLibur ? '-' : stats.A;
+
+                // Badge libur
+                const liburBadge = document.getElementById(`libur-badge-${key}`);
+                if (liburBadge) {
+                    liburBadge.classList.toggle('hidden', !isLibur);
+                    liburBadge.classList.toggle('flex', isLibur);
+                    if (isLibur && liburHari[key]) {
+                        liburBadge.title = 'Keterangan: ' + liburHari[key];
+                    }
+                }
+
+                // Tombol libur
+                const liburBtn = document.getElementById(`libur-btn-${key}`);
+                if (liburBtn) {
+                    liburBtn.classList.remove('hidden');
+                    liburBtn.classList.add('flex');
+                    if (isLibur) {
+                        liburBtn.classList.remove('text-purple-500', 'hover:bg-purple-500');
+                        liburBtn.classList.add('text-red-500', 'hover:bg-red-500');
+                        liburBtn.querySelector('span').textContent = 'Batal Libur';
+                        liburBtn.title = 'Batalkan libur';
+                    } else {
+                        liburBtn.classList.remove('text-red-500', 'hover:bg-red-500');
+                        liburBtn.classList.add('text-purple-500', 'hover:bg-purple-500');
+                        liburBtn.querySelector('span').textContent = 'Libur';
+                        liburBtn.title = 'Tandai libur';
+                    }
+                }
 
                 const hasData = data.some(i => normDate(i.tanggal) === selectedDate);
                 document.querySelector(`.salin-btn-${key}`)?.classList.toggle('hidden', !hasData);
@@ -174,14 +265,13 @@
                 if (editBtn) {
                     editBtn.classList.toggle('hidden', !hasData);
                     editBtn.classList.toggle('flex', hasData);
-                    // selectedDate sudah dd-mm-yyyy, langsung pakai untuk URL
                     editBtn.href = `/mahadiyah/edit-absen/${key}/${selectedDate}`;
                 }
 
                 // Refresh name list jika sedang terbuka
                 const nameList = document.getElementById(`name-list-${key}`);
                 if (!nameList.classList.contains('hidden')) {
-                    const title = document.getElementById(`list-title-${key}`).textContent;
+                    const title   = document.getElementById(`list-title-${key}`).textContent;
                     const statusMap = { 'Daftar Hadir': 'H', 'Daftar Sakit': 'S', 'Daftar Izin': 'I', 'Daftar Alpa': 'A' };
                     showStatusList(key, statusMap[title] || 'H');
                 }
@@ -229,7 +319,59 @@
             document.getElementById(`name-list-${activityId}`).classList.add('hidden');
         }
 
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEditModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeLiburModal(); closeEditModal(); } });
+    </script>
+
+    <script>
+        // ── Libur Pengurus ────────────────────────────────────────────
+        let liburTipe = null;
+
+        function toggleLibur(tipe) {
+            if (!currentDate) return;
+            const liburHari = semuaLibur[currentDate] || {};
+            const isLibur   = liburHari.hasOwnProperty(tipe);
+
+            if (isLibur) {
+                // Langsung hapus libur
+                document.getElementById('libur-destroy-tanggal').value = currentDate;
+                document.getElementById('libur-destroy-tipe').value    = tipe;
+                document.getElementById('form-libur-destroy').submit();
+            } else {
+                // Buka modal input keterangan
+                liburTipe = tipe;
+                const namaMap = { bandongan: 'Bandongan', wirid: 'Wirid', yasinan: 'Yasinan' };
+                const [dd, mm, yyyy] = currentDate.split('-');
+                document.getElementById('modal-libur-title').textContent = `Tandai Libur ${namaMap[tipe]}`;
+                document.getElementById('modal-libur-sub').textContent   = `${dd}-${mm}-${yyyy}`;
+                document.getElementById('libur-keterangan').value = '';
+                const modal = document.getElementById('modal-libur');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.getElementById('libur-keterangan').focus();
+            }
+        }
+
+        function submitLibur() {
+            if (!liburTipe || !currentDate) return;
+            document.getElementById('libur-form-tanggal').value    = currentDate;
+            document.getElementById('libur-form-tipe').value       = liburTipe;
+            document.getElementById('libur-form-keterangan').value = document.getElementById('libur-keterangan').value;
+            document.getElementById('form-libur-store').submit();
+        }
+
+        function closeLiburModal() {
+            const modal = document.getElementById('modal-libur');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            liburTipe = null;
+        }
+
+        // Enter di input keterangan → submit
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('libur-keterangan')?.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') submitLibur();
+            });
+        });
     </script>
 
     <script>
@@ -326,8 +468,7 @@
                             hadirDiv.forEach((item, idx) => {
                                 printedNis.add(item.pengurus?.nis);
                                 const jabatan = item.pengurus?.jabatan?.nama ?? '';
-                                const suffix = jabatan ? ` (${jabatan})` : '';
-                                lines.push(`${idx + 1}. ${item.pengurus?.nama || '-'}${suffix}`);
+                                lines.push(`${idx + 1}. ${item.pengurus?.nama || '-'}`);
                             });
                             lines.push('');
                         }

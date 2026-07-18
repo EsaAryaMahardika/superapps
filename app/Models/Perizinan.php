@@ -8,7 +8,11 @@ class Perizinan extends Model
 {
     use HasFactory;
     protected $table = 'perizinan';
-    protected $guarded = [];
+    protected $fillable = [
+        'nis', 'jenis', 'alasan', 'berangkat', 'es_kembali', 'status',
+        'acckepkam', 'acckeamanan', 'accpengasuh',
+        'laporkepkam', 'laporkeamanan', 'laporpengasuh',
+    ];
     protected $primaryKey = 'nis';
     public $incrementing = false;
     public $timestamps = false;

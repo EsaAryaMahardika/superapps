@@ -26,6 +26,7 @@ class Pengurus extends Model
 
     public function divisi()
     {
+        // ponytail: chain jabatan->divisi lebih simpel, relasi ini tidak dipakai langsung di codebase
         return $this->hasOneThrough(Divisi::class, Jabatan::class, 'id', 'id', 'jabatan_id', 'divisi_id');
     }
 }

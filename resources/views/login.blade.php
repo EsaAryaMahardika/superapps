@@ -30,7 +30,7 @@
           <form class="form px-4 text-center" action="/login" method="POST">
             @csrf
             <input type="text" name="username" class="form-control" placeholder="Username" />
-            <input type="text" name="password" class="form-control" placeholder="Password" />
+            <input type="password" name="password" class="form-control" placeholder="Password" />
             <button class="btn btn-dark btn-block" type="submit">Masuk</button>
           </form>
         </div>

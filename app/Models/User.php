@@ -11,10 +11,10 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
     protected $table = 'user';
     public $timestamps = false;
-    protected $guarded = [
+    protected $fillable = [
         'username',
         'password',
-        'role'
+        'role',
     ];
     protected $hidden = [
         'password'

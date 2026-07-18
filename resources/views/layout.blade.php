@@ -37,7 +37,14 @@
                     <div id="navbar-menu">
                         <ul class="nav navbar-nav">
                             <li><a class="icon-menu" id="mode"><i class="fa fa-2x fa-sun" id="icon"></i></a></li>
-                            <li><a href="/logout" class="icon-menu"><i class="fa fa-2x fa-power-off"></i></a></li>
+                            <li>
+                                <form method="POST" action="/logout" style="display:inline;">
+                                    @csrf
+                                    <button type="submit" class="icon-menu" style="background:none;border:none;cursor:pointer;padding:0;">
+                                        <i class="fa fa-2x fa-power-off"></i>
+                                    </button>
+                                </form>
+                            </li>
                         </ul>
                     </div>
                 </div>

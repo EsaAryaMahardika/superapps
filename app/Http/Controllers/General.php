@@ -28,6 +28,8 @@ class General extends Controller
     public function dashboard(){
         $user = Auth::user()->role;
         switch ($user) {
+            case 'admin':
+                return redirect('/admin');
             case 'kepkam':
                 return redirect('/kepkam');
             case 'keamanan':
@@ -38,20 +40,24 @@ class General extends Controller
                 return redirect('/mahadiyah');
             case 'kantor':
                 return redirect('/kantor');
+            case 'madin':
+                return redirect('/madin');
             default:
                 return redirect('/login');
         }
     }
-    public function logout(){
+    public function logout(Request $request){
         Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return redirect('/login');
     }
     public function santrikepkam(){
-        $nis = Auth::user()->id;
+        $nis = Auth::user()->username;
         $asrama = Asrama::select('id')->where('kepkam', $nis)->first();
         $data = Santri::select('nis','nama')
             ->where('nama', 'like', '%'.request('q').'%')
-            ->where('asr_id', $asrama)
+            ->when($asrama, fn($q) => $q->where('asr_id', $asrama->id))
             ->paginate(10);
         return response()->json($data);
     }

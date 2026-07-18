@@ -121,11 +121,14 @@
 
             <!-- Bottom Actions -->
             <div class="mt-8 px-8 mb-8">
-                <a href="/logout"
-                    class="flex items-center text-[#EE5D50] hover:text-[#D43F33] font-medium transition-colors">
-                    <i class="fa fa-power-off mr-3"></i>
-                    <span>Logout</span>
-                </a>
+                <form method="POST" action="/logout">
+                    @csrf
+                    <button type="submit" class="flex items-center text-[#EE5D50] hover:text-[#D43F33] font-medium transition-colors" style="background:none;border:none;cursor:pointer;padding:0;">
+                        <i class="fa fa-power-off mr-3"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
+            </div>
             </div>
         </nav>
     </aside>

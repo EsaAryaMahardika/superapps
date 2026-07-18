@@ -15,7 +15,7 @@ class AbsensiMingguan extends Model
     }
     public function larangan()
     {
-        return $this->belongsTo(Larangan::class, 'pelanggaran', 'id');
+        return $this->belongsTo(Larangan::class, 'larangan_id', 'id');
     }
     protected $casts = [
         'nis' => 'string'

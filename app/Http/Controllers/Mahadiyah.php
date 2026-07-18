@@ -130,34 +130,35 @@ class Mahadiyah extends Controller
     }
     public function store_absen(Request $request)
     {
+        $request->validate([
+            'kegiatan'   => 'required|in:7,8,9',
+            'tanggal'    => 'required|string',
+            'pengurus'   => 'required|array|min:1',
+            'pengurus.*' => 'required|in:H,S,I,A',
+        ]);
+
         $kegiatan = $request->kegiatan;
         $tanggal  = $request->tanggal;
 
-        match ($kegiatan) {
-            '7' => $exists = Bandongan::where('tanggal', $tanggal)->exists(),
-            '8' => $exists = Wirid::where('tanggal', $tanggal)->exists(),
-            '9' => $exists = Yasinan::where('tanggal', $tanggal)->exists()
+        $modelClass = match ($kegiatan) {
+            '7' => Bandongan::class,
+            '8' => Wirid::class,
+            '9' => Yasinan::class,
         };
 
-        if ($exists) {
-            session()->flash('error', 'Absensi hari ini sudah dibuat');
+        if ($modelClass::where('tanggal', $tanggal)->exists()) {
+            session()->flash('error', 'Absensi tanggal ini sudah dibuat');
             return redirect('/mahadiyah/absensi-pengurus');
         }
 
-        // Yasinan: hanya pengurus non kepkam
-        // Bandongan & Wirid: semua pengurus
+        // Yasinan: hanya pengurus non kepkam; Bandongan & Wirid: semua pengurus
         $allowedNis = ($kegiatan === '9')
             ? Pengurus::whereHas('jabatan.divisi', fn($q) => $q->where('tipe', 'non'))->pluck('nis')->toArray()
             : Pengurus::pluck('nis')->toArray();
 
         foreach ($request->pengurus as $nis => $status) {
             if (!in_array((string) $nis, $allowedNis)) continue;
-
-            match ($kegiatan) {
-                '7' => Bandongan::create(['nis' => (string) $nis, 'tanggal' => $tanggal, 'status' => $status]),
-                '8' => Wirid::create(['nis' => (string) $nis, 'tanggal' => $tanggal, 'status' => $status]),
-                '9' => Yasinan::create(['nis' => (string) $nis, 'tanggal' => $tanggal, 'status' => $status]),
-            };
+            $modelClass::create(['nis' => (string) $nis, 'tanggal' => $tanggal, 'status' => $status]);
         }
 
         session()->flash('success', 'Absensi berhasil dibuat');
@@ -212,15 +213,32 @@ class Mahadiyah extends Controller
         return redirect('/mahadiyah/pengurus');
     }
 
+    public function generateNis()
+    {
+        do {
+            $nis = (string) random_int(100000000, 999999999);
+        } while (\App\Models\Pengurus::where('nis', $nis)->exists());
+
+        return response()->json(['nis' => $nis]);
+    }
+
     public function pengurus_update(Request $request, $nis)
     {
+        $pengurus = Pengurus::where('nis', $nis)->firstOrFail();
+
         $request->validate([
+            'nis'        => 'required|string|max:20|unique:pengurus,nis,' . $nis . ',nis',
             'nama'       => 'required|string|max:100',
             'jabatan_id' => 'nullable|exists:jabatan,id',
         ]);
 
-        $pengurus = Pengurus::where('nis', $nis)->firstOrFail();
+        // Kalau NIS berubah, update juga di tabel user
+        if ($request->nis !== $nis) {
+            \App\Models\User::where('username', $nis)->update(['username' => $request->nis]);
+        }
+
         $pengurus->update([
+            'nis'        => $request->nis,
             'nama'       => $request->nama,
             'jabatan_id' => $request->jabatan_id ?: null,
         ]);
