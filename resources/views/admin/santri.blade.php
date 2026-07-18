@@ -50,6 +50,24 @@
 </div>
 @else
 
+{{-- Toolbar hapus massal --}}
+<div id="bulk-toolbar" style="display:none;" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl items-center justify-between gap-3">
+    <span class="text-sm text-red-700 font-semibold">
+        <i class="fa fa-check-square mr-2"></i>
+        <span id="selected-count">0</span> santri dipilih
+    </span>
+    <button onclick="confirmBulkDelete()"
+        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
+        <i class="fa fa-trash"></i> Hapus yang Dipilih
+    </button>
+</div>
+
+{{-- Form bulk delete tersembunyi --}}
+<form id="form-bulk-santri" method="POST" action="/admin/santri/bulk" class="hidden">
+    @csrf @method('DELETE')
+    <div id="bulk-inputs"></div>
+</form>
+
 {{-- List per Kepala Kamar --}}
 @foreach($grouped as $kepkamNis => $santriList)
 @php $kp = $kepkams->get($kepkamNis); @endphp
@@ -71,9 +89,16 @@
                 @endif
             </div>
         </div>
-        <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#F4F7FE] text-[#4318FF]">
-            {{ $santriList->count() }} santri
-        </span>
+        <div class="flex items-center gap-2">
+            <button onclick="selectGroup('{{ $kepkamNis }}')"
+                class="text-xs px-2.5 py-1 rounded-lg bg-[#F4F7FE] hover:bg-[#4318FF] text-[#4318FF] hover:text-white transition-all font-semibold"
+                id="btn-group-{{ $kepkamNis }}" title="Pilih semua santri grup ini">
+                <i class="fa fa-check-double mr-1"></i>Pilih Semua
+            </button>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#F4F7FE] text-[#4318FF]">
+                {{ $santriList->count() }} santri
+            </span>
+        </div>
     </div>
 
     {{-- Tabel Santri --}}
@@ -81,7 +106,10 @@
         <table class="w-full text-sm">
             <thead>
                 <tr class="border-b border-gray-100 bg-[#F4F7FE]/50">
-                    <th class="text-left px-4 py-2.5 text-xs text-[#A3AED0] font-semibold uppercase w-10">#</th>
+                    <th class="px-4 py-2.5 w-10">
+                        <input type="checkbox" class="group-checkbox w-4 h-4 text-[#4318FF] rounded border-gray-300 focus:ring-[#4318FF] cursor-pointer"
+                            data-group="{{ $kepkamNis }}" onchange="toggleGroup(this)">
+                    </th>
                     <th class="text-left px-4 py-2.5 text-xs text-[#A3AED0] font-semibold uppercase">Nama</th>
                     <th class="text-left px-4 py-2.5 text-xs text-[#A3AED0] font-semibold uppercase">NIS</th>
                     <th class="px-4 py-2.5 w-20"></th>
@@ -89,8 +117,12 @@
             </thead>
             <tbody>
                 @foreach($santriList as $i => $s)
-                <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
-                    <td class="px-4 py-2.5 text-xs text-[#A3AED0]">{{ $i + 1 }}</td>
+                <tr class="santri-row border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors cursor-pointer"
+                    data-group="{{ $kepkamNis }}">
+                    <td class="px-4 py-2.5">
+                        <input type="checkbox" class="santri-checkbox w-4 h-4 text-[#4318FF] rounded border-gray-300 focus:ring-[#4318FF] cursor-pointer"
+                            value="{{ $s->nis }}" data-group="{{ $kepkamNis }}" onchange="updateBulkToolbar()">
+                    </td>
                     <td class="px-4 py-2.5 text-[#2B3674] font-medium text-sm">{{ $s->nama }}</td>
                     <td class="px-4 py-2.5 font-mono text-xs text-[#A3AED0]">{{ $s->nis }}</td>
                     <td class="px-4 py-2.5 text-right">
@@ -280,6 +312,73 @@
 
 @section('script')
 <script>
+function toggleGroup(master) {
+    const group = master.dataset.group;
+    document.querySelectorAll(`.santri-checkbox[data-group="${group}"]`).forEach(cb => cb.checked = master.checked);
+    updateBulkToolbar();
+}
+
+function selectGroup(group) {
+    const checkboxes = document.querySelectorAll(`.santri-checkbox[data-group="${group}"]`);
+    const allChecked = [...checkboxes].every(cb => cb.checked);
+    checkboxes.forEach(cb => cb.checked = !allChecked);
+    // Update group checkbox
+    const gc = document.querySelector(`.group-checkbox[data-group="${group}"]`);
+    if (gc) gc.checked = !allChecked;
+    updateBulkToolbar();
+}
+
+function updateBulkToolbar() {
+    const checked  = document.querySelectorAll('.santri-checkbox:checked');
+    const toolbar  = document.getElementById('bulk-toolbar');
+    const count    = document.getElementById('selected-count');
+
+    count.textContent = checked.length;
+    toolbar.style.display = checked.length > 0 ? 'flex' : 'none';
+
+    // Update group checkbox state
+    document.querySelectorAll('.group-checkbox').forEach(gc => {
+        const group = gc.dataset.group;
+        const total = document.querySelectorAll(`.santri-checkbox[data-group="${group}"]`).length;
+        const chk   = document.querySelectorAll(`.santri-checkbox[data-group="${group}"]:checked`).length;
+        gc.indeterminate = chk > 0 && chk < total;
+        gc.checked       = chk === total && total > 0;
+    });
+
+    // Highlight rows
+    document.querySelectorAll('.santri-row').forEach(row => {
+        const cb = row.querySelector('.santri-checkbox');
+        row.classList.toggle('bg-red-50', cb.checked);
+    });
+}
+
+function confirmBulkDelete() {
+    const checked = document.querySelectorAll('.santri-checkbox:checked');
+    if (checked.length === 0) return;
+    if (confirm(`Hapus ${checked.length} santri yang dipilih? Tindakan ini tidak dapat dibatalkan.`)) {
+        const container = document.getElementById('bulk-inputs');
+        container.innerHTML = '';
+        checked.forEach(cb => {
+            const input = document.createElement('input');
+            input.type  = 'hidden';
+            input.name  = 'nis[]';
+            input.value = cb.value;
+            container.appendChild(input);
+        });
+        document.getElementById('form-bulk-santri').submit();
+    }
+}
+
+// Klik baris untuk toggle checkbox
+document.querySelectorAll('.santri-row').forEach(row => {
+    row.addEventListener('click', function(e) {
+        if (e.target.closest('button, a, form, input')) return;
+        const cb   = this.querySelector('.santri-checkbox');
+        cb.checked = !cb.checked;
+        updateBulkToolbar();
+    });
+});
+
 function openModalImport() {
     document.getElementById('modal-import-santri').classList.remove('hidden');
     document.getElementById('modal-import-santri').classList.add('flex');

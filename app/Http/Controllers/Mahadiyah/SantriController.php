@@ -71,6 +71,17 @@ class SantriController extends Controller
             ->with('success', 'Data santri berhasil diperbarui.');
     }
 
+    public function destroyBulk(Request $request)
+    {
+        $request->validate([
+            'nis'   => 'required|array|min:1',
+            'nis.*' => 'string|exists:santri,nis',
+        ]);
+
+        $deleted = Santri::whereIn('nis', $request->nis)->delete();
+        return redirect('/mahadiyah/santri')->with('success', "{$deleted} santri berhasil dihapus.");
+    }
+
     public function destroy($nis)
     {
         Santri::where('nis', $nis)->firstOrFail()->delete();

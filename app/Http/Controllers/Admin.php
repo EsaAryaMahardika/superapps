@@ -126,6 +126,24 @@ class Admin extends Controller
         return redirect('/admin/users')->with('success', 'Akun berhasil dihapus.');
     }
 
+    public function destroyBulk(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array|min:1',
+            'ids.*' => 'integer|exists:user,id',
+        ]);
+
+        $currentId = Auth::user()->id;
+        $ids       = collect($request->ids)->reject(fn($id) => $id == $currentId)->values();
+
+        if ($ids->isEmpty()) {
+            return redirect('/admin/users')->with('error', 'Tidak bisa menghapus akun sendiri.');
+        }
+
+        $deleted = User::whereIn('id', $ids)->delete();
+        return redirect('/admin/users')->with('success', "{$deleted} akun berhasil dihapus.");
+    }
+
     public function santri(Request $request)
     {
         $query = Santri::query();
@@ -299,6 +317,17 @@ class Admin extends Controller
         ]);
         return redirect('/admin/santri' . '?' . http_build_query(request()->except('_token', '_method')))
             ->with('success', 'Data santri berhasil diperbarui.');
+    }
+
+    public function santriDestroyBulk(Request $request)
+    {
+        $request->validate([
+            'nis'   => 'required|array|min:1',
+            'nis.*' => 'string|exists:santri,nis',
+        ]);
+
+        $deleted = Santri::whereIn('nis', $request->nis)->delete();
+        return redirect('/admin/santri')->with('success', "{$deleted} santri berhasil dihapus.");
     }
 
     public function santriDestroy($nis)

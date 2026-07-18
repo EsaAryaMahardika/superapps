@@ -68,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/santri', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'store']);
         Route::get('/santri/template', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'template']);
         Route::post('/santri/import', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'import']);
+        Route::delete('/santri/bulk', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'destroyBulk']);
         Route::put('/santri/{nis}', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'update']);
         Route::delete('/santri/{nis}', [\App\Http\Controllers\Mahadiyah\SantriController::class, 'destroy']);
 
@@ -124,6 +125,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/santri', [Admin::class, 'santriStore']);
         Route::get('/santri/template', [Admin::class, 'santriTemplate']);
         Route::post('/santri/import', [Admin::class, 'santriImport']);
+        Route::delete('/santri/bulk', [Admin::class, 'santriDestroyBulk']);
         Route::put('/santri/{nis}', [Admin::class, 'santriUpdate']);
         Route::delete('/santri/{nis}', [Admin::class, 'santriDestroy']);
         Route::get('/pengurus', [Admin::class, 'pengurus']);
@@ -137,6 +139,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/users', [Admin::class, 'store']);
         Route::get('/users/{id}/edit', [Admin::class, 'edit']);
         Route::put('/users/{id}', [Admin::class, 'update']);
+        Route::delete('/users/bulk', [Admin::class, 'destroyBulk']);
         Route::delete('/users/{id}', [Admin::class, 'destroy']);
         Route::post('/users/{id}/reset-password', [Admin::class, 'resetPassword']);
     });
