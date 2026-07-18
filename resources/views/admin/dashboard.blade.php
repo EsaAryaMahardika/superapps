@@ -10,12 +10,12 @@
 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
     @php
         $roles = [
-            'admin'     => ['label' => 'Admin',      'icon' => 'fa-shield-halved', 'color' => 'text-purple-600',  'bg' => 'bg-purple-50'],
-            'mahadiyah' => ['label' => 'Mahadiyah',  'icon' => 'fa-star',          'color' => 'text-blue-600',    'bg' => 'bg-blue-50'],
-            'kepkam'    => ['label' => 'Kepala Kamar','icon' => 'fa-house',         'color' => 'text-green-600',   'bg' => 'bg-green-50'],
-            'keamanan'  => ['label' => 'Keamanan',   'icon' => 'fa-shield',        'color' => 'text-red-600',     'bg' => 'bg-red-50'],
-            'kantor'    => ['label' => 'Kantor',      'icon' => 'fa-building',      'color' => 'text-orange-600',  'bg' => 'bg-orange-50'],
-            'madin'     => ['label' => 'Madin',       'icon' => 'fa-book-open',     'color' => 'text-teal-600',    'bg' => 'bg-teal-50'],
+            'admin'     => ['label' => 'Admin',       'icon' => 'fa-shield-halved', 'color' => 'text-purple-600',  'bg' => 'bg-purple-50'],
+            'mahadiyah' => ['label' => 'Mahadiyah',   'icon' => 'fa-star',          'color' => 'text-blue-600',    'bg' => 'bg-blue-50'],
+            'kepkam'    => ['label' => 'Kepala Kamar', 'icon' => 'fa-house',         'color' => 'text-green-600',   'bg' => 'bg-green-50'],
+            'keamanan'  => ['label' => 'Keamanan',    'icon' => 'fa-shield',        'color' => 'text-red-600',     'bg' => 'bg-red-50'],
+            'kantor'    => ['label' => 'Kantor',       'icon' => 'fa-building',      'color' => 'text-orange-600',  'bg' => 'bg-orange-50'],
+            'madin'     => ['label' => 'Madin',        'icon' => 'fa-book-open',     'color' => 'text-teal-600',    'bg' => 'bg-teal-50'],
         ];
     @endphp
 
@@ -34,6 +34,7 @@
     @endforeach
 </div>
 
+{{-- Akun Terbaru --}}
 <div class="flex justify-between items-center mb-4">
     <h3 class="text-sm font-semibold text-[#1B2559]">Akun Terbaru</h3>
     <a href="/admin/users" class="text-xs text-[#4318FF] hover:underline">Lihat semua →</a>
@@ -65,4 +66,25 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    let activeModule = 'semua';
+
+    function filterLog(module) {
+        activeModule = module;
+
+        // Update tombol aktif
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.className = 'filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all bg-gray-100 text-gray-500 hover:bg-gray-200';
+        });
+        const activeBtn = document.getElementById('filter-' + module);
+        activeBtn.className = 'filter-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all bg-[#4318FF] text-white';
+
+        // Filter baris
+        document.querySelectorAll('.log-row').forEach(row => {
+            const mod = row.getAttribute('data-module');
+            row.style.display = (module === 'semua' || mod === module) ? '' : 'none';
+        });
+    }
+</script>
 @endsection

@@ -7,11 +7,36 @@ use App\Models\Kamar;
 use App\Models\Asrama;
 use App\Models\Pengurus;
 use App\Models\Santri;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class Admin extends Controller
 {
+    public function logs(Request $request)
+    {
+        $query = ActivityLog::latest();
+
+        if ($request->filled('module')) {
+            $query->where('module', $request->module);
+        }
+        if ($request->filled('username')) {
+            $query->where('username', 'like', '%' . $request->username . '%');
+        }
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        $logs    = $query->paginate(50)->withQueryString();
+        $modules = ActivityLog::select('module')->distinct()->orderBy('module')->pluck('module');
+
+        // Pre-load nama pengurus untuk semua username di halaman ini (hindari N+1)
+        $usernames   = $logs->pluck('username')->filter()->unique()->values();
+        $namaPengurus = Pengurus::whereIn('nis', $usernames)->pluck('nama', 'nis');
+
+        return view('admin.logs', compact('logs', 'modules', 'namaPengurus'));
+    }
+
     public function dashboard()
     {
         $stats = [
@@ -23,7 +48,10 @@ class Admin extends Controller
             'kantor'    => User::where('role', 'kantor')->count(),
             'madin'     => User::where('role', 'madin')->count(),
         ];
-        return view('admin.dashboard', compact('stats'));
+
+        $logs = ActivityLog::latest()->take(50)->get();
+
+        return view('admin.dashboard', compact('stats', 'logs'));
     }
 
     public function index(Request $request)

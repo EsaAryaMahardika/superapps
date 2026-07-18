@@ -118,7 +118,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/pengurus', [Admin::class, 'pengurus']);
         Route::get('/pengurus/{nis}/edit', [Admin::class, 'pengurusEdit']);
         Route::put('/pengurus/{nis}', [Admin::class, 'pengurusUpdate']);
-        Route::get('/generate-nis', [Admin::class, 'generateNis']);
+        Route::get('/logs', [Admin::class, 'logs']);
         Route::get('/users', [Admin::class, 'index']);
         Route::get('/users/create', [Admin::class, 'create']);
         Route::post('/users', [Admin::class, 'store']);

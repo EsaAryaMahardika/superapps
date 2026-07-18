@@ -97,6 +97,9 @@
                 <li class="{{ Request::is('admin/pengurus*') ? 'active' : '' }}">
                     <a href="/admin/pengurus"><i class="fa fa-id-card"></i><span>Data Pengurus</span></a>
                 </li>
+                <li class="{{ Request::is('admin/logs*') ? 'active' : '' }}">
+                    <a href="/admin/logs"><i class="fa fa-clipboard-list"></i><span>Log Aktivitas</span></a>
+                </li>
             </ul>
 
             <div class="mt-8 px-8 mb-8">

@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
+        $middleware->appendToGroup('web', \App\Http\Middleware\LogActivity::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         Integration::handles($exceptions);
