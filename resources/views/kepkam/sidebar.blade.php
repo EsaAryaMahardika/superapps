@@ -1,6 +1,9 @@
 <li class="{{ Request::is('/') ? 'active' : '' }}">
     <a href="/"><i class="fa fa-home"></i><span>Dashboard</span></a>
 </li>
+<li class="{{ Request::is('kepkam/kelompok*') ? 'active' : '' }}">
+    <a href="/kepkam/kelompok"><i class="fa fa-users"></i><span>Kelompok Santri</span></a>
+</li>
 <li class="{{ Request::is('kepkam/absensi*') ? 'active' : '' }}">
     <a href="/kepkam/absensi"><i class="fa fa-clipboard"></i><span>Absensi</span></a>
 </li>

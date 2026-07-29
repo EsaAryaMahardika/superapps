@@ -15,15 +15,22 @@ class General extends Controller
         return view('login');
     }
     public function auth(Request $request){
-        $credentials = $request->only('username', 'password');
-        if (Auth::attempt($credentials)) {
+        $input    = $request->input('username');
+        $password = $request->input('password');
+
+        // Cari user berdasarkan NIS (username) atau custom_username
+        $user = \App\Models\User::where('username', $input)
+            ->orWhere('custom_username', $input)
+            ->first();
+
+        if ($user && \Illuminate\Support\Facades\Hash::check($password, $user->password)) {
+            Auth::login($user);
             $request->session()->regenerate();
             return redirect()->intended('/');
-            // return dd('OK');
-        } else {
-            session()->flash('error', 'Username / Password salah');
-            return redirect('login');
         }
+
+        session()->flash('error', 'Username / Password salah');
+        return redirect('login');
     }
     public function dashboard(){
         $user = Auth::user()->role;

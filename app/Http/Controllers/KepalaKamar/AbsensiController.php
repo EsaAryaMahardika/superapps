@@ -5,6 +5,7 @@ namespace App\Http\Controllers\KepalaKamar;
 use Carbon\Carbon;
 use App\Models\Santri;
 use App\Models\Kegiatan;
+use App\Models\KelompokSantri;
 use App\Models\AbsensiJamaah;
 use App\Models\AbsensiWaqiah;
 use App\Models\AbsensiNgaji;
@@ -67,10 +68,11 @@ class AbsensiController extends Controller
         }
 
         $kegiatan    = Kegiatan::where('ket', 'S')->get();
-        $santri      = Santri::select('nis', 'nama')->where('kepkam', $this->user->username)->get();
+        $santri      = Santri::select('nis', 'nama', 'kelompok_id')->where('kepkam', $this->user->username)->orderBy('nama')->get();
+        $kelompok    = KelompokSantri::where('kepkam_nis', $this->user->username)->orderBy('nama')->get();
         $completedIds = array_column($completed, 'id');
 
-        return view('kepkam.absensi', compact('completed', 'pending', 'kegiatan', 'santri', 'today', 'activities', 'completedIds'));
+        return view('kepkam.absensi', compact('completed', 'pending', 'kegiatan', 'santri', 'today', 'activities', 'completedIds', 'kelompok'));
     }
 
     public function store(Request $request)

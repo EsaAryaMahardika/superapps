@@ -8,7 +8,7 @@
                 <h2 class="text-2xl font-bold text-[#1B2559]">Data Absensi</h2>
                 <p class="text-[#A3AED0] text-sm mt-1">Kelola dan pantau absensi santri harian</p>
             </div>
-            <button class="btn btn-primary shadow-brand flex items-center gap-2" data-toggle="modal" data-target="#add">
+            <button class="btn btn-primary shadow-brand flex items-center gap-2" onclick="openAddModal()">
                 <i class="fa fa-plus"></i>
                 <span>Buat Absensi</span>
             </button>
@@ -133,12 +133,12 @@
 
     <!-- Modal Buat Absensi -->
     <div class="fixed inset-0 z-50 hidden items-center justify-center p-4" id="add">
-        <div class="absolute inset-0 bg-black/40" onclick="$('#add').addClass('hidden').removeClass('flex')"></div>
+        <div class="absolute inset-0 bg-black/40" onclick="closeAddModal()"></div>
         <div class="relative bg-white rounded-[20px] shadow-2xl w-full max-w-2xl z-10 max-h-[90vh] overflow-y-auto">
             <div class="border-b border-gray-100 p-6 flex items-center justify-between">
                     <h5 class="text-xl font-bold text-[#1B2559]">Buat Absensi Baru</h5>
                     <button type="button" class="text-gray-400 hover:text-gray-600 w-7 h-7 flex items-center justify-center"
-                        onclick="$('#add').addClass('hidden').removeClass('flex')">
+                        onclick="closeAddModal()">
                         <span aria-hidden="true">&times;</span>
                     </button>
             </div>
@@ -172,13 +172,31 @@
                             <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-3">
                                 <h4 class="text-sm font-bold text-[#1B2559] uppercase tracking-wider my-auto">Daftar Santri
                                 </h4>
-                                <div class="relative w-full md:w-72">
-                                    <input type="text" id="searchSantri"
-                                        class="w-full h-11 pl-11 pr-4 rounded-xl text-sm border-0 bg-white shadow-sm ring-1 ring-gray-200 focus:ring-2 focus:ring-[#4318FF] text-[#2B3674] placeholder:text-[#A3AED0] transition-all"
-                                        placeholder="Cari nama santri...">
-                                    <div
-                                        class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[#4318FF]">
-                                        <i class="fa fa-search text-sm"></i>
+                                <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                                    @if($kelompok->count() > 0)
+                                        <div class="relative">
+                                            <select id="filterKelompok"
+                                                class="w-full sm:w-44 h-11 pl-4 pr-8 rounded-xl text-sm border-0 bg-white shadow-sm ring-1 ring-gray-200 focus:ring-2 focus:ring-[#4318FF] text-[#2B3674] appearance-none outline-none transition-all"
+                                                onchange="filterByKelompok(this.value)">
+                                                <option value="">Semua Kelompok</option>
+                                                @foreach($kelompok as $group)
+                                                    <option value="{{ $group->id }}">{{ $group->nama }}</option>
+                                                @endforeach
+                                                <option value="none">Tanpa Kelompok</option>
+                                            </select>
+                                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-[#A3AED0]">
+                                                <i class="fa fa-chevron-down text-xs"></i>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <div class="relative w-full sm:w-56">
+                                        <input type="text" id="searchSantri"
+                                            class="w-full h-11 pl-11 pr-4 rounded-xl text-sm border-0 bg-white shadow-sm ring-1 ring-gray-200 focus:ring-2 focus:ring-[#4318FF] text-[#2B3674] placeholder:text-[#A3AED0] transition-all"
+                                            placeholder="Cari nama santri...">
+                                        <div
+                                            class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[#4318FF]">
+                                            <i class="fa fa-search text-sm"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -211,7 +229,7 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($santri as $item)
-                                            <tr class="border-b border-gray-100 last:border-0 group santri-row">
+                                            <tr class="border-b border-gray-100 last:border-0 group santri-row" data-kelompok="{{ $item->kelompok_id ?? 'none' }}">
                                                 <td class="py-3 text-sm font-medium text-[#2B3674] santri-name">
                                                     {{ $item->nama }}
                                                 </td>
@@ -296,7 +314,7 @@
                         <div class="border-t border-gray-100 pt-4 flex justify-end gap-2">
                             <div>
                                 <button type="button" class="btn bg-gray-100 text-[#2B3674] hover:bg-gray-200"
-                                    onclick="document.getElementById('add').classList.add('hidden'); document.getElementById('add').classList.remove('flex');">Batal</button>
+                                    onclick="closeAddModal()">Batal</button>
                                 <button type="submit" class="btn btn-primary ml-2">Simpan Absensi</button>
                             </div>
                         </div>
@@ -334,11 +352,32 @@
             });
         }
 
+        function openAddModal() {
+            const el = document.getElementById('add');
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+            // Trigger date check
+            const tanggalInput = document.getElementById('tanggal-absen');
+            if (tanggalInput && tanggalInput.value) {
+                tanggalInput.dispatchEvent(new Event('change'));
+            }
+        }
+
+        function closeAddModal() {
+            const el = document.getElementById('add');
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+            // Reset state
+            document.querySelectorAll('.activity-checkbox').forEach(cb => { cb.checked = false; });
+            updateSelectState();
+            document.getElementById('advancedOptions').classList.add('hidden');
+            document.getElementById('advancedChevron').classList.remove('rotate-180');
+        }
+
         function openModalWithActivity(activityId) {
-            $('#add').modal('show');
+            openAddModal();
             const select = document.getElementById('kegiatan');
             select.value = activityId;
-            // Trigger change event to clear validation errors helper
             select.dispatchEvent(new Event('change'));
         }
 
@@ -419,24 +458,7 @@
                 cb.addEventListener('change', updateSelectState);
             });
 
-            // Reset checkboxes when modal is hidden
-            $('#add').on('hidden.bs.modal', function () {
-                document.querySelectorAll('.activity-checkbox').forEach(cb => {
-                    cb.checked = false;
-                });
-                updateSelectState();
-                document.getElementById('advancedOptions').classList.add('hidden');
-                document.getElementById('advancedChevron').classList.remove('rotate-180');
-            });
-
-            // Trigger initial check when modal is shown
-            $('#add').on('shown.bs.modal', function () {
-                const tanggalInput = document.getElementById('tanggal-absen');
-                if (tanggalInput && tanggalInput.value) {
-                    // Trigger change event to load initial state
-                    tanggalInput.dispatchEvent(new Event('change'));
-                }
-            });
+            // (Modal reset handled by closeAddModal())
 
             form.addEventListener('submit', function (e) {
                 if (!kegiatan.value) {
@@ -509,16 +531,27 @@
 
             searchInput.addEventListener('keyup', function () {
                 const query = this.value.toLowerCase();
+                const kelompokFilter = document.getElementById('filterKelompok')?.value || '';
 
                 santriRows.forEach(row => {
                     const name = row.querySelector('.santri-name').textContent.toLowerCase();
-                    if (name.includes(query)) {
-                        row.classList.remove('hidden');
-                    } else {
-                        row.classList.add('hidden');
-                    }
+                    const matchesSearch = name.includes(query);
+                    const matchesKelompok = !kelompokFilter || row.dataset.kelompok === kelompokFilter;
+                    row.classList.toggle('hidden', !(matchesSearch && matchesKelompok));
                 });
             });
         });
+
+        function filterByKelompok(kelompokId) {
+            const query = document.getElementById('searchSantri').value.toLowerCase();
+            const santriRows = document.querySelectorAll('.santri-row');
+
+            santriRows.forEach(row => {
+                const name = row.querySelector('.santri-name').textContent.toLowerCase();
+                const matchesSearch = name.includes(query);
+                const matchesKelompok = !kelompokId || row.dataset.kelompok === kelompokId;
+                row.classList.toggle('hidden', !(matchesSearch && matchesKelompok));
+            });
+        }
     </script>
 @endsection

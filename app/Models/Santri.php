@@ -16,6 +16,10 @@ class Santri extends Model
     protected $casts = [
         'nis' => 'string'
     ];
+    public function kelompok()
+    {
+        return $this->belongsTo(KelompokSantri::class, 'kelompok_id', 'id');
+    }
     // public function asrama()
     // {
     //     return $this->belongsTo(Asrama::class, 'asr_id', 'id');

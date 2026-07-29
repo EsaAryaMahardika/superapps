@@ -66,7 +66,10 @@
                     <a href="/kantor/syahriah"><i class="fa fa-money-bill"></i><span>Syahriah</span></a>
                 </li>
             </ul>
-            <div class="mt-8 px-8 mb-8">
+            <div class="mt-8 px-8 mb-8 space-y-3">
+                <a href="/profil" class="flex items-center text-[#A3AED0] hover:text-white font-medium transition-colors">
+                    <i class="fa fa-user-circle mr-3"></i><span>Profil Saya</span>
+                </a>
                 <form method="POST" action="/logout">
                     @csrf
                     <button type="submit" class="flex items-center text-[#EE5D50] hover:text-[#D43F33] font-medium transition-colors" style="background:none;border:none;cursor:pointer;padding:0;">

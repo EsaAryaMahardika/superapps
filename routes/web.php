@@ -16,6 +16,9 @@ use App\Http\Controllers\Mahadiyah\RekapController as MahadiyahRekap;
 use App\Http\Controllers\KepalaKamar\DashboardController as KepkamDashboard;
 use App\Http\Controllers\KepalaKamar\AbsensiController as KepkamAbsensi;
 use App\Http\Controllers\KepalaKamar\RekapController as KepkamRekap;
+use App\Http\Controllers\KepalaKamar\KelompokController as KepkamKelompok;
+
+use App\Http\Controllers\ProfileController;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [General::class, 'login'])->name('login');
@@ -25,6 +28,8 @@ Route::middleware(['guest'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [General::class, 'dashboard']);
     Route::post('/logout', [General::class, 'logout'])->name('logout');
+    Route::get('/profil', [ProfileController::class, 'index']);
+    Route::post('/profil', [ProfileController::class, 'update']);
 
     // Perizinan — diakses oleh kepkam & keamanan
     Route::middleware(['role:kepkam,keamanan'])->group(function () {
@@ -154,6 +159,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/absensi/check-completed', [KepkamAbsensi::class, 'checkCompleted']);
         Route::post('/absen', [KepkamAbsensi::class, 'store']);
         Route::delete('/absensi/{id}', [KepkamAbsensi::class, 'destroy']);
+
+        // Kelompok Santri
+        Route::get('/kelompok', [KepkamKelompok::class, 'index']);
+        Route::post('/kelompok', [KepkamKelompok::class, 'store']);
+        Route::put('/kelompok/{id}', [KepkamKelompok::class, 'update']);
+        Route::delete('/kelompok/{id}', [KepkamKelompok::class, 'destroy']);
+        Route::post('/kelompok/{id}/assign', [KepkamKelompok::class, 'assign']);
+        Route::delete('/kelompok/{id}/unassign', [KepkamKelompok::class, 'unassign']);
 
         // Rekap & Mingguan
         Route::get('/mingguan', [KepkamRekap::class, 'mingguan']);
