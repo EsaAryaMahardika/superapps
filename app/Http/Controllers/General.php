@@ -42,7 +42,7 @@ class General extends Controller
             case 'keamanan':
                 return redirect('/keamanan');
             case 'pengasuh':
-                return redirect('/');
+                return redirect('/pengasuh');
             case 'mahadiyah':
                 return redirect('/mahadiyah');
             case 'kantor':

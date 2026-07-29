@@ -47,6 +47,7 @@ class Admin extends Controller
             'keamanan'  => User::where('role', 'keamanan')->count(),
             'kantor'    => User::where('role', 'kantor')->count(),
             'madin'     => User::where('role', 'madin')->count(),
+            'pengasuh'  => User::where('role', 'pengasuh')->count(),
         ];
 
         $logs = ActivityLog::latest()->take(50)->get();
@@ -76,10 +77,19 @@ class Admin extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'username' => 'required|string|exists:pengurus,nis|unique:user,username',
+            'role'     => 'required|in:admin,mahadiyah,kepkam,keamanan,kantor,madin,pengasuh',
             'password' => 'required|string|min:4',
-            'role'     => 'required|in:admin,mahadiyah,kepkam,keamanan,kantor,madin',
         ]);
+
+        if ($request->role === 'pengasuh') {
+            $request->validate([
+                'username' => 'required|string|max:50|unique:user,username',
+            ]);
+        } else {
+            $request->validate([
+                'username' => 'required|string|exists:pengurus,nis|unique:user,username',
+            ]);
+        }
 
         User::create([
             'username' => $request->username,
@@ -102,10 +112,19 @@ class Admin extends Controller
         $user = User::findOrFail($id);
 
         $request->validate([
-            'username' => 'required|string|exists:pengurus,nis|unique:user,username,' . $id,
-            'role'     => 'required|in:admin,mahadiyah,kepkam,keamanan,kantor,madin',
+            'role'     => 'required|in:admin,mahadiyah,kepkam,keamanan,kantor,madin,pengasuh',
             'password' => 'nullable|string|min:4',
         ]);
+
+        if ($request->role === 'pengasuh') {
+            $request->validate([
+                'username' => 'required|string|max:50|unique:user,username,' . $id,
+            ]);
+        } else {
+            $request->validate([
+                'username' => 'required|string|exists:pengurus,nis|unique:user,username,' . $id,
+            ]);
+        }
 
         $data = ['username' => $request->username, 'role' => $request->role];
         if ($request->filled('password')) {

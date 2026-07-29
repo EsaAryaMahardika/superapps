@@ -14,7 +14,7 @@
         class="field-input" style="width:200px;">
     <select name="role" class="field-input" style="width:160px;">
         <option value="">Semua Role</option>
-        @foreach(['admin','mahadiyah','kepkam','keamanan','kantor','madin'] as $r)
+        @foreach(['admin','mahadiyah','kepkam','keamanan','kantor','madin','pengasuh'] as $r)
             <option value="{{ $r }}" {{ request('role') === $r ? 'selected' : '' }}>{{ ucfirst($r) }}</option>
         @endforeach
     </select>

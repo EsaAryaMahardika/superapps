@@ -16,6 +16,7 @@
             'keamanan'  => ['label' => 'Keamanan',    'icon' => 'fa-shield',        'color' => 'text-red-600',     'bg' => 'bg-red-50'],
             'kantor'    => ['label' => 'Kantor',       'icon' => 'fa-building',      'color' => 'text-orange-600',  'bg' => 'bg-orange-50'],
             'madin'     => ['label' => 'Madin',        'icon' => 'fa-book-open',     'color' => 'text-teal-600',    'bg' => 'bg-teal-50'],
+            'pengasuh'  => ['label' => 'Pengasuh',     'icon' => 'fa-user-tie',      'color' => 'text-amber-600',   'bg' => 'bg-amber-50'],
         ];
     @endphp
 

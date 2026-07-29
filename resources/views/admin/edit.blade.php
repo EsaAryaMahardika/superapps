@@ -11,26 +11,37 @@
         <form method="POST" action="/admin/users/{{ $user->id }}">
             @csrf @method('PUT')
             <div class="mb-4">
-                <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Pengurus <span class="text-red-400">*</span></label>
-                <select name="username" required class="field-input">
-                    <option value="">-- Pilih Pengurus --</option>
-                    @foreach($pengurus as $p)
-                        <option value="{{ $p->nis }}" {{ old('username', $user->username) == $p->nis ? 'selected' : '' }}>
-                            {{ $p->nama }} ({{ $p->nis }})
-                        </option>
-                    @endforeach
-                </select>
-                @error('username') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-            </div>
-            <div class="mb-4">
                 <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Role <span class="text-red-400">*</span></label>
-                <select name="role" required class="field-input">
-                    @foreach(['admin','mahadiyah','kepkam','keamanan','kantor','madin'] as $r)
+                <select name="role" id="role-select" required class="field-input" onchange="toggleUsernameMode()">
+                    @foreach(['admin','mahadiyah','kepkam','keamanan','kantor','madin','pengasuh'] as $r)
                         <option value="{{ $r }}" {{ old('role', $user->role) == $r ? 'selected' : '' }}>{{ ucfirst($r) }}</option>
                     @endforeach
                 </select>
                 @error('role') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
+
+            {{-- Username: mode pengurus (select) --}}
+            <div class="mb-4" id="username-pengurus">
+                <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Pengurus <span class="text-red-400">*</span></label>
+                <select name="username" id="select-pengurus" class="field-input">
+                    <option value="">-- Pilih Pengurus --</option>
+                    @foreach($pengurus as $p)
+                        <option value="{{ $p->nis }}" {{ old('username', $user->role !== 'pengasuh' ? $user->username : '') == $p->nis ? 'selected' : '' }}>
+                            {{ $p->nama }} ({{ $p->nis }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Username: mode pengasuh (free text) --}}
+            <div class="mb-4 hidden" id="username-custom">
+                <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Username Pengasuh <span class="text-red-400">*</span></label>
+                <input type="text" name="username" id="input-custom" class="field-input" placeholder="contoh: pengasuh1"
+                    value="{{ old('username', $user->role === 'pengasuh' ? $user->username : '') }}" disabled>
+                <p class="text-xs text-[#A3AED0] mt-1">Username untuk login pengasuh (bebas, tidak harus NIS pengurus)</p>
+            </div>
+            @error('username') <p class="text-red-500 text-xs mt-1 -mt-2 mb-4">{{ $message }}</p> @enderror
+
             <div class="mb-6">
                 <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Password Baru <span class="text-[#A3AED0] font-normal">(kosongkan jika tidak diubah)</span></label>
                 <input type="password" name="password" minlength="4"
@@ -44,4 +55,23 @@
         </form>
     </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+function toggleUsernameMode() {
+    const role = document.getElementById('role-select').value;
+    const isPengasuh = role === 'pengasuh';
+    const selectPengurus = document.getElementById('select-pengurus');
+    const inputCustom = document.getElementById('input-custom');
+
+    document.getElementById('username-pengurus').classList.toggle('hidden', isPengasuh);
+    document.getElementById('username-custom').classList.toggle('hidden', !isPengasuh);
+
+    selectPengurus.disabled = isPengasuh;
+    inputCustom.disabled = !isPengasuh;
+}
+
+toggleUsernameMode();
+</script>
 @endsection

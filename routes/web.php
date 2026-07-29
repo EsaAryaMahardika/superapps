@@ -17,6 +17,8 @@ use App\Http\Controllers\KepalaKamar\DashboardController as KepkamDashboard;
 use App\Http\Controllers\KepalaKamar\AbsensiController as KepkamAbsensi;
 use App\Http\Controllers\KepalaKamar\RekapController as KepkamRekap;
 use App\Http\Controllers\KepalaKamar\KelompokController as KepkamKelompok;
+// Pengasuh controller
+use App\Http\Controllers\Pengasuh\PengasuhController;
 
 use App\Http\Controllers\ProfileController;
 
@@ -147,6 +149,18 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/users/bulk', [Admin::class, 'destroyBulk']);
         Route::delete('/users/{id}', [Admin::class, 'destroy']);
         Route::post('/users/{id}/reset-password', [Admin::class, 'resetPassword']);
+    });
+
+    // Pengasuh
+    Route::prefix('pengasuh')->middleware(['role:pengasuh'])->group(function () {
+        Route::get('/', [PengasuhController::class, 'index']);
+        Route::get('/absensi', [PengasuhController::class, 'absensi']);
+        Route::get('/pembayaran', [PengasuhController::class, 'pembayaran']);
+        Route::get('/perizinan', [PengasuhController::class, 'perizinan']);
+        Route::post('/perizinan/{nis}/action', [PengasuhController::class, 'perizinanAction']);
+        Route::get('/track-record', [PengasuhController::class, 'trackRecord']);
+        Route::get('/api/search-santri', [PengasuhController::class, 'searchSantri']);
+        Route::get('/api/santri/{nis}', [PengasuhController::class, 'santriDetail']);
     });
 
     // Kepala Kamar
