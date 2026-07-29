@@ -34,8 +34,8 @@ class AbsensiController extends Controller
             ['id' => '4',  'title' => 'Absensi Ashar',        'model' => 'AbsensiJamaah', 'col' => 'sholat','val' => 4],
             ['id' => '5',  'title' => 'Absensi Maghrib',      'model' => 'AbsensiJamaah', 'col' => 'sholat','val' => 5],
             ['id' => '6',  'title' => 'Absensi Isya',         'model' => 'AbsensiJamaah', 'col' => 'sholat','val' => 6],
-            ['id' => '10', 'title' => 'Absensi Ngaji Sore',   'model' => 'AbsensiNgaji',  'col' => 'ngaji', 'val' => 10],
-            ['id' => '11', 'title' => 'Absensi Ngaji Malam',  'model' => 'AbsensiNgaji',  'col' => 'ngaji', 'val' => 11],
+            ['id' => '10', 'title' => 'Absensi Ngaji Malam 1',   'model' => 'AbsensiNgaji',  'col' => 'ngaji', 'val' => 10],
+            ['id' => '11', 'title' => 'Absensi Ngaji Malam 2',  'model' => 'AbsensiNgaji',  'col' => 'ngaji', 'val' => 11],
         ];
     }
 

@@ -574,8 +574,8 @@ class Mahadiyah extends Controller
             ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5, 'label' => 'Maghrib'],
             ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6, 'label' => 'Isya'],
             ['model' => 'AbsensiWaqiah', 'col' => null, 'val' => null, 'label' => 'Waqiah'],
-            ['model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 10, 'label' => 'Ngaji Sore'],
-            ['model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 11, 'label' => 'Ngaji Malam'],
+            ['model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 10, 'label' => 'Ngaji Malam 1'],
+            ['model' => 'AbsensiNgaji', 'col' => 'ngaji', 'val' => 11, 'label' => 'Ngaji Malam 2'],
         ];
 
         $kepkamSudahAbsenCount = 0;
@@ -643,8 +643,8 @@ class Mahadiyah extends Controller
             ['table' => 'absen_jamaah', 'col' => 'sholat', 'val' => 5, 'label' => 'Maghrib'],
             ['table' => 'absen_jamaah', 'col' => 'sholat', 'val' => 6, 'label' => 'Isya'],
             ['table' => 'absen_waqiah', 'col' => null, 'val' => null, 'label' => 'Waqiah'],
-            ['table' => 'absen_ngaji', 'col' => 'ngaji', 'val' => 10, 'label' => 'Ngaji Sore'],
-            ['table' => 'absen_ngaji', 'col' => 'ngaji', 'val' => 11, 'label' => 'Ngaji Malam'],
+            ['table' => 'absen_ngaji', 'col' => 'ngaji', 'val' => 10, 'label' => 'Ngaji Malam 1'],
+            ['table' => 'absen_ngaji', 'col' => 'ngaji', 'val' => 11, 'label' => 'Ngaji Malam 2'],
         ];
 
         foreach ($activityMap as $act) {
@@ -762,8 +762,8 @@ class Mahadiyah extends Controller
             ['key' => 'Maghrib', 'table' => 'absen_jamaah', 'col' => 'sholat', 'val' => 5],
             ['key' => 'Isya', 'table' => 'absen_jamaah', 'col' => 'sholat', 'val' => 6],
             ['key' => 'Waqiah', 'table' => 'absen_waqiah', 'col' => null, 'val' => null],
-            ['key' => 'Ngaji Sore', 'table' => 'absen_ngaji', 'col' => 'ngaji', 'val' => 10],
-            ['key' => 'Ngaji Malam', 'table' => 'absen_ngaji', 'col' => 'ngaji', 'val' => 11],
+            ['key' => 'Ngaji Malam 1', 'table' => 'absen_ngaji', 'col' => 'ngaji', 'val' => 10],
+            ['key' => 'Ngaji Malam 2', 'table' => 'absen_ngaji', 'col' => 'ngaji', 'val' => 11],
         ];
 
         $chartDatasets = [];
@@ -882,7 +882,7 @@ class Mahadiyah extends Controller
                     ->select('tanggal', 'ngaji as val')
                     ->get();
                 foreach ($details_ngaji as $d) {
-                    $names = [10 => 'Ngaji Sore', 11 => 'Ngaji Malam'];
+                    $names = [10 => 'Ngaji Malam 1', 11 => 'Ngaji Malam 2'];
                     $ngajiName = $names[$d->val] ?? 'Ngaji';
                     $santriDetails[] = [
                         'tanggal' => $d->tanggal,

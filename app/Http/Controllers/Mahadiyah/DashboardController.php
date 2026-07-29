@@ -23,8 +23,8 @@ class DashboardController extends Controller
             ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5,  'label' => 'Maghrib'],
             ['model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6,  'label' => 'Isya'],
             ['model' => 'AbsensiWaqiah', 'col' => null,     'val' => null,'label' => 'Waqiah'],
-            ['model' => 'AbsensiNgaji',  'col' => 'ngaji',  'val' => 10, 'label' => 'Ngaji Sore'],
-            ['model' => 'AbsensiNgaji',  'col' => 'ngaji',  'val' => 11, 'label' => 'Ngaji Malam'],
+            ['model' => 'AbsensiNgaji',  'col' => 'ngaji',  'val' => 10, 'label' => 'Ngaji Malam 1'],
+            ['model' => 'AbsensiNgaji',  'col' => 'ngaji',  'val' => 11, 'label' => 'Ngaji Malam 2'],
         ];
     }
 
@@ -37,8 +37,8 @@ class DashboardController extends Controller
             ['table' => 'absen_jamaah', 'col' => 'sholat', 'val' => 5,  'label' => 'Maghrib'],
             ['table' => 'absen_jamaah', 'col' => 'sholat', 'val' => 6,  'label' => 'Isya'],
             ['table' => 'absen_waqiah', 'col' => null,     'val' => null,'label' => 'Waqiah'],
-            ['table' => 'absen_ngaji',  'col' => 'ngaji',  'val' => 10, 'label' => 'Ngaji Sore'],
-            ['table' => 'absen_ngaji',  'col' => 'ngaji',  'val' => 11, 'label' => 'Ngaji Malam'],
+            ['table' => 'absen_ngaji',  'col' => 'ngaji',  'val' => 10, 'label' => 'Ngaji Malam 1'],
+            ['table' => 'absen_ngaji',  'col' => 'ngaji',  'val' => 11, 'label' => 'Ngaji Malam 2'],
         ];
     }
 
@@ -183,8 +183,8 @@ class DashboardController extends Controller
             ['key' => 'Maghrib',    'table' => 'absen_jamaah', 'col' => 'sholat', 'val' => 5],
             ['key' => 'Isya',       'table' => 'absen_jamaah', 'col' => 'sholat', 'val' => 6],
             ['key' => 'Waqiah',     'table' => 'absen_waqiah', 'col' => null,     'val' => null],
-            ['key' => 'Ngaji Sore', 'table' => 'absen_ngaji',  'col' => 'ngaji',  'val' => 10],
-            ['key' => 'Ngaji Malam','table' => 'absen_ngaji',  'col' => 'ngaji',  'val' => 11],
+            ['key' => 'Ngaji Malam 1', 'table' => 'absen_ngaji',  'col' => 'ngaji',  'val' => 10],
+            ['key' => 'Ngaji Malam 2','table' => 'absen_ngaji',  'col' => 'ngaji',  'val' => 11],
         ];
 
         $labels = [];
@@ -264,7 +264,7 @@ class DashboardController extends Controller
             $details[] = ['tanggal' => $d->tanggal, 'kegiatan' => 'Waqiah', 'raw_date' => Carbon::createFromFormat('d/m/Y', $d->tanggal)->format('Y-m-d') . '_7'];
         }
         foreach (DB::table('absen_ngaji')->where('nis', $nis)->where('status', 'A')->whereIn('tanggal', $dateRange)->select('tanggal', 'ngaji as val')->get() as $d) {
-            $names = [10 => 'Ngaji Sore', 11 => 'Ngaji Malam'];
+            $names = [10 => 'Ngaji Malam 1', 11 => 'Ngaji Malam 2'];
             $details[] = ['tanggal' => $d->tanggal, 'kegiatan' => $names[$d->val] ?? 'Ngaji', 'raw_date' => Carbon::createFromFormat('d/m/Y', $d->tanggal)->format('Y-m-d') . "_{$d->val}"];
         }
 

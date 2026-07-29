@@ -301,7 +301,7 @@
                                                     class="p-2.5 rounded-lg border-2 transition-all duration-200 text-center
                                                                 {{ $isCompleted ? 'bg-gray-100 border-transparent text-[#A3AED0]' : 'bg-white border-transparent text-[#A3AED0] peer-checked:border-[#4318FF] peer-checked:bg-[#4318FF] peer-checked:text-white peer-checked:shadow-md hover:bg-gray-50' }}">
                                                     <span class="text-xs font-bold block truncate">
-                                                        {{ str_replace(['Absensi ', 'Ngaji '], '', $act['title']) }}
+                                                        {{ str_replace('Absensi ', '', $act['title']) }}
                                                     </span>
                                                 </div>
                                             </label>

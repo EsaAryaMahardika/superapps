@@ -35,8 +35,8 @@ class RekapController extends Controller
             ['id' => '5',  'name' => 'Maghrib',     'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 5],
             ['id' => '6',  'name' => 'Isya',        'model' => 'AbsensiJamaah', 'col' => 'sholat', 'val' => 6],
             ['id' => '1',  'name' => 'Waqiah',      'model' => 'AbsensiWaqiah', 'col' => null,      'val' => null],
-            ['id' => '10', 'name' => 'Ngaji Sore',  'model' => 'AbsensiNgaji',  'col' => 'ngaji',   'val' => 10],
-            ['id' => '11', 'name' => 'Ngaji Malam', 'model' => 'AbsensiNgaji',  'col' => 'ngaji',   'val' => 11],
+            ['id' => '10', 'name' => 'Ngaji Malam 1',  'model' => 'AbsensiNgaji',  'col' => 'ngaji',   'val' => 10],
+            ['id' => '11', 'name' => 'Ngaji Malam 2', 'model' => 'AbsensiNgaji',  'col' => 'ngaji',   'val' => 11],
         ];
     }
 
