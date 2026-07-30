@@ -7,35 +7,21 @@
 @endsection
 
 @section('content')
-    <!-- Horizontal Scroll Summary Cards -->
-    <div class="flex overflow-x-auto snap-x hide-scrollbar gap-4 pb-2 mb-4 -mx-4 px-4 md:mx-0 md:px-0">
-        <div class="card snap-center min-w-[140px] flex-1">
-            <div class="flex items-center justify-between mb-2">
-                <div class="w-8 h-8 rounded-lg bg-[#4318FF]/10 flex items-center justify-center"><i class="fa fa-users text-[#4318FF] text-sm"></i></div>
+    <!-- Summary Cards (compact) -->
+    <div class="flex gap-3 mb-4">
+        <div class="bg-white rounded-2xl shadow-[0_20px_27px_0_rgba(0,0,0,0.05)] px-4 py-3 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-[#4318FF]/10 flex items-center justify-center shrink-0"><i class="fa fa-users text-[#4318FF] text-sm"></i></div>
+            <div>
+                <p class="text-lg font-bold text-[#1B2559] leading-tight">{{ $totalSantri }}</p>
+                <p class="text-[10px] text-[#A3AED0]">Total Santri</p>
             </div>
-            <p class="text-xl font-bold text-[#1B2559]">{{ $totalSantri }}</p>
-            <p class="text-[10px] text-[#A3AED0] mt-0.5">Total Santri</p>
         </div>
-        <div class="card snap-center min-w-[140px] flex-1">
-            <div class="flex items-center justify-between mb-2">
-                <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center"><i class="fa fa-check-circle text-green-500 text-sm"></i></div>
+        <div class="bg-white rounded-2xl shadow-[0_20px_27px_0_rgba(0,0,0,0.05)] px-4 py-3 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center shrink-0"><i class="fa fa-user-tie text-green-500 text-sm"></i></div>
+            <div>
+                <p class="text-lg font-bold text-[#1B2559] leading-tight">{{ $totalPengurus }}</p>
+                <p class="text-[10px] text-[#A3AED0]">Total Pengurus</p>
             </div>
-            <p class="text-xl font-bold text-[#1B2559]">{{ $todayStats['H'] }}</p>
-            <p class="text-[10px] text-[#A3AED0] mt-0.5">Hadir Hari Ini</p>
-        </div>
-        <div class="card snap-center min-w-[140px] flex-1">
-            <div class="flex items-center justify-between mb-2">
-                <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center"><i class="fa fa-hand-paper text-orange-500 text-sm"></i></div>
-            </div>
-            <p class="text-xl font-bold text-[#1B2559]">{{ $izinAktif }}</p>
-            <p class="text-[10px] text-[#A3AED0] mt-0.5">Izin Aktif</p>
-        </div>
-        <div class="card snap-center min-w-[140px] flex-1">
-            <div class="flex items-center justify-between mb-2">
-                <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center"><i class="fa fa-times-circle text-red-500 text-sm"></i></div>
-            </div>
-            <p class="text-xl font-bold text-[#1B2559]">{{ $todayStats['A'] }}</p>
-            <p class="text-[10px] text-[#A3AED0] mt-0.5">Alfa Hari Ini</p>
         </div>
     </div>
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Pengasuh;
 
 use Carbon\Carbon;
 use App\Models\Santri;
+use App\Models\Pengurus;
 use App\Models\Kamar;
 use App\Models\Perizinan;
 use App\Models\Pelanggaran;
@@ -54,9 +55,9 @@ class PengasuhController extends Controller
     {
         $today = Carbon::now()->format('d/m/Y');
         $totalSantri = Santri::count();
+        $totalPengurus = Pengurus::count();
 
         // Today's attendance summary across all activities
-        $todayStats = ['H' => 0, 'S' => 0, 'I' => 0, 'A' => 0];
         $activityRecap = [];
 
         foreach ($this->activityConfig() as $act) {
@@ -80,15 +81,7 @@ class PengasuhController extends Controller
                 'name' => $act['name'],
                 'H' => $h, 'S' => $s, 'I' => $i, 'A' => $a,
             ];
-
-            $todayStats['H'] += $h;
-            $todayStats['S'] += $s;
-            $todayStats['I'] += $i;
-            $todayStats['A'] += $a;
         }
-
-        // Active permits (status = 0 pending or 1 approved, not yet returned)
-        $izinAktif = Perizinan::whereIn('status', [0, 1])->count();
 
         // Critical santri: top alfa this month
         $monthStart = Carbon::now()->startOfMonth()->format('d/m/Y');
@@ -121,7 +114,7 @@ class PengasuhController extends Controller
             ->get();
 
         return view('pengasuh.dashboard', compact(
-            'totalSantri', 'todayStats', 'izinAktif',
+            'totalSantri', 'totalPengurus',
             'activityRecap', 'criticalSantri',
             'perizinanMenunggu', 'perizinanTerlambat'
         ));
