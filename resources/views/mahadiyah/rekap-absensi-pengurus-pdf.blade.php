@@ -177,12 +177,12 @@
             @php $tipeKey = isset($tipe) ? $tipe : 'all'; @endphp
             <tr>
                 @foreach($dates as $date)
-                    @php $s = $dailySummary[$tipeKey][$date] ?? ['bandongan'=>0,'bandongan_total'=>0,'wirid'=>0,'wirid_total'=>0,'yasinan'=>0,'yasinan_total'=>0]; @endphp
+                    @php $s = $dailySummary[$tipeKey][$date] ?? ['bandongan'=>0,'bandongan_total'=>0,'bandongan_izin'=>0,'wirid'=>0,'wirid_total'=>0,'wirid_izin'=>0,'yasinan'=>0,'yasinan_total'=>0,'yasinan_izin'=>0]; @endphp
                     <td class="total-hadir-th">
-                        <span style="display:block;"><span style="color:#6EE7B7;font-size:5.5px;">B</span> <span class="val">{{ $s['bandongan'] }}/{{ $s['bandongan_total'] }}</span></span>
-                        <span style="display:block;"><span style="color:#6EE7B7;font-size:5.5px;">W</span> <span class="val">{{ $s['wirid'] }}/{{ $s['wirid_total'] }}</span></span>
+                        <span style="display:block;"><span style="color:#6EE7B7;font-size:5.5px;">B</span> <span class="val">{{ $s['bandongan'] }}/{{ $s['bandongan_total'] }}</span>@if($s['bandongan_izin'])<span style="color:#93C5FD;font-size:5.5px;"> i{{ $s['bandongan_izin'] }}</span>@endif</span>
+                        <span style="display:block;"><span style="color:#6EE7B7;font-size:5.5px;">W</span> <span class="val">{{ $s['wirid'] }}/{{ $s['wirid_total'] }}</span>@if($s['wirid_izin'])<span style="color:#93C5FD;font-size:5.5px;"> i{{ $s['wirid_izin'] }}</span>@endif</span>
                         @if($tipeKey !== 'kepkam')
-                        <span style="display:block;"><span style="color:#6EE7B7;font-size:5.5px;">Y</span> <span class="val">{{ $s['yasinan'] }}/{{ $s['yasinan_total'] }}</span></span>
+                        <span style="display:block;"><span style="color:#6EE7B7;font-size:5.5px;">Y</span> <span class="val">{{ $s['yasinan'] }}/{{ $s['yasinan_total'] }}</span>@if($s['yasinan_izin'])<span style="color:#93C5FD;font-size:5.5px;"> i{{ $s['yasinan_izin'] }}</span>@endif</span>
                         @endif
                     </td>
                 @endforeach
@@ -239,10 +239,16 @@
                     {{-- Summary: Bandongan --}}
                     <td class="summary-cell">
                         <span class="summary-H">{{ $row['summary']['bandongan']['H'] }}</span><span class="summary-slash">/</span><span class="summary-tot">{{ $row['summary']['bandongan']['total'] }}</span>
+                        @if($row['summary']['bandongan']['I'])
+                            <span style="display:block; color:#2563EB; font-size:5.5px; font-weight:bold;">Izin {{ $row['summary']['bandongan']['I'] }}</span>
+                        @endif
                     </td>
                     {{-- Summary: Wirid --}}
                     <td class="summary-cell">
                         <span class="summary-H">{{ $row['summary']['wirid']['H'] }}</span><span class="summary-slash">/</span><span class="summary-tot">{{ $row['summary']['wirid']['total'] }}</span>
+                        @if($row['summary']['wirid']['I'])
+                            <span style="display:block; color:#2563EB; font-size:5.5px; font-weight:bold;">Izin {{ $row['summary']['wirid']['I'] }}</span>
+                        @endif
                     </td>
                     {{-- Summary: Yasinan --}}
                     <td class="summary-cell">
@@ -250,6 +256,9 @@
                             <span style="color:#D1D5DB;">-</span>
                         @else
                             <span class="summary-H">{{ $row['summary']['yasinan']['H'] }}</span><span class="summary-slash">/</span><span class="summary-tot">{{ $row['summary']['yasinan']['total'] }}</span>
+                            @if($row['summary']['yasinan']['I'])
+                                <span style="display:block; color:#2563EB; font-size:5.5px; font-weight:bold;">Izin {{ $row['summary']['yasinan']['I'] }}</span>
+                            @endif
                         @endif
                     </td>
                 </tr>
@@ -274,6 +283,7 @@
         <span class="legend-item"><span class="badge" style="background:#E5E7EB;color:#374151;">B</span> Bandongan</span>
         <span class="legend-item"><span class="badge" style="background:#E5E7EB;color:#374151;">W</span> Wirid</span>
         <span class="legend-item"><span class="badge" style="background:#E5E7EB;color:#374151;">Y</span> Yasinan (Non KepKam)</span>
+        <span class="legend-item"><span class="badge" style="background:#DBEAFE;color:#1E40AF;">i</span> Jumlah Izin</span>
     </div>
 
     <div class="footer">

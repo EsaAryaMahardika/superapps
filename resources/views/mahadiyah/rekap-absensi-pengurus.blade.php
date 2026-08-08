@@ -96,7 +96,7 @@
                                     $dateObj = \Carbon\Carbon::createFromFormat('d-m-Y', $date);
                                     $hari = $dateObj->locale('id')->isoFormat('dd');
                                 @endphp
-                                <th class="text-[10px] text-white font-bold p-2 border border-[#3311CC] text-center min-w-[70px]">
+                                <th class="text-[10px] text-white font-bold p-2 border border-[#3311CC] text-center min-w-[80px]">
                                     <span class="block text-[8px] uppercase tracking-wider text-blue-200 font-medium">{{ $hari }}</span>
                                     <span class="block text-xs font-extrabold mt-0.5">{{ $dateObj->format('d') }}</span>
                                 </th>
@@ -120,21 +120,36 @@
                                 <div class="text-[9px] uppercase tracking-wider font-black text-blue-200">Total Hadir</div>
                             </td>
                             @foreach($dates as $date)
-                                @php $s = $dailySummary[$tipeRow][$date] ?? ['bandongan'=>0,'bandongan_total'=>0,'wirid'=>0,'wirid_total'=>0,'yasinan'=>0,'yasinan_total'=>0]; @endphp
+                                @php $s = $dailySummary[$tipeRow][$date] ?? ['bandongan'=>0,'bandongan_total'=>0,'bandongan_izin'=>0,'wirid'=>0,'wirid_total'=>0,'wirid_izin'=>0,'yasinan'=>0,'yasinan_total'=>0,'yasinan_izin'=>0]; @endphp
                                 <td class="p-1.5 border-r border-[#2d3a6b] align-middle">
-                                    <div class="flex flex-col items-center gap-0.5">
-                                        <div class="flex items-center gap-0.5">
-                                            <span class="text-[8px] text-blue-300 font-bold">B</span>
-                                            <span class="text-green-300 font-extrabold text-[10px]">{{ $s['bandongan'] }}/{{ $s['bandongan_total'] }}</span>
+                                    <div class="flex flex-col items-center gap-1">
+                                        <div class="flex flex-col items-center leading-tight">
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-[8px] text-blue-300 font-bold">B</span>
+                                                <span class="text-green-300 font-extrabold text-[10px]">{{ $s['bandongan'] }}/{{ $s['bandongan_total'] }}</span>
+                                            </div>
+                                            @if($s['bandongan_izin'])
+                                                <span class="mt-0.5 px-1 rounded-full bg-sky-500/25 text-sky-200 font-bold text-[8px] leading-tight">Izin {{ $s['bandongan_izin'] }}</span>
+                                            @endif
                                         </div>
-                                        <div class="flex items-center gap-0.5">
-                                            <span class="text-[8px] text-blue-300 font-bold">W</span>
-                                            <span class="text-green-300 font-extrabold text-[10px]">{{ $s['wirid'] }}/{{ $s['wirid_total'] }}</span>
+                                        <div class="flex flex-col items-center leading-tight">
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-[8px] text-blue-300 font-bold">W</span>
+                                                <span class="text-green-300 font-extrabold text-[10px]">{{ $s['wirid'] }}/{{ $s['wirid_total'] }}</span>
+                                            </div>
+                                            @if($s['wirid_izin'])
+                                                <span class="mt-0.5 px-1 rounded-full bg-sky-500/25 text-sky-200 font-bold text-[8px] leading-tight">Izin {{ $s['wirid_izin'] }}</span>
+                                            @endif
                                         </div>
                                         @if($tipeRow !== 'kepkam')
-                                        <div class="flex items-center gap-0.5">
-                                            <span class="text-[8px] text-blue-300 font-bold">Y</span>
-                                            <span class="text-green-300 font-extrabold text-[10px]">{{ $s['yasinan'] }}/{{ $s['yasinan_total'] }}</span>
+                                        <div class="flex flex-col items-center leading-tight">
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-[8px] text-blue-300 font-bold">Y</span>
+                                                <span class="text-green-300 font-extrabold text-[10px]">{{ $s['yasinan'] }}/{{ $s['yasinan_total'] }}</span>
+                                            </div>
+                                            @if($s['yasinan_izin'])
+                                                <span class="mt-0.5 px-1 rounded-full bg-sky-500/25 text-sky-200 font-bold text-[8px] leading-tight">Izin {{ $s['yasinan_izin'] }}</span>
+                                            @endif
                                         </div>
                                         @endif
                                     </div>
@@ -148,16 +163,22 @@
                                 $sumWT = array_sum(array_column($dailySummary[$tipeRow], 'wirid_total'));
                                 $sumYH = array_sum(array_column($dailySummary[$tipeRow], 'yasinan'));
                                 $sumYT = array_sum(array_column($dailySummary[$tipeRow], 'yasinan_total'));
+                                $sumBI = array_sum(array_column($dailySummary[$tipeRow], 'bandongan_izin'));
+                                $sumWI = array_sum(array_column($dailySummary[$tipeRow], 'wirid_izin'));
+                                $sumYI = array_sum(array_column($dailySummary[$tipeRow], 'yasinan_izin'));
                             @endphp
                             <td class="p-2 text-center border-r border-[#2d3a6b] bg-[#151d47]">
                                 <span class="text-green-300 font-extrabold text-xs">{{ $sumBH }}/{{ $sumBT }}</span>
+                                <span class="block text-sky-300 font-semibold text-[9px]">Izin {{ $sumBI }}</span>
                             </td>
                             <td class="p-2 text-center border-r border-[#2d3a6b] bg-[#151d47]">
                                 <span class="text-green-300 font-extrabold text-xs">{{ $sumWH }}/{{ $sumWT }}</span>
+                                <span class="block text-sky-300 font-semibold text-[9px]">Izin {{ $sumWI }}</span>
                             </td>
                             <td class="p-2 text-center bg-[#151d47]">
                                 @if($tipeRow !== 'kepkam')
                                     <span class="text-green-300 font-extrabold text-xs">{{ $sumYH }}/{{ $sumYT }}</span>
+                                    <span class="block text-sky-300 font-semibold text-[9px]">Izin {{ $sumYI }}</span>
                                 @else
                                     <span class="text-gray-500 select-none">-</span>
                                 @endif
@@ -242,12 +263,18 @@
                                     <span class="text-green-600 font-extrabold">{{ $row['summary']['bandongan']['H'] }}</span>
                                     <span class="text-gray-300 text-[10px] font-normal mx-0.5">/</span>
                                     <span class="text-gray-500 text-[11px] font-medium">{{ $row['summary']['bandongan']['total'] }}</span>
+                                    @if($row['summary']['bandongan']['I'])
+                                        <span class="block text-blue-600 text-[10px] font-semibold mt-0.5">Izin {{ $row['summary']['bandongan']['I'] }}</span>
+                                    @endif
                                 </td>
                                 <!-- Wirid Summary -->
                                 <td class="p-3 text-center border-r border-gray-100 bg-[#F4F7FE]/30 font-bold text-[#1B2559]">
                                     <span class="text-green-600 font-extrabold">{{ $row['summary']['wirid']['H'] }}</span>
                                     <span class="text-gray-300 text-[10px] font-normal mx-0.5">/</span>
                                     <span class="text-gray-500 text-[11px] font-medium">{{ $row['summary']['wirid']['total'] }}</span>
+                                    @if($row['summary']['wirid']['I'])
+                                        <span class="block text-blue-600 text-[10px] font-semibold mt-0.5">Izin {{ $row['summary']['wirid']['I'] }}</span>
+                                    @endif
                                 </td>
                                 <!-- Yasinan Summary -->
                                 <td class="p-3 text-center bg-[#F4F7FE]/30 font-bold text-[#1B2559]">
@@ -257,6 +284,9 @@
                                         <span class="text-green-600 font-extrabold">{{ $row['summary']['yasinan']['H'] }}</span>
                                         <span class="text-gray-300 text-[10px] font-normal mx-0.5">/</span>
                                         <span class="text-gray-500 text-[11px] font-medium">{{ $row['summary']['yasinan']['total'] }}</span>
+                                        @if($row['summary']['yasinan']['I'])
+                                            <span class="block text-blue-600 text-[10px] font-semibold mt-0.5">Izin {{ $row['summary']['yasinan']['I'] }}</span>
+                                        @endif
                                     @endif
                                 </td>
                             </tr>
@@ -295,6 +325,7 @@
                     <span class="font-bold"><span class="bg-gray-100 text-gray-700 px-1 py-0.5 rounded text-[9px] font-black">B</span> Bandongan</span>
                     <span class="font-bold"><span class="bg-gray-100 text-gray-700 px-1 py-0.5 rounded text-[9px] font-black">W</span> Wirid</span>
                     <span class="font-bold"><span class="bg-gray-100 text-gray-700 px-1 py-0.5 rounded text-[9px] font-black">Y</span> Yasinan</span>
+                    <span class="font-bold"><span class="bg-sky-100 text-sky-700 px-1 py-0.5 rounded text-[9px] font-black">i</span> Jumlah Izin</span>
                 </div>
             </div>
         </div>

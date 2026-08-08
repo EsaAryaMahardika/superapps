@@ -79,7 +79,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     @foreach($pengurusKepkam as $p)
                     <div class="pengurus-item flex items-center justify-between p-3 rounded-xl bg-[#F4F7FE] hover:bg-[#EEF2FF] transition-colors"
-                        data-search="{{ strtolower($p->nama . ' ' . ($p->jabatan->nama ?? '') . ' kepala kamar kepkam') }}">
+                        data-search="{{ strtolower($p->nama . ' ' . ($p->jabatan->nama ?? '') . ' kepala kamar kepkam pengurus ' . ($p->asal ?? 'dalam')) }}">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
                                 <i class="fa fa-user text-[#4318FF] text-xs"></i>
@@ -89,10 +89,13 @@
                                 <span class="inline-block mt-0.5 px-2 py-0.5 rounded-md bg-[#4318FF]/10 text-[#4318FF] text-xs font-medium">
                                     {{ $p->jabatan->nama ?? '-' }}
                                 </span>
+                                <span class="inline-block mt-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-semibold {{ ($p->asal ?? 'dalam') === 'luar' ? 'bg-amber-100 text-amber-700' : 'bg-gray-200/70 text-gray-600' }}">
+                                    {{ ($p->asal ?? 'dalam') === 'luar' ? 'Luar' : 'Dalam' }}
+                                </span>
                             </div>
                         </div>
                         <div class="flex gap-1.5 flex-shrink-0 ml-2">
-                            <button onclick="openEditPengurus('{{ $p->nis }}','{{ addslashes($p->nama) }}',{{ $p->jabatan_id ?? 'null' }})"
+                            <button onclick="openEditPengurus('{{ $p->nis }}','{{ addslashes($p->nama) }}',{{ $p->jabatan_id ?? 'null' }},'{{ $p->asal ?? 'dalam' }}')"
                                 class="w-7 h-7 rounded-lg bg-white hover:bg-[#4318FF] text-[#4318FF] hover:text-white transition-all flex items-center justify-center shadow-sm">
                                 <i class="fa fa-pen text-xs"></i>
                             </button>
@@ -335,6 +338,13 @@
                 </select>
                 <p class="text-[10px] text-[#A3AED0] mt-1">Untuk Kepala Kamar: pilih opsi di grup "Kepala Kamar" — contoh: <em>Kepala Kamar 1 SMA</em>, <em>Kepala Kamar 2 SMP</em></p>
             </div>
+            <div>
+                <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Asal Pengurus</label>
+                <select name="asal" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4318FF] focus:ring-2 focus:ring-[#4318FF]/20 transition-all text-sm outline-none">
+                    <option value="dalam">Pengurus Dalam</option>
+                    <option value="luar">Pengurus Luar</option>
+                </select>
+            </div>
             <div class="flex gap-3 pt-2">
                 <button type="button" onclick="closeModal('modal-tambah-pengurus')" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 text-sm">Batal</button>
                 <button type="submit" class="flex-1 px-4 py-2.5 rounded-xl bg-[#4318FF] hover:bg-[#3311CC] text-white font-semibold shadow-lg shadow-blue-500/30 text-sm"><i class="fa fa-save mr-1.5"></i>Simpan</button>
@@ -394,6 +404,13 @@
                     @endif
                 </select>
                 <p class="text-[10px] text-[#A3AED0] mt-1">Untuk Kepala Kamar: pilih opsi di grup "Kepala Kamar" — contoh: <em>Kepala Kamar 1 SMA</em>, <em>Kepala Kamar 2 SMP</em></p>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-[#1B2559] mb-1.5">Asal Pengurus</label>
+                <select name="asal" id="ep-asal" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4318FF] focus:ring-2 focus:ring-[#4318FF]/20 transition-all text-sm outline-none">
+                    <option value="dalam">Pengurus Dalam</option>
+                    <option value="luar">Pengurus Luar</option>
+                </select>
             </div>
             <div class="flex gap-3 pt-2">
                 <button type="button" onclick="closeModal('modal-edit-pengurus')" class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 text-sm">Batal</button>
@@ -669,10 +686,11 @@
     });
 
     // ---- Pengurus ----
-    function openEditPengurus(nis, nama, jabatanId) {
+    function openEditPengurus(nis, nama, jabatanId, asal) {
         document.getElementById('ep-nis').value = nis;
         document.getElementById('ep-nama').value = nama;
         document.getElementById('ep-jabatan').value = jabatanId || '';
+        document.getElementById('ep-asal').value = asal || 'dalam';
         document.getElementById('form-edit-pengurus').action = '/mahadiyah/pengurus/' + nis;
         openModal('modal-edit-pengurus');
     }
@@ -859,7 +877,7 @@
     <div class="absolute inset-0 bg-black/40" onclick="closeModalImportPengurus()"></div>
     <div class="relative bg-white rounded-[20px] shadow-[0_20px_27px_0_rgba(0,0,0,0.1)] w-full max-w-sm z-10 p-6">
         <h3 class="text-lg font-bold text-[#1B2559] mb-1">Import Pengurus dari CSV</h3>
-        <p class="text-xs text-[#A3AED0] mb-4">Format: <span class="font-mono">nis, nama, jabatan_id</span> — baris pertama header. Kolom <span class="font-mono">jabatan_id</span> boleh kosong.</p>
+        <p class="text-xs text-[#A3AED0] mb-4">Format: <span class="font-mono">nis, nama, jabatan_id, asal</span> — baris pertama header. Kolom <span class="font-mono">jabatan_id</span> boleh kosong. Kolom <span class="font-mono">asal</span> diisi <span class="font-mono">dalam</span> / <span class="font-mono">luar</span> (kosong = dalam).</p>
         <form method="POST" action="/mahadiyah/pengurus/import" enctype="multipart/form-data">
             @csrf
             <div class="mb-5">
