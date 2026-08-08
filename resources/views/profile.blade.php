@@ -121,6 +121,18 @@
                 <i class="fa fa-save mr-2"></i> Simpan Perubahan
             </button>
         </form>
+
+        {{-- Logout: satu-satunya jalan keluar di tampilan mobile, karena
+             sidebar (yang memuat tombol logout) disembunyikan di layar kecil. --}}
+        <div class="mt-6 pt-6 border-t border-gray-100">
+            <form action="/logout" method="POST">
+                @csrf
+                <button type="submit"
+                    class="w-full bg-[#EE5D50]/10 hover:bg-[#EE5D50] text-[#EE5D50] hover:text-white py-3 rounded-xl font-semibold text-sm transition-all">
+                    <i class="fa fa-power-off mr-2"></i> Logout
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 

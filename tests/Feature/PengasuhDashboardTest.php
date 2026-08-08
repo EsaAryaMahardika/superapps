@@ -48,9 +48,7 @@ class PengasuhDashboardTest extends TestCase
         foreach (['>Bayar<', '>Absen<', '>Izin<', '>Akun<', '>Utama<'] as $label) {
             $response->assertDontSee($label, false);
         }
-        // Logout & profil kini terjangkau (sebelumnya logout tidak ada di mobile)
         $response->assertSee('href="/profil"', false);
-        $response->assertSee('action="/logout"', false);
     }
 
     public function test_dashboard_tidak_lagi_punya_kolom_pencarian(): void
@@ -123,12 +121,26 @@ class PengasuhDashboardTest extends TestCase
         $this->assertSame($jumlahAwal, \App\Models\Perizinan::where('status', 0)->count());
     }
 
-    public function test_halaman_profil_bisa_dibuka_pengasuh(): void
+    public function test_halaman_profil_bisa_dibuka_dan_punya_logout(): void
     {
-        // Navbar sekarang menautkan /profil, jadi pastikan role ini boleh masuk
+        // Di mobile, sidebar (tempat tombol logout) disembunyikan, jadi /profil
+        // adalah satu-satunya jalan keluar — form logout wajib ada di sini.
         $response = $this->actingAs($this->loginPengasuh())->get('/profil');
 
         $response->assertOk();
+        $response->assertSee('action="/logout"', false);
+        $response->assertSee('Logout');
+    }
+
+    public function test_logout_benar_benar_mengakhiri_sesi(): void
+    {
+        $this->actingAs($this->loginPengasuh())
+            ->post('/logout')
+            ->assertRedirect();
+
+        $this->assertGuest();
+        // Setelah logout, halaman pengasuh tidak boleh bisa dibuka lagi
+        $this->get('/pengasuh')->assertRedirect();
     }
 
     public function test_search_santri_api_mengembalikan_json(): void

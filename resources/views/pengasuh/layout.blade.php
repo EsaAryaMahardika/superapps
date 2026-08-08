@@ -110,9 +110,10 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#4318FF]/10 flex items-center justify-center text-[#4318FF]">
+                <a href="/profil" title="Profil & Logout"
+                    class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#4318FF]/10 hover:bg-[#4318FF]/20 flex items-center justify-center text-[#4318FF] transition-colors no-underline">
                     <i class="fa fa-user text-sm md:text-base"></i>
-                </div>
+                </a>
             </div>
         </header>
 
