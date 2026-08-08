@@ -41,10 +41,10 @@ class PengurusController extends Controller
         $callback = function () use ($jabatanList) {
             $file = fopen('php://output', 'w');
 
-            // Data pengurus
-            fputcsv($file, ['nis', 'nama', 'jabatan_id']);
-            fputcsv($file, ['123456789', 'Ahmad Fauzi', '6']);
-            fputcsv($file, ['987654321', 'Muhammad Ali', '']);
+            // Data pengurus — kolom asal: dalam / luar (kosong = dalam)
+            fputcsv($file, ['nis', 'nama', 'jabatan_id', 'asal']);
+            fputcsv($file, ['123456789', 'Ahmad Fauzi', '6', 'dalam']);
+            fputcsv($file, ['987654321', 'Muhammad Ali', '', 'luar']);
 
             // Referensi jabatan
             fputcsv($file, []);
@@ -98,12 +98,14 @@ class PengurusController extends Controller
                     'nis'        => trim($line[0] ?? ''),
                     'nama'       => trim($line[1] ?? ''),
                     'jabatan_id' => trim($line[2] ?? ''),
+                    'asal'       => trim($line[3] ?? ''),
                 ];
             }
 
             $nis       = $data['nis']        ?? '';
             $nama      = $data['nama']       ?? '';
             $jabatanId = $data['jabatan_id'] ?? '';
+            $asal      = strtolower($data['asal'] ?? '');
 
             if (empty($nis) || empty($nama)) {
                 $errors[] = "Baris {$row}: NIS atau Nama kosong, dilewati.";
@@ -126,7 +128,19 @@ class PengurusController extends Controller
                 }
             }
 
-            Pengurus::create(['nis' => $nis, 'nama' => $nama, 'jabatan_id' => $validJabatanId]);
+            if (!in_array($asal, ['dalam', 'luar'], true)) {
+                if ($asal !== '') {
+                    $errors[] = "Baris {$row}: asal '{$asal}' tidak dikenal, dianggap 'dalam'.";
+                }
+                $asal = 'dalam';
+            }
+
+            Pengurus::create([
+                'nis'        => $nis,
+                'nama'       => $nama,
+                'jabatan_id' => $validJabatanId,
+                'asal'       => $asal,
+            ]);
             $success++;
         }
 
@@ -149,12 +163,14 @@ class PengurusController extends Controller
             'nis'        => 'required|string|max:20|unique:pengurus,nis',
             'nama'       => 'required|string|max:100',
             'jabatan_id' => 'nullable|exists:jabatan,id',
+            'asal'       => 'nullable|in:dalam,luar',
         ]);
 
         Pengurus::create([
             'nis'        => $request->nis,
             'nama'       => $request->nama,
             'jabatan_id' => $request->jabatan_id ?: null,
+            'asal'       => $request->asal ?: 'dalam',
         ]);
 
         session()->flash('success', 'Pengurus berhasil ditambahkan.');
@@ -178,6 +194,7 @@ class PengurusController extends Controller
             'nis'        => 'required|string|max:20|unique:pengurus,nis,' . $nis . ',nis',
             'nama'       => 'required|string|max:100',
             'jabatan_id' => 'nullable|exists:jabatan,id',
+            'asal'       => 'nullable|in:dalam,luar',
         ]);
 
         if ($request->nis !== $nis) {
@@ -188,6 +205,7 @@ class PengurusController extends Controller
             'nis'        => $request->nis,
             'nama'       => $request->nama,
             'jabatan_id' => $request->jabatan_id ?: null,
+            'asal'       => $request->asal ?: 'dalam',
         ]);
 
         session()->flash('success', 'Data pengurus berhasil diperbarui.');

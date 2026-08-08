@@ -90,6 +90,32 @@
             .sidebar-menu li.active > a i {
                 @apply text-white;
             }
+
+            /* Sidebar Submenu / Category Group */
+            .sidebar-group-toggle {
+                @apply cursor-pointer;
+            }
+            .sidebar-menu li.sidebar-group.active > a.sidebar-group-toggle {
+                @apply text-white bg-white/10 shadow-none;
+            }
+            .sidebar-menu li.sidebar-group.active > a.sidebar-group-toggle i:first-child {
+                @apply text-white;
+            }
+            .submenu-caret {
+                @apply transition-transform duration-200;
+            }
+            .sidebar-group.open > a .submenu-caret {
+                @apply rotate-180;
+            }
+            .sidebar-submenu {
+                @apply mt-1 mb-1 space-y-1 overflow-hidden;
+            }
+            .sidebar-submenu li a {
+                @apply pl-14 py-2 text-sm;
+            }
+            .sidebar-submenu li a i {
+                @apply text-base mr-3 w-5;
+            }
             /* Clean up bootstrap conflicts */
             .row { @apply mx-[-12px] !important; }
             .col, [class*="col-"] { @apply px-[12px] !important; }
@@ -187,6 +213,13 @@
 
     <script>
         const BASE_URL = "{{ url('/') }}";
+
+        function toggleSubmenu(el) {
+            const groupLi = el.closest('.sidebar-group');
+            const submenu = groupLi.querySelector('.sidebar-submenu');
+            submenu.classList.toggle('hidden');
+            groupLi.classList.toggle('open');
+        }
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar-wrapper');

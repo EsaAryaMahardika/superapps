@@ -130,8 +130,10 @@
                         <tr>
                             <th class="text-left text-xs uppercase text-[#A3AED0] font-bold p-3 sticky left-0 bg-white z-10 min-w-[140px]">Nama Santri</th>
                             @foreach($dates as $d)
+                                @php $dObj = \Carbon\Carbon::createFromFormat('d/m/Y', $d); @endphp
                                 <th class="text-center text-[10px] uppercase text-[#A3AED0] font-bold p-2 min-w-[52px]">
-                                    {{ \Carbon\Carbon::createFromFormat('d/m/Y', $d)->locale('id')->isoFormat('ddd<br>DD/MM') }}
+                                    <span class="block">{{ $dObj->locale('id')->isoFormat('ddd') }}</span>
+                                    <span class="block">{{ $dObj->format('d/m') }}</span>
                                 </th>
                             @endforeach
                         </tr>

@@ -226,7 +226,7 @@ class RekapController extends Controller
 
         foreach ($tipes as $tipe) {
             foreach ($dates as $date) {
-                $bH = $bT = $wH = $wT = $yH = $yT = 0;
+                $bH = $bT = $bI = $wH = $wT = $wI = $yH = $yT = $yI = 0;
 
                 foreach ($rekapData as $row) {
                     if ($tipe !== 'all' && $row['tipe'] !== $tipe) continue;
@@ -240,21 +240,24 @@ class RekapController extends Controller
                     if (!is_null($bStatus) && $bStatus !== 'L') {
                         $bT++;
                         if ($bStatus === 'H') $bH++;
+                        elseif ($bStatus === 'I') $bI++;
                     }
                     if (!is_null($wStatus) && $wStatus !== 'L') {
                         $wT++;
                         if ($wStatus === 'H') $wH++;
+                        elseif ($wStatus === 'I') $wI++;
                     }
                     if (!is_null($yStatus) && $yStatus !== 'L') {
                         $yT++;
                         if ($yStatus === 'H') $yH++;
+                        elseif ($yStatus === 'I') $yI++;
                     }
                 }
 
                 $summary[$tipe][$date] = [
-                    'bandongan' => $bH, 'bandongan_total' => $bT,
-                    'wirid'     => $wH, 'wirid_total'     => $wT,
-                    'yasinan'   => $yH, 'yasinan_total'   => $yT,
+                    'bandongan' => $bH, 'bandongan_total' => $bT, 'bandongan_izin' => $bI,
+                    'wirid'     => $wH, 'wirid_total'     => $wT, 'wirid_izin'     => $wI,
+                    'yasinan'   => $yH, 'yasinan_total'   => $yT, 'yasinan_izin'   => $yI,
                 ];
             }
         }

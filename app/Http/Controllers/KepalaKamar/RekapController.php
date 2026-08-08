@@ -85,16 +85,37 @@ class RekapController extends Controller
         return redirect('/kepkam/mingguan');
     }
 
+    /**
+     * Bentuk data yang dipakai view rekap harian (layar & PDF):
+     * rekapData = [['nis','nama','attendance' => [nama kegiatan => status]], ...]
+     */
+    private function buildRekapHarian(string $tanggal): array
+    {
+        $santriList     = Santri::select('nis', 'nama')->where('kepkam', $this->user->username)->orderBy('nama')->get();
+        $activities     = $this->activityConfig();
+        $attendanceData = $this->fetchAttendance($tanggal);
+
+        $rekapData = $santriList->values()->map(fn($santri, $i) => [
+            'no'         => $i + 1,   // dipakai view PDF
+            'nis'        => $santri->nis,
+            'nama'       => $santri->nama,
+            'attendance' => collect($activities)->mapWithKeys(fn($act) => [
+                $act['name'] => $attendanceData[$act['name']][$santri->nis]->status ?? '-'
+            ])->all(),
+        ])->all();
+
+        return [$rekapData, $activities, $this->user->pengurus->nama ?? '-'];
+    }
+
     public function rekapHarian(Request $request)
     {
         $tanggal = $request->input('tanggal')
             ? Carbon::parse($request->input('tanggal'))->format('d/m/Y')
             : Carbon::now()->format('d/m/Y');
 
-        $santriList  = Santri::select('nis', 'nama')->where('kepkam', $this->user->username)->orderBy('nama')->get();
-        $attendanceByActivity = $this->fetchAttendance($tanggal);
+        [$rekapData, $activities, $kepalaKamar] = $this->buildRekapHarian($tanggal);
 
-        return view('kepkam.rekap-harian', compact('tanggal', 'santriList', 'attendanceByActivity'));
+        return view('kepkam.rekap-harian', compact('rekapData', 'activities', 'tanggal', 'kepalaKamar'));
     }
 
     public function downloadRekapHarian(Request $request)
@@ -104,13 +125,12 @@ class RekapController extends Controller
             : Carbon::now()->format('d/m/Y');
 
         try {
-            $santriList = Santri::select('nis', 'nama')->where('kepkam', $this->user->username)->orderBy('nama')->get();
-            $attendanceByActivity = $this->fetchAttendance($tanggal);
+            [$rekapData, $activities, $kepalaKamar] = $this->buildRekapHarian($tanggal);
 
             // Calculate dynamic paper height
             $baseHeight      = 200;
             $rowHeight       = 25;
-            $rowCount        = $santriList->count();
+            $rowCount        = count($rekapData);
             $totalHeightPoints = $baseHeight + ($rowHeight * $rowCount);
 
             \Log::info('[PDF Download] Generating PDF', [
@@ -123,7 +143,7 @@ class RekapController extends Controller
                 'height_inches'  => round($totalHeightPoints / 72, 2),
             ]);
 
-            $pdf = Pdf::loadView('kepkam.rekap-harian-pdf', compact('tanggal', 'santriList', 'attendanceByActivity'));
+            $pdf = Pdf::loadView('kepkam.rekap-harian-pdf', compact('rekapData', 'activities', 'tanggal', 'kepalaKamar'));
             $pdf->setPaper([0, 0, 612, $totalHeightPoints]);
 
             \Log::info('[PDF Download] PDF generated successfully');

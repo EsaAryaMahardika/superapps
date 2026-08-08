@@ -81,6 +81,7 @@ class RekapAbsensiPengurusExport implements FromCollection, WithTitle, WithStyle
             $r = [$no++, $row['nama'], $row['divisi'], $row['jabatan']];
 
             $sumB = $sumW = $sumY = $totalB = $totalW = $totalY = 0;
+            $izinB = $izinW = $izinY = 0;
 
             foreach ($this->dates as $date) {
                 $att     = $row['attendance'][$date] ?? [];
@@ -89,15 +90,15 @@ class RekapAbsensiPengurusExport implements FromCollection, WithTitle, WithStyle
                 $yStatus = ($this->tipe === 'kepkam') ? null : ($att['yasinan'] ?? null);
 
                 $parts = [];
-                if ($bStatus) { $parts[] = "B:{$bStatus}"; if ($bStatus === 'H') $sumB++; $totalB++; }
-                if ($wStatus) { $parts[] = "W:{$wStatus}"; if ($wStatus === 'H') $sumW++; $totalW++; }
-                if ($yStatus) { $parts[] = "Y:{$yStatus}"; if ($yStatus === 'H') $sumY++; $totalY++; }
+                if ($bStatus) { $parts[] = "B:{$bStatus}"; if ($bStatus === 'H') $sumB++; elseif ($bStatus === 'I') $izinB++; $totalB++; }
+                if ($wStatus) { $parts[] = "W:{$wStatus}"; if ($wStatus === 'H') $sumW++; elseif ($wStatus === 'I') $izinW++; $totalW++; }
+                if ($yStatus) { $parts[] = "Y:{$yStatus}"; if ($yStatus === 'H') $sumY++; elseif ($yStatus === 'I') $izinY++; $totalY++; }
                 $r[] = empty($parts) ? '-' : implode(' | ', $parts);
             }
 
-            $r[] = "{$sumB}/{$totalB}";
-            $r[] = "{$sumW}/{$totalW}";
-            if ($this->tipe !== 'kepkam') $r[] = "{$sumY}/{$totalY}";
+            $r[] = "{$sumB}/{$totalB}" . ($izinB ? " (Izin {$izinB})" : '');
+            $r[] = "{$sumW}/{$totalW}" . ($izinW ? " (Izin {$izinW})" : '');
+            if ($this->tipe !== 'kepkam') $r[] = "{$sumY}/{$totalY}" . ($izinY ? " (Izin {$izinY})" : '');
 
             $rows->push($r);
             $this->dataRows[] = $rowNum++;
@@ -107,18 +108,24 @@ class RekapAbsensiPengurusExport implements FromCollection, WithTitle, WithStyle
         $totalRowData = ['', 'TOTAL HADIR', '', ''];
         $sumByDate    = [];
         foreach ($this->dates as $date) {
-            $bH = $bT = $wH = $wT = $yH = $yT = 0;
+            $bH = $bT = $bI = $wH = $wT = $wI = $yH = $yT = $yI = 0;
             foreach ($this->rekapData as $row) {
                 if ($this->tipe !== 'all' && $row['tipe'] !== $this->tipe) continue;
                 $att = $row['attendance'][$date] ?? [];
-                if (!is_null($att['bandongan'] ?? null)) { $bT++; if (($att['bandongan'] ?? null) === 'H') $bH++; }
-                if (!is_null($att['wirid'] ?? null))     { $wT++; if (($att['wirid']     ?? null) === 'H') $wH++; }
-                if ($this->tipe !== 'kepkam' && !is_null($att['yasinan'] ?? null)) { $yT++; if (($att['yasinan'] ?? null) === 'H') $yH++; }
+                $b = $att['bandongan'] ?? null;
+                $w = $att['wirid']     ?? null;
+                $y = $att['yasinan']   ?? null;
+                if (!is_null($b)) { $bT++; if ($b === 'H') $bH++; elseif ($b === 'I') $bI++; }
+                if (!is_null($w)) { $wT++; if ($w === 'H') $wH++; elseif ($w === 'I') $wI++; }
+                if ($this->tipe !== 'kepkam' && !is_null($y)) { $yT++; if ($y === 'H') $yH++; elseif ($y === 'I') $yI++; }
             }
-            $parts = ["B:{$bH}/{$bT}", "W:{$wH}/{$wT}"];
-            if ($this->tipe !== 'kepkam') $parts[] = "Y:{$yH}/{$yT}";
+            $parts = [
+                "B:{$bH}/{$bT}" . ($bI ? " i{$bI}" : ''),
+                "W:{$wH}/{$wT}" . ($wI ? " i{$wI}" : ''),
+            ];
+            if ($this->tipe !== 'kepkam') $parts[] = "Y:{$yH}/{$yT}" . ($yI ? " i{$yI}" : '');
             $totalRowData[] = implode(' | ', $parts);
-            $sumByDate[$date] = compact('bH','bT','wH','wT','yH','yT');
+            $sumByDate[$date] = compact('bH','bT','bI','wH','wT','wI','yH','yT','yI');
         }
 
         // Total keseluruhan
@@ -126,12 +133,15 @@ class RekapAbsensiPengurusExport implements FromCollection, WithTitle, WithStyle
         $allBT = array_sum(array_column($sumByDate, 'bT'));
         $allWH = array_sum(array_column($sumByDate, 'wH'));
         $allWT = array_sum(array_column($sumByDate, 'wT'));
-        $totalRowData[] = "{$allBH}/{$allBT}";
-        $totalRowData[] = "{$allWH}/{$allWT}";
+        $allBI = array_sum(array_column($sumByDate, 'bI'));
+        $allWI = array_sum(array_column($sumByDate, 'wI'));
+        $totalRowData[] = "{$allBH}/{$allBT} (Izin {$allBI})";
+        $totalRowData[] = "{$allWH}/{$allWT} (Izin {$allWI})";
         if ($this->tipe !== 'kepkam') {
             $allYH = array_sum(array_column($sumByDate, 'yH'));
             $allYT = array_sum(array_column($sumByDate, 'yT'));
-            $totalRowData[] = "{$allYH}/{$allYT}";
+            $allYI = array_sum(array_column($sumByDate, 'yI'));
+            $totalRowData[] = "{$allYH}/{$allYT} (Izin {$allYI})";
         }
 
         $rows->push($totalRowData);

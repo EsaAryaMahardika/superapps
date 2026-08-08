@@ -375,6 +375,12 @@
     </script>
 
     <script>
+        // Nama hari ala pesantren: Ahad, bukan Minggu
+        const HARI_ID = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        const BULAN_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const formatTanggalId = d =>
+            `${HARI_ID[d.getDay()]}, ${String(d.getDate()).padStart(2, '0')} ${BULAN_ID[d.getMonth()]} ${d.getFullYear()}`;
+
         // ── Salin Absensi ─────────────────────────────────────────────
         function salinAbsensi(tipe) {
             const data = activitiesData[tipe];
@@ -390,9 +396,7 @@
             // Format tanggal Indonesia
             const [dd, mm, yyyy] = currentDate.split('-'); // dd-mm-yyyy
             const dateObj = new Date(`${yyyy}-${mm}-${dd}`);
-            const hariList = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const bulanList = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            const tglStr = `${hariList[dateObj.getDay()]}, ${dd} ${bulanList[parseInt(mm) - 1]} ${yyyy}`;
+            const tglStr = `${HARI_ID[dateObj.getDay()]}, ${dd} ${BULAN_ID[parseInt(mm) - 1]} ${yyyy}`;
 
             // Judul kegiatan
             const judulMap = { yasinan: 'JAMAAH SUBUH DAN YASIN', bandongan: 'BANDONGAN', wirid: 'WIRID' };
@@ -552,10 +556,10 @@
         // ── Datepicker ────────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', function () {
             $.fn.datepicker.dates['id'] = {
-                days: ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"],
-                daysShort: ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"],
-                daysMin: ["Mg", "Sn", "Sl", "Rb", "Km", "Jm", "Sb"],
-                months: ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"],
+                days: HARI_ID,
+                daysShort: ["Ahd", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"],
+                daysMin: ["Ah", "Sn", "Sl", "Rb", "Km", "Jm", "Sb"],
+                months: BULAN_ID,
                 monthsShort: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"],
                 today: "Hari Ini", clear: "Kosongkan",
                 format: "dd/mm/yyyy", titleFormat: "MM yyyy", weekStart: 1
@@ -563,7 +567,6 @@
 
             const displayInput = $('#tanggal-display');
             const dateInput = $('#tanggal');
-            const options = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
 
             const today = new Date();
             const dd = String(today.getDate()).padStart(2, '0');
@@ -571,7 +574,7 @@
             const yyyy = today.getFullYear();
             const dbDate = `${dd}-${mm}-${yyyy}`; // format dd-mm-yyyy sesuai DB
 
-            displayInput.val(today.toLocaleDateString('id-ID', options));
+            displayInput.val(formatTanggalId(today));
             renderTables(dbDate);
 
             dateInput.datepicker({
@@ -579,7 +582,7 @@
                 todayHighlight: true, orientation: 'bottom auto', container: '#date-container'
             }).on('changeDate', function (e) {
                 const d = e.date;
-                displayInput.val(d.toLocaleDateString('id-ID', options));
+                displayInput.val(formatTanggalId(d));
                 const day = String(d.getDate()).padStart(2, '0');
                 const mo = String(d.getMonth() + 1).padStart(2, '0');
                 renderTables(`${day}-${mo}-${d.getFullYear()}`); // dd-mm-yyyy sesuai DB

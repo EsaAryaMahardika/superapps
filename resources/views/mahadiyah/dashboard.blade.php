@@ -259,8 +259,8 @@
                     <h3 class="text-sm sm:text-lg font-bold text-[#1B2559]">Top 5 Santri Paling Bermasalah</h3>
                     <p class="text-[10px] sm:text-xs text-[#A3AED0] mt-0.5 sm:mt-1">
                         Total Alpa terbanyak selama
-                        <span class="font-semibold text-red-500">{{ $rankStartDate->format('d M') }} -
-                            {{ $rankEndDate->format('d M') }}</span>
+                        <span class="font-semibold text-red-500">{{ $rankStartDate->translatedFormat('d M') }} -
+                            {{ $rankEndDate->translatedFormat('d M') }}</span>
                     </p>
                 </div>
 
