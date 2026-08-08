@@ -198,7 +198,7 @@ class RekapController extends Controller
 
     private function loadPengurusAbsensiData(array $dates): array
     {
-        $pengurusList = Pengurus::with(['jabatan.divisi'])->get()->sortBy(function ($p) {
+        $pengurusList = Pengurus::where('asal', 'dalam')->with(['jabatan.divisi'])->get()->sortBy(function ($p) {
             $tipe  = $p->jabatan->divisi->tipe ?? 'z_none';
             $order = $tipe === 'kepkam' ? 0 : 1;
             return sprintf('%d_%s_%s_%s', $order, $p->jabatan->divisi->nama ?? 'z', $p->jabatan->nama ?? 'z', $p->nama);

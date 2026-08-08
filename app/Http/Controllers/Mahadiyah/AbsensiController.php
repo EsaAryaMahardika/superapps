@@ -17,16 +17,19 @@ class AbsensiController extends Controller
 {
     public function index()
     {
-        $with      = ['pengurus.jabatan.divisi'];
-        $bandongan = Bandongan::with($with)->get();
-        $wirid     = Wirid::with($with)->get();
-        $yasinan   = Yasinan::with($with)->get();
+        $with       = ['pengurus.jabatan.divisi'];
+        $onlyDalam  = fn($q) => $q->whereHas('pengurus', fn($p) => $p->where('asal', 'dalam'));
+        $bandongan  = Bandongan::with($with)->tap($onlyDalam)->get();
+        $wirid      = Wirid::with($with)->tap($onlyDalam)->get();
+        $yasinan    = Yasinan::with($with)->tap($onlyDalam)->get();
 
-        $divisiNon    = Divisi::where('tipe', 'non')->with(['jabatan.pengurus'])->orderBy('id')->get();
-        $divisiKepkam = Divisi::where('tipe', 'kepkam')->with(['jabatan.pengurus'])->orderBy('id')->get();
+        $dalamOnly = fn($q) => $q->where('asal', 'dalam');
 
-        $totalSemua = Pengurus::count();
-        $totalNon   = Pengurus::whereHas('jabatan.divisi', fn($q) => $q->where('tipe', 'non'))->count();
+        $divisiNon    = Divisi::where('tipe', 'non')->with(['jabatan.pengurus' => $dalamOnly])->orderBy('id')->get();
+        $divisiKepkam = Divisi::where('tipe', 'kepkam')->with(['jabatan.pengurus' => $dalamOnly])->orderBy('id')->get();
+
+        $totalSemua = Pengurus::where('asal', 'dalam')->count();
+        $totalNon   = Pengurus::where('asal', 'dalam')->whereHas('jabatan.divisi', fn($q) => $q->where('tipe', 'non'))->count();
 
         // Ambil semua data libur, group by tanggal
         $semuaLibur = LiburPengurus::orderBy('tanggal')->get()
@@ -53,7 +56,7 @@ class AbsensiController extends Controller
         $existing = $modelClass::with('pengurus.jabatan.divisi')
             ->where('tanggal', $tanggalDb)->get()->keyBy('nis');
 
-        $pengurus = Pengurus::with('jabatan.divisi')
+        $pengurus = Pengurus::where('asal', 'dalam')->with('jabatan.divisi')
             ->whereIn('nis', $existing->keys())->orderBy('nama')->get();
 
         $judulMap       = ['bandongan' => 'Bandongan', 'wirid' => 'Wirid', 'yasinan' => 'Yasinan'];
@@ -95,8 +98,9 @@ class AbsensiController extends Controller
     public function create()
     {
         $kegiatan      = Kegiatan::where('ket', 'P')->get();
-        $pengurusSemua = Pengurus::with('jabatan.divisi')->orderBy('nama')->get();
-        $pengurusNon   = Pengurus::whereHas('jabatan.divisi', fn($q) => $q->where('tipe', 'non'))
+        $pengurusSemua = Pengurus::where('asal', 'dalam')->with('jabatan.divisi')->orderBy('nama')->get();
+        $pengurusNon   = Pengurus::where('asal', 'dalam')
+            ->whereHas('jabatan.divisi', fn($q) => $q->where('tipe', 'non'))
             ->with('jabatan.divisi')->orderBy('nama')->get();
 
         // Kirim data libur ke form create
@@ -130,8 +134,8 @@ class AbsensiController extends Controller
         }
 
         $allowedNis = ($kegiatan === '9')
-            ? Pengurus::whereHas('jabatan.divisi', fn($q) => $q->where('tipe', 'non'))->pluck('nis')->toArray()
-            : Pengurus::pluck('nis')->toArray();
+            ? Pengurus::where('asal', 'dalam')->whereHas('jabatan.divisi', fn($q) => $q->where('tipe', 'non'))->pluck('nis')->toArray()
+            : Pengurus::where('asal', 'dalam')->pluck('nis')->toArray();
 
         foreach ($request->pengurus as $nis => $status) {
             if (!in_array((string) $nis, $allowedNis)) continue;
