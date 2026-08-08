@@ -11,6 +11,10 @@ use App\Models\Pelanggaran;
 use App\Models\AbsensiJamaah;
 use App\Models\AbsensiWaqiah;
 use App\Models\AbsensiNgaji;
+use App\Models\Bandongan;
+use App\Models\Wirid;
+use App\Models\Yasinan;
+use App\Support\DemoPengasuh;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -50,15 +54,10 @@ class PengasuhController extends Controller
         };
     }
 
-    // ==================== DASHBOARD ====================
-    public function index(Request $request)
+    /** Rekap status absensi hari ini per kegiatan. */
+    private function buildActivityRecap(string $tanggal): array
     {
-        $today = Carbon::now()->format('d/m/Y');
-        $totalSantri = Santri::count();
-        $totalPengurus = Pengurus::count();
-
-        // Today's attendance summary across all activities
-        $activityRecap = [];
+        $recap = [];
 
         foreach ($this->activityConfig() as $act) {
             $modelClass = "\\App\\Models\\{$act['model']}";
@@ -67,27 +66,31 @@ class PengasuhController extends Controller
                 DB::raw("SUM(CASE WHEN status = 'S' THEN 1 ELSE 0 END) as sakit"),
                 DB::raw("SUM(CASE WHEN status = 'I' THEN 1 ELSE 0 END) as izin"),
                 DB::raw("SUM(CASE WHEN status = 'A' THEN 1 ELSE 0 END) as alfa")
-            )->where('tanggal', $today);
+            )->where('tanggal', $tanggal);
 
             if ($act['col']) $query->where($act['col'], $act['val']);
 
             $row = $query->first();
-            $h = (int) ($row->hadir ?? 0);
-            $s = (int) ($row->sakit ?? 0);
-            $i = (int) ($row->izin ?? 0);
-            $a = (int) ($row->alfa ?? 0);
 
-            $activityRecap[] = [
+            $recap[] = [
                 'name' => $act['name'],
-                'H' => $h, 'S' => $s, 'I' => $i, 'A' => $a,
+                'H' => (int) ($row->hadir ?? 0),
+                'S' => (int) ($row->sakit ?? 0),
+                'I' => (int) ($row->izin ?? 0),
+                'A' => (int) ($row->alfa ?? 0),
             ];
         }
 
-        // Critical santri: top alfa this month
-        $monthStart = Carbon::now()->startOfMonth()->format('d/m/Y');
-        $monthEnd = Carbon::now()->endOfMonth()->format('d/m/Y');
+        return $recap;
+    }
 
-        $criticalSantri = AbsensiJamaah::select(
+    /** Santri dengan alfa terbanyak bulan ini. */
+    private function buildCriticalSantri()
+    {
+        $monthStart = Carbon::now()->startOfMonth()->format('d/m/Y');
+        $monthEnd   = Carbon::now()->endOfMonth()->format('d/m/Y');
+
+        return AbsensiJamaah::select(
             'absen_jamaah.nis',
             'santri.nama',
             'santri.kepkam',
@@ -100,24 +103,35 @@ class PengasuhController extends Controller
             ->orderByDesc('total_alfa')
             ->limit(5)
             ->get();
+    }
 
-        // Perizinan menunggu & terlambat
-        $perizinanMenunggu = Perizinan::with(['santri', 'alasanizin', 'statusizin'])
-            ->where('status', 0)
-            ->limit(5)
-            ->get();
+    // ==================== DASHBOARD ====================
+    // Dashboard hanya menampilkan ringkasan + grid menu; detailnya ada di
+    // masing-masing halaman.
+    public function index(Request $request)
+    {
+        return view('pengasuh.dashboard', [
+            'totalSantri'        => Santri::count(),
+            'totalPengurusDalam' => Pengurus::where('asal', 'dalam')->count(),
+            'totalPengurusLuar'  => Pengurus::where('asal', 'luar')->count(),
+        ]);
+    }
 
-        $perizinanTerlambat = Perizinan::with(['santri', 'alasanizin', 'statusizin'])
-            ->where('status', 1)
-            ->where('es_kembali', '<', Carbon::now())
-            ->limit(5)
-            ->get();
+    // ==================== KESEHATAN / INFRASTRUKTUR / LOGISTIK ====================
+    // Modul-modul ini belum punya sumber data asli — isinya masih data contoh.
+    public function kesehatan()
+    {
+        return view('pengasuh.kesehatan', ['demo' => DemoPengasuh::kesehatan()]);
+    }
 
-        return view('pengasuh.dashboard', compact(
-            'totalSantri', 'totalPengurus',
-            'activityRecap', 'criticalSantri',
-            'perizinanMenunggu', 'perizinanTerlambat'
-        ));
+    public function infrastruktur()
+    {
+        return view('pengasuh.infrastruktur', ['demo' => DemoPengasuh::infrastruktur()]);
+    }
+
+    public function logistik()
+    {
+        return view('pengasuh.logistik', ['demo' => DemoPengasuh::logistik()]);
     }
 
     // ==================== REKAP ABSENSI ====================
@@ -181,16 +195,38 @@ class PengasuhController extends Controller
             }
         }
 
+        // Ringkasan harian & santri kritis (sebelumnya tampil di dashboard)
+        $activityRecap  = $this->buildActivityRecap(Carbon::now()->format('d/m/Y'));
+        $criticalSantri = $this->buildCriticalSantri();
+
         return view('pengasuh.absensi', compact(
             'rekapKamar', 'activities', 'activeTab', 'actConfig',
-            'sumH', 'sumS', 'sumI', 'sumA', 'startFmt', 'endFmt'
+            'sumH', 'sumS', 'sumI', 'sumA', 'startFmt', 'endFmt',
+            'activityRecap', 'criticalSantri'
         ));
     }
 
-    // ==================== PEMBAYARAN (Coming Soon) ====================
-    public function pembayaran()
+    // ==================== PEMBAYARAN (data dummy) ====================
+    public function pembayaran(Request $request)
     {
-        return view('pengasuh.pembayaran');
+        $demo = DemoPengasuh::pembayaran();
+
+        // Filter dijalankan di PHP karena sumbernya masih array dummy.
+        $search = strtolower(trim($request->input('search', '')));
+        $status = $request->input('status', '');
+
+        $daftar = collect($demo['daftar'])
+            ->when($search !== '', fn($c) => $c->filter(fn($r) => str_contains(strtolower($r['nama']), $search)))
+            ->when($status !== '', fn($c) => $c->filter(fn($r) => $r['status'] === $status))
+            ->values();
+
+        return view('pengasuh.pembayaran', [
+            'ringkasan'     => $demo['ringkasan'],
+            'daftar'        => $daftar,
+            'topTunggakan'  => $demo['top_tunggakan'],
+            'search'        => $request->input('search', ''),
+            'status'        => $status,
+        ]);
     }
 
     // ==================== PERIZINAN ====================
@@ -306,6 +342,77 @@ class PengasuhController extends Controller
             ],
             'pelanggaran' => $pelanggaran,
             'prestasi' => [], // Coming Soon
+        ]);
+    }
+
+    // API: Search pengurus for track record
+    public function searchPengurus(Request $request)
+    {
+        $q = $request->input('q', '');
+        if (strlen($q) < 2) return response()->json([]);
+
+        $results = Pengurus::select('nis', 'nama', 'asal')
+            ->with('jabatan')
+            ->where('nama', 'like', "%{$q}%")
+            ->orWhere('nis', 'like', "%{$q}%")
+            ->limit(10)
+            ->get()
+            ->map(fn($p) => [
+                'nis' => $p->nis,
+                'nama' => $p->nama,
+                'asal' => $p->asal,
+                'jabatan' => $p->jabatan->nama ?? '-',
+            ]);
+
+        return response()->json($results);
+    }
+
+    // API: Get pengurus track record detail (rekap absensi kegiatan)
+    public function pengurusDetail(Request $request, $nis)
+    {
+        $pengurus = Pengurus::with('jabatan.divisi')->where('nis', $nis)->firstOrFail();
+
+        $activities = [
+            ['tipe' => 'bandongan', 'label' => 'Bandongan', 'model' => Bandongan::class],
+            ['tipe' => 'wirid',     'label' => 'Wirid',     'model' => Wirid::class],
+            ['tipe' => 'yasinan',   'label' => 'Yasinan',   'model' => Yasinan::class],
+        ];
+
+        $stats = ['H' => 0, 'S' => 0, 'I' => 0, 'A' => 0];
+        $riwayat = collect();
+
+        foreach ($activities as $act) {
+            $records = $act['model']::where('nis', $nis)->orderByDesc('tanggal')->get();
+            foreach ($records as $r) {
+                if (isset($stats[$r->status])) $stats[$r->status]++;
+                $riwayat->push([
+                    'tanggal' => $r->tanggal,
+                    'kegiatan' => $act['label'],
+                    'status' => $r->status,
+                ]);
+            }
+        }
+
+        $total = array_sum($stats);
+        $kehadiran = $total > 0 ? round(($stats['H'] / $total) * 100) : 100;
+
+        $riwayat = $riwayat->sortByDesc(fn($r) => Carbon::createFromFormat('d-m-Y', $r['tanggal']))
+            ->take(10)->values();
+
+        return response()->json([
+            'nis' => $pengurus->nis,
+            'nama' => $pengurus->nama,
+            'jabatan' => $pengurus->jabatan->nama ?? '-',
+            'divisi' => $pengurus->jabatan->divisi->nama ?? '-',
+            'asal' => $pengurus->asal,
+            'stats' => [
+                'hadir' => $stats['H'],
+                'sakit' => $stats['S'],
+                'izin' => $stats['I'],
+                'alfa' => $stats['A'],
+                'kehadiran' => $kehadiran,
+            ],
+            'riwayat' => $riwayat,
         ]);
     }
 }

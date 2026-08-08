@@ -6,6 +6,53 @@
 @endsection
 
 @section('content')
+    <!-- Ringkasan Hari Ini & Santri Perhatian Khusus -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
+        <!-- Perhatian Khusus -->
+        <div class="card bg-red-50/50 border border-red-100">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-bold text-sm text-red-600 flex items-center gap-2">
+                    <i class="fa fa-exclamation-triangle"></i> Santri Perhatian Khusus
+                </h3>
+                <a href="/pengasuh/track-record?type=santri" class="text-[10px] text-red-500 font-bold hover:underline">Lihat Profil</a>
+            </div>
+            <div class="space-y-2">
+                @forelse($criticalSantri as $cs)
+                    <div class="flex items-center gap-3 p-2 bg-white rounded-xl border border-red-100 shadow-sm">
+                        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                            <i class="fa fa-user-times text-red-500 text-xs"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-[#1B2559] truncate">{{ $cs->nama }}</p>
+                            <p class="text-xs text-[#A3AED0] mb-0.5"><i class="fa fa-user-tie text-xs mr-1"></i>Kepala Kamar: {{ $cs->kepkam }}</p>
+                            <p class="text-[10px] text-red-500 font-medium">Alfa {{ $cs->total_alfa }}x bulan ini</p>
+                        </div>
+                    </div>
+                @empty
+                    <div class="p-3 text-center text-xs text-[#A3AED0] bg-white rounded-xl border border-gray-100">Tidak ada santri kritis bulan ini.</div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Rekap Absensi Hari Ini -->
+        <div class="card">
+            <h3 class="font-bold text-sm text-[#1B2559] mb-3">Rekap Absensi Hari Ini</h3>
+            <div class="space-y-2">
+                @foreach($activityRecap as $act)
+                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
+                        <span class="text-xs font-medium text-[#2B3674]">{{ $act['name'] }}</span>
+                        <div class="flex gap-1 text-[10px] font-bold">
+                            <span class="bg-green-100 text-green-600 px-1.5 py-0.5 rounded">H:{{ $act['H'] }}</span>
+                            <span class="bg-yellow-100 text-yellow-600 px-1.5 py-0.5 rounded">S:{{ $act['S'] }}</span>
+                            <span class="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">I:{{ $act['I'] }}</span>
+                            <span class="bg-red-100 text-red-600 px-1.5 py-0.5 rounded">A:{{ $act['A'] }}</span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
     <!-- Filter Tanggal Global -->
     <div class="card mb-6 p-3 md:p-4">
         <form method="GET" action="/pengasuh/absensi">

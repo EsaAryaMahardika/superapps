@@ -156,11 +156,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [PengasuhController::class, 'index']);
         Route::get('/absensi', [PengasuhController::class, 'absensi']);
         Route::get('/pembayaran', [PengasuhController::class, 'pembayaran']);
+        Route::get('/kesehatan', [PengasuhController::class, 'kesehatan']);
+        Route::get('/infrastruktur', [PengasuhController::class, 'infrastruktur']);
+        Route::get('/logistik', [PengasuhController::class, 'logistik']);
         Route::get('/perizinan', [PengasuhController::class, 'perizinan']);
         Route::post('/perizinan/{nis}/action', [PengasuhController::class, 'perizinanAction']);
         Route::get('/track-record', [PengasuhController::class, 'trackRecord']);
         Route::get('/api/search-santri', [PengasuhController::class, 'searchSantri']);
         Route::get('/api/santri/{nis}', [PengasuhController::class, 'santriDetail']);
+        Route::get('/api/search-pengurus', [PengasuhController::class, 'searchPengurus']);
+        Route::get('/api/pengurus/{nis}', [PengasuhController::class, 'pengurusDetail']);
     });
 
     // Kepala Kamar

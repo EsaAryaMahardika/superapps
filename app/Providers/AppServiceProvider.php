@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Carbon\Carbon;
 use Carbon\Translator;
+use App\Models\Perizinan;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
@@ -39,6 +40,12 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer(['sidebar', 'layout', 'kepkam.layout'], function ($view) {
             $view->with('user', Auth::user());
+        });
+
+        // Badge "perizinan menunggu" di navbar pengasuh — dibutuhkan di semua
+        // halaman, jadi disuntik lewat composer ketimbang tiap controller.
+        View::composer('pengasuh.layout', function ($view) {
+            $view->with('perizinanMenungguCount', Perizinan::where('status', 0)->count());
         });
         if (env('APP_ENV') === 'production') {
             URL::forceScheme('https');

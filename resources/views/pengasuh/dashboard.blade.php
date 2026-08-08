@@ -7,173 +7,60 @@
 @endsection
 
 @section('content')
-    <!-- Summary Cards (compact) -->
-    <div class="flex gap-3 mb-4">
-        <div class="bg-white rounded-2xl shadow-[0_20px_27px_0_rgba(0,0,0,0.05)] px-4 py-3 flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-[#4318FF]/10 flex items-center justify-center shrink-0"><i class="fa fa-users text-[#4318FF] text-sm"></i></div>
-            <div>
-                <p class="text-lg font-bold text-[#1B2559] leading-tight">{{ $totalSantri }}</p>
-                <p class="text-[10px] text-[#A3AED0]">Total Santri</p>
+    <!-- Summary Cards — selalu muat 3 kolom, tanpa geser samping -->
+    <div class="grid grid-cols-3 gap-2 md:gap-3 mb-4">
+        <div class="bg-white rounded-2xl shadow-[0_20px_27px_0_rgba(0,0,0,0.05)] p-3 md:px-4 md:py-3 flex flex-col md:flex-row items-center md:gap-3 text-center md:text-left">
+            <div class="w-9 h-9 rounded-lg bg-[#4318FF]/10 flex items-center justify-center shrink-0 mb-1.5 md:mb-0">
+                <i class="fa fa-user-graduate text-[#4318FF] text-sm"></i>
+            </div>
+            <div class="min-w-0">
+                <p class="text-base md:text-lg font-bold text-[#1B2559] leading-tight">{{ $totalSantri }}</p>
+                <p class="text-[9px] md:text-[10px] text-[#A3AED0] leading-tight">Total Santri</p>
             </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-[0_20px_27px_0_rgba(0,0,0,0.05)] px-4 py-3 flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center shrink-0"><i class="fa fa-user-tie text-green-500 text-sm"></i></div>
-            <div>
-                <p class="text-lg font-bold text-[#1B2559] leading-tight">{{ $totalPengurus }}</p>
-                <p class="text-[10px] text-[#A3AED0]">Total Pengurus</p>
+        <div class="bg-white rounded-2xl shadow-[0_20px_27px_0_rgba(0,0,0,0.05)] p-3 md:px-4 md:py-3 flex flex-col md:flex-row items-center md:gap-3 text-center md:text-left">
+            <div class="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center shrink-0 mb-1.5 md:mb-0">
+                <i class="fa fa-user-tie text-green-500 text-sm"></i>
+            </div>
+            <div class="min-w-0">
+                <p class="text-base md:text-lg font-bold text-[#1B2559] leading-tight">{{ $totalPengurusDalam }}</p>
+                <p class="text-[9px] md:text-[10px] text-[#A3AED0] leading-tight">Pengurus Dalam</p>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-[0_20px_27px_0_rgba(0,0,0,0.05)] p-3 md:px-4 md:py-3 flex flex-col md:flex-row items-center md:gap-3 text-center md:text-left">
+            <div class="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center shrink-0 mb-1.5 md:mb-0">
+                <i class="fa fa-user-tie text-amber-500 text-sm"></i>
+            </div>
+            <div class="min-w-0">
+                <p class="text-base md:text-lg font-bold text-[#1B2559] leading-tight">{{ $totalPengurusLuar }}</p>
+                <p class="text-[9px] md:text-[10px] text-[#A3AED0] leading-tight">Pengurus Luar</p>
             </div>
         </div>
     </div>
 
-    <!-- Tabs Section -->
-    <div class="flex overflow-x-auto hide-scrollbar gap-2 mb-4 -mx-4 px-4 md:mx-0 md:px-0">
-        <button onclick="switchTab('absensi')" id="btn-absensi" class="tab-btn active">Absensi & Kritis</button>
-        <button onclick="switchTab('keuangan')" id="btn-keuangan" class="tab-btn">Keuangan</button>
-        <button onclick="switchTab('perizinan')" id="btn-perizinan" class="tab-btn">Perizinan</button>
-        <button onclick="switchTab('kesehatan')" id="btn-kesehatan" class="tab-btn">Kesehatan</button>
-        <button onclick="switchTab('infrastruktur')" id="btn-infrastruktur" class="tab-btn">Infrastruktur</button>
-        <button onclick="switchTab('logistik')" id="btn-logistik" class="tab-btn">Logistik</button>
-    </div>
-
-    <!-- TAB: ABSENSI & KRITIS -->
-    <div id="tab-absensi" class="space-y-4">
-        <!-- Perhatian Khusus -->
-        <div class="card bg-red-50/50 border border-red-100">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="font-bold text-sm text-red-600 flex items-center gap-2"><i class="fa fa-exclamation-triangle"></i> Perhatian Khusus</h3>
-                <a href="/pengasuh/track-record" class="text-[10px] text-red-500 font-bold hover:underline">Lihat Semua Profil</a>
-            </div>
-            <div class="space-y-2">
-                @forelse($criticalSantri as $cs)
-                <div class="flex items-center gap-3 p-2 bg-white rounded-xl border border-red-100 shadow-sm">
-                    <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0"><i class="fa fa-user-times text-red-500 text-xs"></i></div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-[#1B2559] truncate">{{ $cs->nama }}</p>
-                        <p class="text-xs text-[#A3AED0] mb-0.5"><i class="fa fa-user-tie text-xs mr-1"></i>Kepala Kamar: {{ $cs->kepkam }}</p>
-                        <p class="text-[10px] text-red-500 font-medium">Alfa {{ $cs->total_alfa }}x bulan ini</p>
+    <!-- Menu Grid -->
+    @php
+        $menuGrid = [
+            ['label' => 'Absensi',        'icon' => 'fa-clipboard-list', 'bg' => 'bg-blue-50',    'fg' => 'text-blue-500',    'href' => '/pengasuh/absensi'],
+            ['label' => 'Perizinan',      'icon' => 'fa-hand-paper',     'bg' => 'bg-sky-50',     'fg' => 'text-sky-500',     'href' => '/pengasuh/perizinan'],
+            ['label' => 'Keuangan',       'icon' => 'fa-money-bill-wave','bg' => 'bg-orange-50',  'fg' => 'text-orange-500',  'href' => '/pengasuh/pembayaran'],
+            ['label' => 'Kesehatan',      'icon' => 'fa-heartbeat',      'bg' => 'bg-emerald-50', 'fg' => 'text-emerald-500', 'href' => '/pengasuh/kesehatan'],
+            ['label' => 'Infrastruktur',  'icon' => 'fa-hard-hat',       'bg' => 'bg-violet-50',  'fg' => 'text-violet-500',  'href' => '/pengasuh/infrastruktur'],
+            ['label' => 'Logistik',       'icon' => 'fa-truck',          'bg' => 'bg-cyan-50',    'fg' => 'text-cyan-500',    'href' => '/pengasuh/logistik'],
+            ['label' => 'Track Santri',   'icon' => 'fa-user-graduate',  'bg' => 'bg-teal-50',    'fg' => 'text-teal-500',    'href' => '/pengasuh/track-record?type=santri'],
+            ['label' => 'Track Pengurus', 'icon' => 'fa-user-tie',       'bg' => 'bg-rose-50',    'fg' => 'text-rose-500',    'href' => '/pengasuh/track-record?type=pengurus'],
+        ];
+    @endphp
+    <div class="card !p-4 md:!p-5">
+        <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-y-4 gap-x-2">
+            @foreach($menuGrid as $m)
+                <a href="{{ $m['href'] }}" class="flex flex-col items-center gap-1.5 group no-underline">
+                    <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl {{ $m['bg'] }} flex items-center justify-center transition-transform group-hover:scale-105 group-active:scale-95">
+                        <i class="fa {{ $m['icon'] }} {{ $m['fg'] }} text-lg md:text-xl"></i>
                     </div>
-                </div>
-                @empty
-                <div class="p-3 text-center text-xs text-[#A3AED0] bg-white rounded-xl border border-gray-100">Tidak ada santri kritis bulan ini.</div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Rekap Absensi Hari Ini -->
-        <div class="card">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="font-bold text-sm text-[#1B2559]">Rekap Absensi Hari Ini</h3>
-                <a href="/pengasuh/absensi" class="text-[10px] text-[#4318FF] font-bold hover:underline">Detail</a>
-            </div>
-            <div class="space-y-2">
-                @foreach($activityRecap as $act)
-                <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
-                    <span class="text-xs font-medium text-[#2B3674]">{{ $act['name'] }}</span>
-                    <div class="flex gap-1 text-[10px] font-bold">
-                        <span class="bg-green-100 text-green-600 px-1.5 py-0.5 rounded">H:{{ $act['H'] }}</span>
-                        <span class="bg-yellow-100 text-yellow-600 px-1.5 py-0.5 rounded">S:{{ $act['S'] }}</span>
-                        <span class="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">I:{{ $act['I'] }}</span>
-                        <span class="bg-red-100 text-red-600 px-1.5 py-0.5 rounded">A:{{ $act['A'] }}</span>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB: KEUANGAN (Coming Soon) -->
-    <div id="tab-keuangan" class="space-y-4 hidden">
-        <div class="card text-center py-12">
-            <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-300 text-3xl">
-                <i class="fa fa-money-bill-wave"></i>
-            </div>
-            <h3 class="text-sm md:text-lg font-bold text-[#1B2559] mb-1">Coming Soon</h3>
-            <p class="text-xs md:text-sm text-[#A3AED0]">Modul Keuangan / Pembayaran SPP sedang dalam pengembangan.</p>
-        </div>
-    </div>
-
-    <!-- TAB: PERIZINAN -->
-    <div id="tab-perizinan" class="space-y-4 hidden">
-        <div class="card bg-blue-50/50 border border-blue-100">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="font-bold text-sm text-blue-600 flex items-center gap-2"><i class="fa fa-hand-paper"></i> Menunggu & Terlambat</h3>
-                <a href="/pengasuh/perizinan" class="text-[10px] text-blue-500 font-bold hover:underline">Lihat Semua</a>
-            </div>
-            <div class="space-y-2">
-                {{-- Terlambat --}}
-                @foreach($perizinanTerlambat as $p)
-                <div class="p-2 bg-white rounded-xl shadow-sm border-l-2 border-red-500">
-                    <div class="flex justify-between items-start mb-1 gap-2">
-                        <p class="text-sm font-bold text-[#1B2559] truncate">{{ $p->santri->nama ?? $p->nis }}</p>
-                        <span class="bg-red-100 text-red-600 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase flex-shrink-0">Terlambat</span>
-                    </div>
-                    <p class="text-[10px] text-[#A3AED0] mb-1"><i class="fa fa-suitcase-rolling w-3 text-center"></i> {{ $p->jenis === 'P' ? 'Pulang' : 'Keluar' }} - {{ $p->alasanizin->nama ?? '-' }}</p>
-                    <p class="text-[10px] font-bold text-red-500"><i class="fa fa-clock w-3 text-center"></i> Seharusnya kembali {{ \Carbon\Carbon::parse($p->es_kembali)->format('d/m') }}</p>
-                </div>
-                @endforeach
-
-                {{-- Menunggu --}}
-                @foreach($perizinanMenunggu as $p)
-                <div class="p-2 bg-white rounded-xl shadow-sm border-l-2 border-yellow-500">
-                    <div class="flex justify-between items-start mb-1 gap-2">
-                        <p class="text-sm font-bold text-[#1B2559] truncate">{{ $p->santri->nama ?? $p->nis }}</p>
-                        <span class="bg-yellow-100 text-yellow-600 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase flex-shrink-0">Menunggu</span>
-                    </div>
-                    <p class="text-[10px] text-[#A3AED0] mb-1"><i class="fa fa-suitcase-rolling w-3 text-center"></i> {{ $p->jenis === 'P' ? 'Pulang' : 'Keluar' }} - {{ $p->alasanizin->nama ?? '-' }}</p>
-                    <p class="text-[10px] text-[#2B3674]"><i class="fa fa-calendar-alt w-3 text-center"></i> {{ \Carbon\Carbon::parse($p->berangkat)->format('d/m') }} s.d {{ \Carbon\Carbon::parse($p->es_kembali)->format('d/m') }}</p>
-                </div>
-                @endforeach
-
-                @if($perizinanMenunggu->isEmpty() && $perizinanTerlambat->isEmpty())
-                <div class="p-3 text-center text-xs text-[#A3AED0] bg-white rounded-xl border border-gray-100">Tidak ada perizinan menunggu atau terlambat.</div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB: KESEHATAN (Coming Soon) -->
-    <div id="tab-kesehatan" class="space-y-4 hidden">
-        <div class="card text-center py-12">
-            <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-300 text-3xl">
-                <i class="fa fa-heartbeat"></i>
-            </div>
-            <h3 class="text-sm md:text-lg font-bold text-[#1B2559] mb-1">Coming Soon</h3>
-            <p class="text-xs md:text-sm text-[#A3AED0]">Modul Kesehatan / IKS (Poskestren) sedang dalam pengembangan.</p>
-        </div>
-    </div>
-
-    <!-- TAB: INFRASTRUKTUR (Coming Soon) -->
-    <div id="tab-infrastruktur" class="space-y-4 hidden">
-        <div class="card text-center py-12">
-            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-300 text-3xl">
-                <i class="fa fa-building"></i>
-            </div>
-            <h3 class="text-sm md:text-lg font-bold text-[#1B2559] mb-1">Coming Soon</h3>
-            <p class="text-xs md:text-sm text-[#A3AED0]">Modul Infrastruktur / Pembangunan sedang dalam pengembangan.</p>
-        </div>
-    </div>
-
-    <!-- TAB: LOGISTIK (Coming Soon) -->
-    <div id="tab-logistik" class="space-y-4 hidden">
-        <div class="card text-center py-12">
-            <div class="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4 text-purple-300 text-3xl">
-                <i class="fa fa-truck"></i>
-            </div>
-            <h3 class="text-sm md:text-lg font-bold text-[#1B2559] mb-1">Coming Soon</h3>
-            <p class="text-xs md:text-sm text-[#A3AED0]">Modul Logistik / Distribusi sedang dalam pengembangan.</p>
+                    <span class="text-[10px] md:text-[11px] font-medium text-[#2B3674] text-center leading-tight">{{ $m['label'] }}</span>
+                </a>
+            @endforeach
         </div>
     </div>
 @endsection
-
-@push('scripts')
-<script>
-function switchTab(tab) {
-    document.querySelectorAll('[id^="tab-"]').forEach(el => {
-        if (el.id.startsWith('tab-')) el.classList.add('hidden');
-    });
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.remove('hidden');
-    document.getElementById('btn-' + tab).classList.add('active');
-}
-</script>
-@endpush

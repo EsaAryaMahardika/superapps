@@ -1,17 +1,29 @@
 @extends('pengasuh.layout')
 
-@section('title', 'Track Record Santri')
+@section('title', 'Track Record')
 @section('header')
     <h1 class="text-sm md:text-xl font-bold text-[#1B2559]">Profil & Track Record</h1>
 @endsection
 
 @section('content')
+    <!-- Toggle Tipe -->
+    <div class="flex bg-gray-100/80 p-1.5 rounded-xl gap-1 w-full sm:w-fit mb-4">
+        <button onclick="switchType('santri')" id="type-santri"
+            class="type-btn flex-1 sm:flex-none text-xs font-semibold px-4 py-2 rounded-lg transition-all bg-[#4318FF] text-white">
+            <i class="fa fa-user-graduate mr-1.5"></i>Santri
+        </button>
+        <button onclick="switchType('pengurus')" id="type-pengurus"
+            class="type-btn flex-1 sm:flex-none text-xs font-semibold px-4 py-2 rounded-lg transition-all bg-white text-[#2B3674] border border-transparent">
+            <i class="fa fa-user-tie mr-1.5"></i>Pengurus
+        </button>
+    </div>
+
     <!-- Search -->
     <div class="relative z-20 mb-6">
         <div class="flex gap-2">
             <div class="flex-1 relative">
                 <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input type="text" id="searchSantri" placeholder="Cari santri berdasarkan nama atau NIS..."
+                <input type="text" id="searchSantri" placeholder="Cari berdasarkan nama atau NIS..."
                     class="w-full bg-white border border-gray-100 text-gray-600 text-sm rounded-xl h-12 pl-10 pr-4 focus:ring-2 focus:ring-[#4318FF] focus:outline-none shadow-sm">
             </div>
         </div>
@@ -19,7 +31,7 @@
         <div id="searchResults" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl max-h-60 overflow-y-auto shadow-xl z-30"></div>
     </div>
 
-    <!-- Profile Section (Hidden initially) -->
+    <!-- Profile Section: SANTRI (Hidden initially) -->
     <div id="profileSection" class="hidden space-y-4 md:space-y-6">
         <!-- Identitas & Ringkasan -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -107,12 +119,79 @@
         </div>
     </div>
 
+    <!-- Profile Section: PENGURUS (Hidden initially) -->
+    <div id="profileSectionPengurus" class="hidden space-y-4 md:space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            <!-- Kartu Identitas -->
+            <div class="card md:col-span-1">
+                <div class="flex items-center gap-4 border-b border-gray-100 pb-4">
+                    <div class="w-16 h-16 md:w-24 md:h-24 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-2xl md:text-3xl shrink-0">
+                        <i class="fa fa-user-tie"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg md:text-xl font-bold text-[#1B2559]" id="pgNama">Nama Pengurus</h3>
+                        <p class="text-[#A3AED0] text-xs md:text-sm" id="pgNis">NIS: -</p>
+                        <span class="inline-block mt-1 text-[9px] font-bold uppercase px-2 py-0.5 rounded-full" id="pgAsalBadge">-</span>
+                    </div>
+                </div>
+                <div class="pt-4 space-y-2">
+                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
+                        <span class="text-[10px] text-[#A3AED0]">Jabatan</span>
+                        <span class="text-xs font-bold text-[#1B2559]" id="pgJabatan">-</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
+                        <span class="text-[10px] text-[#A3AED0]">Divisi</span>
+                        <span class="text-xs font-bold text-[#1B2559]" id="pgDivisi">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistik Grid -->
+            <div class="card md:col-span-2">
+                <h3 class="font-bold text-sm md:text-lg text-[#1B2559] mb-3">Ringkasan Absensi Kegiatan</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4">
+                    <div class="bg-green-50 p-3 rounded-xl text-center border border-green-100">
+                        <p class="text-xl md:text-2xl font-bold text-green-600" id="pgHadir">0</p>
+                        <p class="text-[9px] md:text-xs text-[#A3AED0] mt-1 font-bold uppercase">Hadir</p>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded-xl text-center border border-yellow-100">
+                        <p class="text-xl md:text-2xl font-bold text-yellow-600" id="pgSakit">0</p>
+                        <p class="text-[9px] md:text-xs text-[#A3AED0] mt-1 font-bold uppercase">Sakit</p>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-xl text-center border border-blue-100">
+                        <p class="text-xl md:text-2xl font-bold text-blue-600" id="pgIzin">0</p>
+                        <p class="text-[9px] md:text-xs text-[#A3AED0] mt-1 font-bold uppercase">Izin</p>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-xl text-center border border-red-100">
+                        <p class="text-xl md:text-2xl font-bold text-red-600" id="pgAlfa">0</p>
+                        <p class="text-[9px] md:text-xs text-[#A3AED0] mt-1 font-bold uppercase">Alfa</p>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <div class="flex justify-between items-end mb-1">
+                        <h4 class="font-bold text-[10px] md:text-sm text-[#1B2559]">Kehadiran</h4>
+                        <p class="text-[10px] md:text-xs font-bold text-green-500" id="pgTxtKehadiran">0%</p>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" id="pgBarKehadiran" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Riwayat Absensi -->
+        <div class="card">
+            <h3 class="font-bold text-sm md:text-lg text-[#1B2559] mb-3">Riwayat Absensi Terakhir</h3>
+            <div class="space-y-2" id="pgRiwayat"></div>
+        </div>
+    </div>
+
     <!-- Empty State -->
     <div id="emptyState" class="card text-center py-12 md:py-24 mt-4">
         <div class="w-16 h-16 md:w-20 md:h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300 text-3xl md:text-4xl">
             <i class="fa fa-search"></i>
         </div>
-        <h3 class="text-sm md:text-lg font-bold text-[#1B2559] mb-1">Cari Profil Santri</h3>
+        <h3 class="text-sm md:text-lg font-bold text-[#1B2559] mb-1" id="emptyTitle">Cari Profil Santri</h3>
         <p class="text-xs md:text-sm text-[#A3AED0]">Ketik nama atau NIS untuk melihat track record detail.</p>
     </div>
 @endsection
@@ -122,6 +201,30 @@
 const searchInput = document.getElementById('searchSantri');
 const resultsDiv = document.getElementById('searchResults');
 let debounceTimer;
+let currentType = 'santri';
+
+function switchType(type) {
+    currentType = type;
+
+    document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.classList.remove('bg-[#4318FF]', 'text-white');
+        btn.classList.add('bg-white', 'text-[#2B3674]', 'border', 'border-gray-200');
+    });
+    const activeBtn = document.getElementById('type-' + type);
+    activeBtn.classList.remove('bg-white', 'text-[#2B3674]', 'border', 'border-gray-200');
+    activeBtn.classList.add('bg-[#4318FF]', 'text-white');
+
+    searchInput.placeholder = type === 'santri'
+        ? 'Cari santri berdasarkan nama atau NIS...'
+        : 'Cari pengurus berdasarkan nama atau NIS...';
+    document.getElementById('emptyTitle').textContent = type === 'santri' ? 'Cari Profil Santri' : 'Cari Profil Pengurus';
+
+    searchInput.value = '';
+    resultsDiv.classList.add('hidden');
+    document.getElementById('profileSection').classList.add('hidden');
+    document.getElementById('profileSectionPengurus').classList.add('hidden');
+    document.getElementById('emptyState').classList.remove('hidden');
+}
 
 searchInput.addEventListener('input', function() {
     clearTimeout(debounceTimer);
@@ -131,29 +234,90 @@ searchInput.addEventListener('input', function() {
             resultsDiv.classList.add('hidden');
             return;
         }
-        fetch(`/pengasuh/api/search-santri?q=${encodeURIComponent(query)}`)
+        const endpoint = currentType === 'santri' ? '/pengasuh/api/search-santri' : '/pengasuh/api/search-pengurus';
+        fetch(`${endpoint}?q=${encodeURIComponent(query)}`)
             .then(r => r.json())
             .then(data => {
                 resultsDiv.innerHTML = '';
                 if (data.length > 0) {
                     data.forEach(s => {
+                        const sub = currentType === 'santri'
+                            ? `NIS: ${s.nis}`
+                            : `NIS: ${s.nis} · ${s.jabatan} · <span class="uppercase font-bold ${s.asal === 'luar' ? 'text-amber-500' : 'text-green-500'}">${s.asal}</span>`;
+                        const onclickFn = currentType === 'santri' ? `showProfile('${s.nis}')` : `showPengurusProfile('${s.nis}')`;
+                        const icon = currentType === 'santri' ? 'fa-user' : 'fa-user-tie';
                         resultsDiv.innerHTML += `
-                            <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0 flex items-center gap-3" onclick="showProfile('${s.nis}')">
-                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fa fa-user text-xs"></i></div>
+                            <div class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0 flex items-center gap-3" onclick="${onclickFn}">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><i class="fa ${icon} text-xs"></i></div>
                                 <div>
                                     <p class="font-bold text-[#1B2559] text-xs md:text-sm">${s.nama}</p>
-                                    <p class="text-[10px] text-[#A3AED0]">NIS: ${s.nis}</p>
+                                    <p class="text-[10px] text-[#A3AED0]">${sub}</p>
                                 </div>
                             </div>`;
                     });
                     resultsDiv.classList.remove('hidden');
                 } else {
-                    resultsDiv.innerHTML = '<div class="p-4 text-center text-xs text-[#A3AED0]">Santri tidak ditemukan</div>';
+                    resultsDiv.innerHTML = `<div class="p-4 text-center text-xs text-[#A3AED0]">${currentType === 'santri' ? 'Santri' : 'Pengurus'} tidak ditemukan</div>`;
                     resultsDiv.classList.remove('hidden');
                 }
             });
     }, 300);
 });
+
+function showPengurusProfile(nis) {
+    resultsDiv.classList.add('hidden');
+    searchInput.value = '';
+
+    fetch(`/pengasuh/api/pengurus/${nis}`)
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('profileSection').classList.add('hidden');
+            document.getElementById('profileSectionPengurus').classList.remove('hidden');
+
+            document.getElementById('pgNama').textContent = data.nama;
+            document.getElementById('pgNis').textContent = `NIS: ${data.nis}`;
+            document.getElementById('pgJabatan').textContent = data.jabatan;
+            document.getElementById('pgDivisi').textContent = data.divisi;
+
+            const badge = document.getElementById('pgAsalBadge');
+            badge.textContent = data.asal === 'luar' ? 'Pengurus Luar' : 'Pengurus Dalam';
+            badge.className = `inline-block mt-1 text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${data.asal === 'luar' ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'}`;
+
+            document.getElementById('pgHadir').textContent = data.stats.hadir;
+            document.getElementById('pgSakit').textContent = data.stats.sakit;
+            document.getElementById('pgIzin').textContent = data.stats.izin;
+            document.getElementById('pgAlfa').textContent = data.stats.alfa;
+
+            const bar = document.getElementById('pgBarKehadiran');
+            bar.style.width = `${data.stats.kehadiran}%`;
+            bar.className = `h-2 rounded-full ${data.stats.kehadiran >= 90 ? 'bg-green-500' : data.stats.kehadiran >= 75 ? 'bg-yellow-500' : 'bg-red-500'}`;
+
+            const txt = document.getElementById('pgTxtKehadiran');
+            txt.textContent = `${data.stats.kehadiran}%`;
+            txt.className = `text-[10px] md:text-xs font-bold ${data.stats.kehadiran >= 90 ? 'text-green-500' : data.stats.kehadiran >= 75 ? 'text-yellow-500' : 'text-red-500'}`;
+
+            const listR = document.getElementById('pgRiwayat');
+            listR.innerHTML = '';
+            const statusLabel = { H: 'Hadir', S: 'Sakit', I: 'Izin', A: 'Alfa' };
+            const statusColor = { H: 'green', S: 'yellow', I: 'blue', A: 'red' };
+            if (data.riwayat.length > 0) {
+                data.riwayat.forEach(r => {
+                    const c = statusColor[r.status] || 'gray';
+                    listR.innerHTML += `
+                        <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl">
+                            <div>
+                                <p class="text-xs md:text-sm font-bold text-[#1B2559]">${r.kegiatan}</p>
+                                <p class="text-[10px] text-[#A3AED0]">${r.tanggal}</p>
+                            </div>
+                            <span class="bg-${c}-100 text-${c}-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase">${statusLabel[r.status] || r.status}</span>
+                        </div>`;
+                });
+            } else {
+                listR.innerHTML = '<div class="p-3 text-center text-xs text-[#A3AED0] bg-white rounded-xl border border-gray-100">Belum ada riwayat absensi.</div>';
+            }
+        });
+}
 
 function showProfile(nis) {
     resultsDiv.classList.add('hidden');
@@ -163,6 +327,7 @@ function showProfile(nis) {
         .then(r => r.json())
         .then(data => {
             document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('profileSectionPengurus').classList.add('hidden');
             document.getElementById('profileSection').classList.remove('hidden');
 
             document.getElementById('profNama').textContent = data.nama;
@@ -214,6 +379,19 @@ function showProfile(nis) {
 document.addEventListener('click', function(e) {
     if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
         resultsDiv.classList.add('hidden');
+    }
+});
+
+// Deep-link dari fitur pencarian di dashboard: ?type=santri|pengurus&nis=...
+document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type') || 'santri';
+    const nis  = params.get('nis');
+
+    if (type === 'pengurus') switchType('pengurus');
+
+    if (nis) {
+        type === 'pengurus' ? showPengurusProfile(nis) : showProfile(nis);
     }
 });
 </script>

@@ -48,13 +48,33 @@
                 <li class="{{ request()->is('pengasuh') ? 'active' : '' }}"><a href="/pengasuh"><i class="fa fa-home"></i><span>Dashboard</span></a></li>
                 <li class="{{ request()->is('pengasuh/absensi') ? 'active' : '' }}"><a href="/pengasuh/absensi"><i class="fa fa-clipboard-list"></i><span>Rekap Absensi</span></a></li>
                 <li class="{{ request()->is('pengasuh/pembayaran') ? 'active' : '' }}"><a href="/pengasuh/pembayaran"><i class="fa fa-money-bill-wave"></i><span>Pembayaran</span></a></li>
-                <li class="{{ request()->is('pengasuh/perizinan') ? 'active' : '' }}"><a href="/pengasuh/perizinan"><i class="fa fa-hand-paper"></i><span>Perizinan</span></a></li>
-                <li class="{{ request()->is('pengasuh/track-record') ? 'active' : '' }}"><a href="/pengasuh/track-record"><i class="fa fa-user-clock"></i><span>Track Record Santri</span></a></li>
+                <li class="{{ request()->is('pengasuh/perizinan') ? 'active' : '' }}">
+                    <a href="/pengasuh/perizinan">
+                        <i class="fa fa-hand-paper"></i><span>Perizinan</span>
+                        @if(($perizinanMenungguCount ?? 0) > 0)
+                            <span class="ml-auto bg-[#EE5D50] text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center">
+                                {{ $perizinanMenungguCount > 99 ? '99+' : $perizinanMenungguCount }}
+                            </span>
+                        @endif
+                    </a>
+                </li>
+                <li class="{{ request()->is('pengasuh/kesehatan') ? 'active' : '' }}"><a href="/pengasuh/kesehatan"><i class="fa fa-heartbeat"></i><span>Kesehatan</span></a></li>
+                <li class="{{ request()->is('pengasuh/infrastruktur') ? 'active' : '' }}"><a href="/pengasuh/infrastruktur"><i class="fa fa-hard-hat"></i><span>Infrastruktur</span></a></li>
+                <li class="{{ request()->is('pengasuh/logistik') ? 'active' : '' }}"><a href="/pengasuh/logistik"><i class="fa fa-truck"></i><span>Logistik</span></a></li>
+                <li class="{{ request()->is('pengasuh/track-record') ? 'active' : '' }}"><a href="/pengasuh/track-record"><i class="fa fa-user-clock"></i><span>Track Record</span></a></li>
             </ul>
-            <div class="mt-8 px-8 mb-8">
+            <div class="mt-8 px-8 mb-8 space-y-3">
+                <button type="button" onclick="openSearch()"
+                    class="flex items-center text-[#A3AED0] hover:text-white font-medium transition-colors"
+                    style="background:none;border:none;cursor:pointer;padding:0;">
+                    <i class="fa fa-search mr-3"></i><span>Cari</span>
+                </button>
+                <a href="/profil" class="flex items-center text-[#A3AED0] hover:text-white font-medium transition-colors no-underline">
+                    <i class="fa fa-user-circle mr-3"></i><span>Profil Saya</span>
+                </a>
                 <form action="/logout" method="POST">
                     @csrf
-                    <button type="submit" class="flex items-center text-[#A3AED0] hover:text-white font-medium transition-colors">
+                    <button type="submit" class="flex items-center text-[#EE5D50] hover:text-[#D43F33] font-medium transition-colors" style="background:none;border:none;cursor:pointer;padding:0;">
                         <i class="fa fa-sign-out-alt mr-3"></i><span>Logout</span>
                     </button>
                 </form>
@@ -63,21 +83,17 @@
     </aside>
 
     <!-- Mobile Bottom Navigation -->
+    {{-- Sengaja hanya 4 slot: daftar menu lengkap sudah ada di grid dashboard,
+         jadi navbar diisi hal yang dibutuhkan dari halaman mana pun. --}}
     <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 h-16 z-50 flex justify-around items-center px-2 pb-safe">
         <a href="/pengasuh" class="bottom-nav-item {{ request()->is('pengasuh') ? 'active' : '' }}">
-            <i class="fa fa-home"></i><span>Utama</span>
+            <i class="fa fa-home"></i><span>Beranda</span>
         </a>
-        <a href="/pengasuh/absensi" class="bottom-nav-item {{ request()->is('pengasuh/absensi') ? 'active' : '' }}">
-            <i class="fa fa-clipboard-list"></i><span>Absen</span>
-        </a>
-        <a href="/pengasuh/pembayaran" class="bottom-nav-item {{ request()->is('pengasuh/pembayaran') ? 'active' : '' }}">
-            <i class="fa fa-money-bill-wave"></i><span>Bayar</span>
-        </a>
-        <a href="/pengasuh/perizinan" class="bottom-nav-item {{ request()->is('pengasuh/perizinan') ? 'active' : '' }}">
-            <i class="fa fa-hand-paper"></i><span>Izin</span>
-        </a>
-        <a href="/pengasuh/track-record" class="bottom-nav-item {{ request()->is('pengasuh/track-record') ? 'active' : '' }}">
-            <i class="fa fa-user-clock"></i><span>Profil</span>
+        <button type="button" onclick="openSearch()" class="bottom-nav-item" style="background:none;border:none;cursor:pointer;">
+            <i class="fa fa-search"></i><span>Cari</span>
+        </button>
+        <a href="/profil" class="bottom-nav-item {{ request()->is('profil') ? 'active' : '' }}">
+            <i class="fa fa-user-circle"></i><span>Profil</span>
         </a>
     </nav>
 
@@ -116,6 +132,8 @@
             <div class="h-6 md:h-0"></div>
         </div>
     </main>
+
+    @include('pengasuh._search')
 
     @stack('scripts')
 </body>
